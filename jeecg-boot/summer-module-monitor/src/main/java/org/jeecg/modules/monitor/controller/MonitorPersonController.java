@@ -152,4 +152,14 @@ public class MonitorPersonController extends JeecgController<MonitorPerson, IMon
         return super.importExcel(request, response, MonitorPerson.class);
     }
 
+
+	 /**
+	  * 获取本日查询
+	  * @return
+	  */
+	 @GetMapping(value = "/getTodayStat")
+	 public Result<?> getTodayStat() {
+		Map<String,Object> resMap= monitorPersonService.getTodayStat();
+		 return Result.ok(resMap);
+	 }
 }

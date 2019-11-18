@@ -12,5 +12,5 @@ import java.util.Map;
  * @Version: V1.0
  */
 public interface IMonitorPersonService extends IService<MonitorPerson> {
-    public Map<String,Object> getCurrentDayStat();
+    public Map<String,Object> getTodayStat();
 }

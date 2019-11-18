@@ -21,5 +21,5 @@ public interface MonitorPersonMapper extends BaseMapper<MonitorPerson> {
      * @return
      */
     @Select(" SELECT COUNT(*) AS totalCount,SUM( CASE  WHEN `out_in_type` ='0' THEN 1 ELSE 0 END ) AS inCount ,SUM( CASE  WHEN `out_in_type` ='1' THEN 1 ELSE 0 END ) AS outCount,SUM( CASE  WHEN `person_type` ='0' THEN 1 ELSE 0 END ) AS djCount ,SUM( CASE  WHEN `person_type` ='1' THEN 1 ELSE 0 END ) AS wdjCount  FROM `monitor_person`  where DATE_FORMAT(`out_in_time` , '%Y-%m-%d')  =DATE_FORMAT(NOW() , '%Y-%m-%d')")
-     Map<String,Object> getCurrentDayStat();
+     Map<String,Object> getTodayStat();
 }

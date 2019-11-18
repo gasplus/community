@@ -23,7 +23,7 @@ public class MonitorPersonServiceImpl  extends ServiceImpl<MonitorPersonMapper, 
     private MonitorPersonMapper monitorPersonMapper;
 
     @Override
-    public Map<String, Object> getCurrentDayStat() {
-        return monitorPersonMapper.getCurrentDayStat();
+    public Map<String, Object> getTodayStat() {
+        return monitorPersonMapper.getTodayStat();
     }
 }
