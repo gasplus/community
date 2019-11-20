@@ -2,6 +2,7 @@ package org.jeecg.modules.monitor.service;
 
 import org.jeecg.modules.monitor.entity.MonitorCar;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.jeecg.modules.monitor.entity.MonitorStat;
 
 /**
  * @Description: monitor_car
@@ -10,5 +11,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  * @Version: V1.0
  */
 public interface IMonitorCarService extends IService<MonitorCar> {
-
+    public MonitorStat getTodayStat();
 }

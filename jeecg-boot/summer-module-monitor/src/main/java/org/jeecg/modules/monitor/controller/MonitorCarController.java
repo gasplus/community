@@ -9,10 +9,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import io.swagger.annotations.ApiOperation;
 import org.jeecg.common.api.vo.Result;
+import org.jeecg.common.constant.CommonConstant;
 import org.jeecg.common.system.query.QueryGenerator;
 import org.jeecg.common.util.oConvertUtils;
 import org.jeecg.modules.monitor.entity.MonitorCar;
+import org.jeecg.modules.monitor.entity.MonitorStat;
 import org.jeecg.modules.monitor.service.IMonitorCarService;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -152,4 +156,15 @@ public class MonitorCarController extends JeecgController<MonitorCar, IMonitorCa
         return super.importExcel(request, response, MonitorCar.class);
     }
 
+	 /**
+	  * 获取本日查询
+	  * @return
+	  */
+	 @ApiOperation(value="获取本日查询统计", notes="获取本日查询统计" )
+	 @GetMapping(value = "/getTodayStat")
+	 public Result<MonitorStat> getTodayStat() {
+		 MonitorStat monitorStat= monitorCarService.getTodayStat();
+		 Result r=new Result(true, CommonConstant.SC_OK_200,monitorStat);
+		 return r;
+	 }
 }

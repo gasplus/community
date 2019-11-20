@@ -1,8 +1,10 @@
 package org.jeecg.modules.monitor.service.impl;
 
 import org.jeecg.modules.monitor.entity.MonitorCar;
+import org.jeecg.modules.monitor.entity.MonitorStat;
 import org.jeecg.modules.monitor.mapper.MonitorCarMapper;
 import org.jeecg.modules.monitor.service.IMonitorCarService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -16,4 +18,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 @Service
 public class MonitorCarServiceImpl extends ServiceImpl<MonitorCarMapper, MonitorCar> implements IMonitorCarService {
 
+    @Autowired
+    private  MonitorCarMapper monitorCarMapper;
+    @Override
+    public MonitorStat getTodayStat() {
+        return monitorCarMapper.getTodayStat();
+    }
 }

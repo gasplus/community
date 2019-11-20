@@ -3,6 +3,7 @@ package org.jeecg.modules.monitor.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.jeecg.modules.monitor.entity.MonitorPerson;
+import org.jeecg.modules.monitor.entity.MonitorStat;
 import org.jeecg.modules.monitor.mapper.MonitorPersonMapper;
 import org.jeecg.modules.monitor.service.IMonitorPersonService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class MonitorPersonServiceImpl  extends ServiceImpl<MonitorPersonMapper, 
     private MonitorPersonMapper monitorPersonMapper;
 
     @Override
-    public Map<String, Object> getTodayStat() {
+    public MonitorStat getTodayStat() {
         return monitorPersonMapper.getTodayStat();
     }
 }
