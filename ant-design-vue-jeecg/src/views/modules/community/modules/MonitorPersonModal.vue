@@ -44,7 +44,7 @@
           <a-input v-decorator="[ 'louDongHao', validatorRules.louDongHao]" placeholder="请输入楼栋号"></a-input>
         </a-form-item>
         <a-form-item label="民族" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['hu_mz']" :trigger-change="true" dictCode="" placeholder="请选择民族"/>
+          <j-dict-select-tag type="list" v-decorator="['minZu']" :trigger-change="true" dictCode="hu_mz" placeholder="请选择民族"/>
         </a-form-item>
         <a-form-item label="街路巷" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'jieLuXiang', validatorRules.jieLuXiang]" placeholder="请输入街路巷"></a-input>

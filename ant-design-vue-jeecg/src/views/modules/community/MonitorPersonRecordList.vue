@@ -13,7 +13,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('车辆信息')">导出</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('人员监控信息')">导出</a-button>
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
@@ -84,24 +84,25 @@
       </a-table>
     </div>
 
-    <monitorCar-modal ref="modalForm" @ok="modalFormOk"></monitorCar-modal>
+    <monitorPersonRecord-modal ref="modalForm" @ok="modalFormOk"></monitorPersonRecord-modal>
   </a-card>
 </template>
 
 <script>
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import MonitorCarModal from './modules/MonitorCarModal'
+  import MonitorPersonRecordModal from './modules/MonitorPersonRecordModal'
+  import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
-    name: "MonitorCarList",
+    name: "MonitorPersonRecordList",
     mixins:[JeecgListMixin],
     components: {
-      MonitorCarModal
+      MonitorPersonRecordModal
     },
     data () {
       return {
-        description: '车辆信息管理页面',
+        description: '人员监控信息管理页面',
         // 表头
         columns: [
           {
@@ -115,19 +116,54 @@
             }
           },
           {
-            title:'车牌号',
-            align:"center",
-            dataIndex: 'carNumber'
-          },
-          {
-            title:'姓名',
+            title:'人员姓名',
             align:"center",
             dataIndex: 'personName'
           },
           {
             title:'身份证',
             align:"center",
-            dataIndex: 'personCardId'
+            dataIndex: 'personIdCard'
+          },
+          {
+            title:'进入类型',
+            align:"center",
+            dataIndex: 'outInType',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['outInType'], text+"")
+              }
+            }
+          },
+          {
+            title:'进出时间',
+            align:"center",
+            dataIndex: 'outInTime'
+          },
+          {
+            title:'人员类型',
+            align:"center",
+            dataIndex: 'personType',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['personType'], text+"")
+              }
+            }
+          },
+          {
+            title:'图片地址',
+            align:"center",
+            dataIndex: 'photoUrl',
+            scopedSlots: {customRender: 'imgSlot'}
+          },
+          {
+            title:'进出地址',
+            align:"center",
+            dataIndex: 'address'
           },
           {
             title: '操作',
@@ -137,13 +173,15 @@
           }
         ],
         url: {
-          list: "/monitor/monitorCar/list",
-          delete: "/monitor/monitorCar/delete",
-          deleteBatch: "/monitor/monitorCar/deleteBatch",
-          exportXlsUrl: "/monitor/monitorCar/exportXls",
-          importExcelUrl: "monitor/monitorCar/importExcel",
+          list: "/monitor/monitorPersonRecord/list",
+          delete: "/monitor/monitorPersonRecord/delete",
+          deleteBatch: "/monitor/monitorPersonRecord/deleteBatch",
+          exportXlsUrl: "/monitor/monitorPersonRecord/exportXls",
+          importExcelUrl: "monitor/monitorPersonRecord/importExcel",
         },
         dictOptions:{
+         outInType:[],
+         personType:[],
         },
       }
     },
@@ -154,6 +192,16 @@
     },
     methods: {
       initDictConfig(){
+        initDictOptions('out_in_type').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'outInType', res.result)
+          }
+        })
+        initDictOptions('person_type').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'personType', res.result)
+          }
+        })
       }
        
     }
