@@ -6,6 +6,7 @@ import { UserLayout, TabLayout, RouteView, BlankLayout, PageView } from '@/compo
  */
 export const asyncRouterMap = [
 
+
   {
     path: '/',
     name: 'dashboard',
@@ -13,7 +14,6 @@ export const asyncRouterMap = [
     meta: { title: '首页' },
     redirect: '/dashboard/workplace',
     children: [
-
       // // dashboard
       // {
       //   path: '/dashboard',
@@ -294,6 +294,12 @@ export const asyncRouterMap = [
  * @type { *[] }
  */
 export const constantRouterMap = [
+  {
+    path: '/bigHome',
+    name: 'bigHome',
+    component: () => import('@/views/big/home'),
+    meta: { title: '大屏', keepAlive: true }
+  },
   {
     path: '/user',
     component: UserLayout,
