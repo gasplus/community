@@ -1,4 +1,5 @@
 import { axios } from '@/utils/request'
+//http://139.129.89.115:9080/jeecg-boot/接口地址
 
 const api = {
   personMonitorList: '/monitor/monitorPersonRecord/list',
