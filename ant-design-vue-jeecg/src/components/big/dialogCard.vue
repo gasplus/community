@@ -1,5 +1,5 @@
 <template>
-  <div class="card1" :style="'left:'+position.left+';top:'+position.top">
+  <div class="card1" :style="'left:'+position.left+';top:'+position.top" @mouseleave="leave">
     <div class="card1_bg">
       <div class="card1_bg_l_t"></div>
       <div class="card1_bg_l_c"></div>
@@ -13,38 +13,21 @@
     </div>
     <div class="card1_body">
       <div class="dialog_top_info">
-        <div class="dialog_top_info_left">当前目标：<b>18栋</b>（50人）</div>
+        <div class="dialog_top_info_left"><b>{{loudongData.ld}}栋</b>（{{loudongData.totalCount||0}}人）</div>
         <div class="dialog_top_info_right">
-          <div class="shangfang">上访人数：1人</div>
-          <div class="gudu">孤独老人：1人</div>
+          <div class="shangfang">正常：{{loudongData.zcCount||0}}人</div>
+          <div class="children">留守儿童：{{loudongData.childrenCount||0}}人</div>
+          <div class="keyPerson">重点人员：{{loudongData.keyPersonCount||0}}人</div>
+          <div class="gudu">孤独老人：{{loudongData.oldPersonCount||0}}人</div>
         </div>
       </div>
       <div class="dialog_danyuan_box">
         <div class="dialog_danyuan_line"></div>
         <div class="dialog_danyuan_body">
           <div class="dialog_danyuan_body_line"></div>
-          <div class="dialog_danyuan_item active">
-            一单元
+          <div :class="'dialog_danyuan_item '+(currentIndex===index?'active':'')" v-for="(item,index) in loudongData.danYuan"  @click="changeDY(index)">
+            {{danyuanMap[item.danYuanHao]}}单元
           </div>
-          <div class="dialog_danyuan_item">
-            二单元
-          </div>
-          <div class="dialog_danyuan_item">
-            三单元
-          </div>
-          <div class="dialog_danyuan_item">
-            四单元
-          </div>
-          <div class="dialog_danyuan_item">
-            五单元
-          </div>
-
-          <!--                <div class="dialog_danyuan_item">-->
-          <!--                    六单元-->
-          <!--                </div>-->
-          <!--                <div class="dialog_danyuan_item">-->
-          <!--                    七单元-->
-          <!--                </div>-->
         </div>
       </div>
       <div class="card2">
@@ -60,398 +43,17 @@
           <div class="card2_bg_c"></div>
         </div>
         <div class="card2_body">
-          <div class="room_list">
-            <div class="room_item">
+          <div class="room_list" v-if="currentIndex!==undefined">
+            <div class="room_item" v-for="item in loudongData.danYuan[currentIndex].fangJian">
               <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
+                <div class="room_item_type_name">{{item.Type==='0'?'常住':'其它'}}</div>
                 <div class="room_item_type_r"></div>
                 <div class="room_item_type_b"></div>
               </div>
               <div class="room_item_title">
-                101室
+                {{item.fangJianHao}}室
               </div>
             </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-            <div class="room_item">
-              <div class="room_item_type">
-                <div class="room_item_type_name">合租</div>
-                <div class="room_item_type_r"></div>
-                <div class="room_item_type_b"></div>
-              </div>
-              <div class="room_item_title">
-                101室
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -462,7 +64,52 @@
 <script>
     export default {
         name: "dialogCard",
-        props:['position']
+        props:['position'],
+        data() {
+          return {
+            loudongData: {
+              ld: '',
+              childrenCount: 0,
+              danYuan: [],
+              keyPersonCount: 0,
+              oldPersonCount:0,
+              totalCount: 0,
+              zcCount: 0
+            },
+            currentIndex: undefined,
+            danyuanMap: {
+              1: '一',
+              2: '二',
+              3: '三',
+              4: '四',
+              5: '五',
+              6: '六',
+              7: '七',
+              8: '八',
+              9: '九',
+              10: '十'
+            }
+          }
+        },
+        methods: {
+          changeDY(index) {
+            this.currentIndex = index;
+          },
+          setLouDongData(data) {
+            for(let key in data) {
+              this.loudongData[key] = data[key];
+            }
+            if(this.loudongData.danYuan && this.loudongData.danYuan.length > 0) {
+              this.currentIndex = 0;
+            } else {
+              this.currentIndex = undefined;
+            }
+            console.log(this.currentIndex)
+          },
+          leave() {
+            this.$emit('leave')
+          }
+        }
     }
 </script>
 
@@ -476,6 +123,8 @@
     top:0;
     width:650px;
     min-height:420px;
+    /*margin-top:-210px;*/
+    /*margin-left:-325px;*/
     z-index: 3;
   }
   .card1_bg{
@@ -759,17 +408,37 @@
     font-size:14px;
   }
   .shangfang{
-    padding-left:24px;
-    margin-left:20px;
+    padding-left:20px;
+    margin-left:10px;
     float:left;
     background-image: url("~@/assets/images/dialog_person.png");
     background-position:0 center;
     background-size:16px 16px;
     background-repeat: no-repeat;
   }
+
+  .children{
+    padding-left:20px;
+    margin-left:10px;
+    float:left;
+    background-image: url("~@/assets/images/dialog_children.png");
+    background-position:0 center;
+    background-size:16px 16px;
+    background-repeat: no-repeat;
+  }
+
+  .keyPerson{
+    padding-left:20px;
+    margin-left:10px;
+    float:left;
+    background-image: url("~@/assets/images/dialog_key_person.png");
+    background-position:0 center;
+    background-size:16px 16px;
+    background-repeat: no-repeat;
+  }
   .gudu{
-    padding-left:24px;
-    margin-left:20px;
+    padding-left:20px;
+    margin-left:10px;
     float:left;
     background-image: url("~@/assets/images/dialog_old_person.png");
     background-position:0 center;
@@ -813,8 +482,12 @@
     padding-left:37px;
     text-align: center;
   }
-  .dialog_danyuan_item.active{
+  .dialog_danyuan_item.active,.dialog_danyuan_item:hover{
     background: url("~@/assets/images/dialog_card_left_item_active.png") 0 0 no-repeat;
+    cursor: pointer;
+  }
+  .dialog_danyuan_item:hover{
+    opacity: 0.8;
   }
   .room_list{
     position:relative;
