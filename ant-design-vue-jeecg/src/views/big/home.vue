@@ -1,13 +1,11 @@
 <template>
   <div id="big_home">
     <div class="home_head">
-      <div class="home_head_title">成龙崮社区治安态势智慧感知中心</div>
+      <div class="home_head_title">龙崮社区治安态势智慧感知中心</div>
       <div class="home_head_info">
-        <div class="home_head_info_item">09:35:26</div>
-        <div class="home_head_info_item">2019-10-19</div>
-        <div class="home_head_info_item">星期一</div>
-        <div class="home_head_info_item">多云转晴</div>
-        <div class="home_head_info_item">8-13℃</div>
+        <div class="home_head_info_item">{{dateData.getFullYear()}}-{{dateData.getMonth()+1}}-{{dateData.getDate()}}</div>
+        <div class="home_head_info_item">{{dateData.getHours()}}:{{dateData.getMinutes()}}:{{dateData.getSeconds()}}</div>
+        <div class="home_head_info_item">星期{{weekMap[dateData.getDay()]}}</div>
       </div>
     </div>
     <div class="home_l_t">
@@ -15,85 +13,48 @@
         <div class="home_common_title_info">今日人员进出统计</div>
       </div>
       <div class="home_common_number_box">
-        <div class="home_common_number_title">进入人次</div>
+        <div class="home_common_number_title">总次数</div>
         <div class="home_common_number_count">
-          <div class="count"><span class="count_1"></span></div>
-          <div class="count"><span class="count_4"></span></div>
-          <div class="count"><span class="count_6"></span></div>
-          <div class="count"><span class="count_0"></span></div>
+          <div class="count" v-for="(item,index) in userToday.totalCount" :key="index"><span :class="'count_'+item"></span></div>
         </div>
       </div>
 
       <div class="home_common_number_box">
-        <div class="home_common_number_title">外出人次</div>
+        <div class="home_common_number_title"></div>
         <div class="home_common_number_count">
-          <div class="count"><span class="count_1"></span></div>
-          <div class="count"><span class="count_4"></span></div>
-          <div class="count"><span class="count_6"></span></div>
-          <div class="count"><span class="count_0"></span></div>
         </div>
       </div>
 
       <div class="home_common_number_box">
         <div class="home_common_number_title">已登记人数</div>
         <div class="home_common_number_count">
-          <div class="count"><span class="count_1"></span></div>
-          <div class="count"><span class="count_4"></span></div>
-          <div class="count"><span class="count_6"></span></div>
-          <div class="count"><span class="count_0"></span></div>
+          <div class="count" v-for="(item,index) in userToday.normalCount" :key="index"><span :class="'count_'+item"></span></div>
         </div>
       </div>
 
       <div class="home_common_number_box">
         <div class="home_common_number_title">未登记人数</div>
         <div class="home_common_number_count">
-          <div class="count"><span class="count_1"></span></div>
-          <div class="count"><span class="count_4"></span></div>
-          <div class="count"><span class="count_6"></span></div>
-          <div class="count"><span class="count_0"></span></div>
+          <div class="count" v-for="(item,index) in userToday.anonymousCount" :key="index"><span :class="'count_'+item"></span></div>
         </div>
       </div>
     </div>
     <div class="home_l_b">
       <div class="home_bottom_title">信息列表</div>
       <div class="home_bottom_box scroll_body">
-        <div class="home_bottom_item">
+        <div class="home_bottom_item" v-for="item in userList" :key="item.id">
           <div class="home_bottom_item_jiao1"></div>
           <div class="home_bottom_item_jiao2"></div>
           <div class="home_bottom_item_jiao3"></div>
           <div class="home_bottom_item_jiao4"></div>
           <div class="home_bottom_item_body">
-            <div class="home_bottom_item_img"></div>
-            <div class="home_bottom_item_info"><span>姓名：</span>张三</div>
-            <div class="home_bottom_item_info"><span>地点：</span>1号门</div>
-            <div class="home_bottom_item_info"><span>方式：</span>进入</div>
-            <div class="home_bottom_item_info"><span>时间：</span>2019-11-11 22:22:22</div>
-          </div>
-        </div>
-        <div class="home_bottom_item">
-          <div class="home_bottom_item_jiao1"></div>
-          <div class="home_bottom_item_jiao2"></div>
-          <div class="home_bottom_item_jiao3"></div>
-          <div class="home_bottom_item_jiao4"></div>
-          <div class="home_bottom_item_body">
-            <div class="home_bottom_item_img"></div>
-            <div class="home_bottom_item_info"><span>姓名：</span>张三</div>
-            <div class="home_bottom_item_info"><span>地点：</span>1号门</div>
-            <div class="home_bottom_item_info"><span>方式：</span>进入</div>
-            <div class="home_bottom_item_info"><span>时间：</span>2019-11-11 22:22:22</div>
-          </div>
-        </div>
-        <div class="home_bottom_item">
-          <div class="home_bottom_item_jiao1"></div>
-          <div class="home_bottom_item_jiao2"></div>
-          <div class="home_bottom_item_jiao3"></div>
-          <div class="home_bottom_item_jiao4"></div>
-          <div class="home_bottom_item_body">
-            <div class="home_bottom_item_img"></div>
-            <div class="home_bottom_item_info"><span>姓名：</span>张三</div>
-            <div class="home_bottom_item_info"><span>地点：</span>1号门</div>
-            <div class="home_bottom_item_info"><span>方式：</span>进入</div>
-            <div class="home_bottom_item_info"><span>时间：</span>2019-11-11 22:22:22</div>
+            <div class="home_bottom_item_img">
+              <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
+            </div>
+            <div class="home_bottom_item_info"><span>姓名：</span>{{item.personName}}</div>
+            <div class="home_bottom_item_info"><span>地点：</span>{{item.address}}</div>
+<!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
+            <div class="home_bottom_item_info"><span>时间：</span>{{item.outInTime}}</div>
           </div>
         </div>
       </div>
@@ -187,16 +148,21 @@
         </div>
       </div>
     </div>
-    <div class="home_c">
+    <div class="home_c" ref="center" @mouseleave="leave">
       <div class="home_c_l_t"></div>
       <div class="home_c_r_t"></div>
 
       <div class="home_c_line_l_b"></div>
       <div class="home_c_line_b"></div>
       <div class="home_c_line_r_b"></div>
-
-      <DialogCard :position="position"></DialogCard>
+      <div class="home_tongji_list">
+        <div class="home_tongji_item"></div>
+        <div class="home_tongji_item"></div>
+        <div class="home_tongji_item"></div>
+      </div>
+      <DialogCard :position="position" v-show="dialogShow" @leave="leave" ref="dialogDom"></DialogCard>
       <div class="home_c_body">
+        <iframe :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
       </div>
     </div>
 
@@ -205,11 +171,39 @@
 </template>
 
 <script>
+
+  import { getPersonMonitorList, getTodayStat, getLouDongInfo } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
     export default {
       name: "home",
       data () {
         return {
+          louDongData: {
+            childrenCount: "0",
+            danYuan: [],
+            keyPersonCount: "0",
+            oldPersonCount: "0",
+            totalCount: "0",
+            zcCount: "0"
+          },
+          centerHeight: 0,
+          mapUrl: '' +
+            '',
+          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          imagePath: '/jeecg-boot/sys/common/view/',
+          dialogShow: false,
+          userList: [],
+          userToday: {},
+          dateData: new Date(),
+          weekMap: {
+            1: '一',
+            2: '二',
+            3: '三',
+            4: '四',
+            5: '五',
+            6: '六',
+            7: '日'
+          },
           position:{
             left: '-100px',
             top: '100px'
@@ -218,6 +212,92 @@
       },
       components:{
         DialogCard
+      },
+      mounted() {
+        this.getPersonMonitorList()
+        this.getTodayStat()
+        this.$nextTick(() => {
+          this.centerHeight = this.$refs.center.offsetHeight
+        })
+        const that = this
+        window.onresize = () => {
+          return (() => {
+            that.$nextTick(() => {
+              that.centerHeight = that.$refs.center.offsetHeight
+            })
+          })()
+        }
+      },
+      created() {
+        window.addEventListener('message', (event) => {
+          if(event.data.funcName === 'showDialog'){
+            this.$nextTick(() => {
+
+              let x = event.data.x
+              let y = event.data.y
+              const dialogHeight = 420
+              const centerHeight = this.centerHeight
+              if(y + dialogHeight >= centerHeight) {
+                y = centerHeight - dialogHeight;
+              }
+              this.position.left = x + 'px'
+              this.position.top = y + 'px'
+              const _data = event.data.data;
+              console.log(_data)
+
+              this.getLouDongInfo({
+                louDongHao: _data.ld,
+                xiaoQuId: '1'
+              }, (data1) => {
+                data1.ld = _data.ld
+                this.$nextTick(() => {
+                  this.$refs.dialogDom.setLouDongData(data1)
+                  this.dialogShow = true
+                })
+              })
+
+            })
+          }else {
+            this.dialogShow = false
+          }
+
+        }, false);
+      },
+      methods: {
+        getLouDongInfo(params, cb) {
+          getLouDongInfo(params).then(rel => {
+            if(rel.code === 200) {
+              console.log(rel)
+              this.louDongData = rel.result
+              console.log(rel)
+              if(cb && typeof cb === 'function') {
+                cb(rel.result)
+              }
+            }
+          })
+        },
+        getTodayStat() {
+          getTodayStat().then(rel => {
+            if(rel.code === 200) {
+              const o = rel.result || {}
+              this.userToday = {
+                anonymousCount: o.anonymousCount?(o.anonymousCount+'').split(''):['0'],
+                normalCount: o.normalCount?(o.normalCount+'').split(''):['0'],
+                totalCount: o.totalCount?(o.totalCount+'').split(''):['0']
+              }
+            }
+          })
+        },
+        getPersonMonitorList() {
+          getPersonMonitorList().then(rel => {
+            if(rel.code === 200) {
+              this.userList = rel.result.records || []
+            }
+          })
+        },
+        leave() {
+          this.dialogShow = false
+        }
       }
     }
 </script>
@@ -227,6 +307,13 @@
   }
 </style>
 <style scoped>
+  .home_c_body iframe{
+    position:absolute;
+    left:0;
+    top:0;
+    width:100%;
+    height:100%;
+  }
   #big_home *{
     box-sizing:content-box;
   }
@@ -524,6 +611,16 @@
     width:90px;
     height:100px;
     background:rgba(255,255,255,0.2);
+  }
+  .home_bottom_item_img img{
+    position:absolute;
+    left:0;
+    top:0;
+    display: block;
+    padding:0;
+    margin:0;
+    width:100%;
+    height:100%;
   }
   .home_bottom_item_info{
     padding-left:90px;
