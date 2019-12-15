@@ -165,6 +165,7 @@
             align:"center",
             dataIndex: 'address'
           },
+
           {
             title: '操作',
             dataIndex: 'action',
@@ -172,6 +173,11 @@
             scopedSlots: { customRender: 'action' }
           }
         ],
+        /* 排序参数 */
+        isorter:{
+          column: 'outInTime',
+          order: 'desc',
+        },
         url: {
           list: "/monitor/monitorPersonRecord/list",
           delete: "/monitor/monitorPersonRecord/delete",
