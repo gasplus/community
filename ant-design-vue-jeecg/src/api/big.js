@@ -1,10 +1,11 @@
 import { axios } from '@/utils/request'
 //http://139.129.89.115:9080/jeecg-boot/接口地址
-
+const xiaoQuId = 1
 const api = {
   personMonitorList: '/monitor/monitorPersonRecord/list',
   todayStat: 'monitor/monitorPersonRecord/getTodayStat',
-  louDongInfo: 'monitor/monitorPerson/getLouDongInfo'
+  louDongInfo: 'monitor/monitorPerson/getLouDongInfo',
+  monitorPersonStat: '/monitor/monitorPerson/getMonitorPersonStat'
 }
 
 export default api
@@ -26,6 +27,8 @@ export function getTodayStat(parameter) {
 }
 
 export function getLouDongInfo(parameter) {
+  parameter = parameter || {}
+  parameter.xiaoQuId = xiaoQuId
   return axios({
     url: api.louDongInfo,
     method: 'get',
@@ -33,3 +36,13 @@ export function getLouDongInfo(parameter) {
   })
 }
 
+
+export function getMonitorPersonStat(parameter) {
+  parameter = parameter || {}
+  parameter.xiaoQuId = xiaoQuId
+  return axios({
+    url: api.monitorPersonStat,
+    method: 'get',
+    params: parameter
+  })
+}
