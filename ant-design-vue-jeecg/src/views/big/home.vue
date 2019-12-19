@@ -187,9 +187,9 @@
             zcCount: "0"
           },
           centerHeight: 0,
-          mapUrl: '' +
-            '',
-          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+        /*  mapUrl: '' +
+            '',*/
+          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
           imagePath: '/jeecg-boot/sys/common/view/',
           dialogShow: false,
           userList: [],
