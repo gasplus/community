@@ -10,20 +10,20 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item label="车牌号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'carNumber', validatorRules.carNumber]" placeholder="请输入车牌号"></a-input>
+        <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag type="list" v-decorator="['messageType']" :trigger-change="true" dictCode="message_type" placeholder="请选择类型"/>
         </a-form-item>
-        <a-form-item label="车辆类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['carType']" :trigger-change="true" dictCode="" placeholder="请选择车辆类型"/>
+        <a-form-item label="日志内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'content', validatorRules.content]" placeholder="请输入日志内容"></a-input>
         </a-form-item>
-        <a-form-item label="图片地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-upload v-decorator="['photoUrl']" :trigger-change="true"></j-upload>
+        <a-form-item label="数据json" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'dataContent', validatorRules.dataContent]" placeholder="请输入数据json"></a-input>
         </a-form-item>
-        <a-form-item label="所属人员" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'personId', validatorRules.personId]" placeholder="请输入所属人员"></a-input>
+        <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag type="list" v-decorator="['status']" :trigger-change="true" dictCode="message_status" placeholder="请选择状态"/>
         </a-form-item>
-        <a-form-item label="所属小区" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['xiaoQuId']" :trigger-change="true" dictCode="" placeholder="请选择所属小区"/>
+        <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'memo', validatorRules.memo]" placeholder="请输入备注"></a-input>
         </a-form-item>
 
       </a-form>
@@ -35,13 +35,11 @@
 
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
-  import JUpload from '@/components/jeecg/JUpload'
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
 
   export default {
-    name: "MonitorCarModal",
+    name: "MonitorMessageModal",
     components: { 
-      JUpload,
       JDictSelectTag,
     },
     data () {
@@ -62,15 +60,15 @@
 
         confirmLoading: false,
         validatorRules:{
-        carNumber:{},
-        carType:{rules: [{ required: true, message: '请输入车辆类型!' }]},
-        photoUrl:{},
-        personId:{},
-        xiaoQuId:{rules: [{ required: true, message: '请输入所属小区!' }]},
+        messageType:{},
+        content:{},
+        dataContent:{},
+        status:{},
+        memo:{},
         },
         url: {
-          add: "/monitor/monitorCar/add",
-          edit: "/monitor/monitorCar/edit",
+          add: "/monitor/monitorMessage/add",
+          edit: "/monitor/monitorMessage/edit",
         }
      
       }
@@ -86,7 +84,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'carNumber','carType','photoUrl','personId','xiaoQuId'))
+          this.form.setFieldsValue(pick(this.model,'createTime','messageType','content','dataContent','status','memo'))
         })
       },
       close () {
@@ -129,7 +127,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'carNumber','carType','photoUrl','personId','xiaoQuId'))
+        this.form.setFieldsValue(pick(row,'createTime','messageType','content','dataContent','status','memo'))
       },
 
       

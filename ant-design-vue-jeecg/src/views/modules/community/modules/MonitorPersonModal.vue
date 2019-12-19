@@ -37,8 +37,8 @@
         <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'lxdh', validatorRules.lxdh]" placeholder="请输入联系电话"></a-input>
         </a-form-item>
-        <a-form-item label="小区id" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'xiaoQuId', validatorRules.xiaoQuId]" placeholder="请输入小区id"></a-input>
+        <a-form-item label="租户id" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'tenantId', validatorRules.tenantId]" placeholder="请输入租户id"></a-input>
         </a-form-item>
         <a-form-item label="楼栋号" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'louDongHao', validatorRules.louDongHao]" placeholder="请输入楼栋号"></a-input>
@@ -65,7 +65,19 @@
           <a-input v-decorator="[ 'huHao', validatorRules.huHao]" placeholder="请输入户号"></a-input>
         </a-form-item>
         <a-form-item label="人员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['type']" :trigger-change="true" dictCode="hu_person_type" placeholder="请选择人员类型"/>
+          <j-category-select v-decorator="['type']" pcode="A01" placeholder="请选择人员类型" back="type_text" @change="handleCategoryChange"/>
+        </a-form-item>
+        <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-textarea v-decorator="['memo']" rows="4" placeholder="请输入备注"/>
+        </a-form-item>
+        <a-form-item label="xxxdz" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'xxdz', validatorRules.xxdz]" placeholder="请输入xxxdz"></a-input>
+        </a-form-item>
+        <a-form-item label="人员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'typeText', validatorRules.typeText]" placeholder="请输入人员类型"></a-input>
+        </a-form-item>
+        <a-form-item v-show="false">
+          <a-input v-decorator="[ 'type_text']"></a-input>
         </a-form-item>
 
       </a-form>
@@ -80,6 +92,7 @@
   import JDate from '@/components/jeecg/JDate'  
   import JUpload from '@/components/jeecg/JUpload'
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
+  import JCategorySelect from '@/components/jeecg/JCategorySelect'
 
   export default {
     name: "MonitorPersonModal",
@@ -87,6 +100,7 @@
       JDate,
       JUpload,
       JDictSelectTag,
+      JCategorySelect
     },
     data () {
       return {
@@ -115,7 +129,7 @@
         hjdz:{},
         guanXi:{},
         lxdh:{},
-        xiaoQuId:{},
+        tenantId:{},
         louDongHao:{},
         minZu:{},
         jieLuXiang:{},
@@ -125,6 +139,9 @@
         zhaoPian:{},
         huHao:{},
         type:{},
+        memo:{},
+        xxdz:{},
+        typeText:{},
         },
         url: {
           add: "/monitor/monitorPerson/add",
@@ -144,7 +161,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'xingMing','xingBie','csrq','sfzh','pcs','jwh','hjdz','guanXi','lxdh','xiaoQuId','louDongHao','minZu','jieLuXiang','fenJu','danYuanHao','fangJianHao','zhaoPian','huHao','type'))
+          this.form.setFieldsValue(pick(this.model,'xingMing','xingBie','csrq','sfzh','pcs','jwh','hjdz','guanXi','lxdh','tenantId','louDongHao','minZu','jieLuXiang','fenJu','danYuanHao','fangJianHao','zhaoPian','huHao','type','memo','xxdz','typeText'))
         })
       },
       close () {
@@ -187,8 +204,11 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'xingMing','xingBie','csrq','sfzh','pcs','jwh','hjdz','guanXi','lxdh','xiaoQuId','louDongHao','minZu','jieLuXiang','fenJu','danYuanHao','fangJianHao','zhaoPian','huHao','type'))
+        this.form.setFieldsValue(pick(row,'xingMing','xingBie','csrq','sfzh','pcs','jwh','hjdz','guanXi','lxdh','tenantId','louDongHao','minZu','jieLuXiang','fenJu','danYuanHao','fangJianHao','zhaoPian','huHao','type','memo','xxdz','typeText'))
       },
+      handleCategoryChange(value,backObj){
+        this.form.setFieldsValue(backObj)
+      }
 
       
     }
