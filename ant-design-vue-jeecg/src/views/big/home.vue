@@ -42,21 +42,27 @@
     <div class="home_l_b">
       <div class="home_bottom_title">信息列表</div>
       <div class="home_bottom_box scroll_body">
-        <div class="home_bottom_item" v-for="item in userList" :key="item.id">
-          <div class="home_bottom_item_jiao1"></div>
-          <div class="home_bottom_item_jiao2"></div>
-          <div class="home_bottom_item_jiao3"></div>
-          <div class="home_bottom_item_jiao4"></div>
-          <div class="home_bottom_item_body">
-            <div class="home_bottom_item_img">
-              <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
+        <a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">
+          <template slot="content">
+            <PersonDetail></PersonDetail>
+          </template>
+          <div class="home_bottom_item">
+            <div class="home_bottom_item_jiao1"></div>
+            <div class="home_bottom_item_jiao2"></div>
+            <div class="home_bottom_item_jiao3"></div>
+            <div class="home_bottom_item_jiao4"></div>
+            <div class="home_bottom_item_body">
+                  <div class="home_bottom_item_img">
+                    <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
+                  </div>
+                  <div class="home_bottom_item_info"><span>姓名：</span>{{item.personName}}</div>
+                  <div class="home_bottom_item_info"><span>地点：</span>{{item.address}}</div>
+                  <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
+                  <div class="home_bottom_item_info"><span>时间：</span>{{item.outInTime}}</div>
+
             </div>
-            <div class="home_bottom_item_info"><span>姓名：</span>{{item.personName}}</div>
-            <div class="home_bottom_item_info"><span>地点：</span>{{item.address}}</div>
-<!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-            <div class="home_bottom_item_info"><span>时间：</span>{{item.outInTime}}</div>
           </div>
-        </div>
+        </a-popover>
       </div>
     </div>
     <div class="home_r_t">
@@ -156,9 +162,57 @@
       <div class="home_c_line_b"></div>
       <div class="home_c_line_r_b"></div>
       <div class="home_tongji_list">
-        <div class="home_tongji_item"></div>
-        <div class="home_tongji_item"></div>
-        <div class="home_tongji_item"></div>
+        <div class="home_tongji_item" v-if="xiaoquData.fangJianCount!==undefined">
+          <div class="home_tongji_item_box">
+            <div class="home_tongji_item_title">实有房间</div>
+            <div class="home_tongji_item_info">
+              <span>{{xiaoquData.fangJianCount}}</span>个
+            </div>
+          </div>
+        </div>
+        <div class="home_tongji_item" v-if="xiaoquData.personCount!==undefined">
+          <div class="home_tongji_item_box">
+            <div class="home_tongji_item_title">实有人口</div>
+            <div class="home_tongji_item_info">
+              <span>{{xiaoquData.personCount}}</span>人
+            </div>
+          </div>
+        </div>
+
+        <div class="home_tongji_item" v-if="xiaoquData.dw !== undefined">
+          <div class="home_tongji_item_box">
+            <div class="home_tongji_item_title">实有单位</div>
+            <div class="home_tongji_item_info">
+              <span>{{xiaoquData.dw}}</span>个
+            </div>
+          </div>
+        </div>
+        <div class="home_tongji_item" v-if="xiaoquData.cl !== undefined">
+          <div class="home_tongji_item_box">
+            <div class="home_tongji_item_title">实有车辆</div>
+            <div class="home_tongji_item_info">
+              <span>{{xiaoquData.cl}}</span>辆
+            </div>
+          </div>
+        </div>
+
+        <div class="home_tongji_item" v-if="xiaoquData.cz !== undefined">
+          <div class="home_tongji_item_box">
+            <div class="home_tongji_item_title">出租房</div>
+            <div class="home_tongji_item_info">
+              <span>{{xiaoquData.cz}}</span>套
+            </div>
+          </div>
+        </div>
+
+        <div class="home_tongji_item" v-if="xiaoquData.gz !== undefined">
+          <div class="home_tongji_item_box">
+            <div class="home_tongji_item_title">关注人员</div>
+            <div class="home_tongji_item_info">
+              <span>{{xiaoquData.gz}}</span>人
+            </div>
+          </div>
+        </div>
       </div>
       <DialogCard :position="position" v-show="dialogShow" @leave="leave" ref="dialogDom"></DialogCard>
       <div class="home_c_body">
@@ -172,12 +226,21 @@
 
 <script>
 
-  import { getPersonMonitorList, getTodayStat, getLouDongInfo } from "@/api/big"
+  import {
+    getPersonMonitorList,
+    getTodayStat,
+    getLouDongInfo,
+    getMonitorPersonStat
+  } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
+  import PersonList from '@/components/big/personList'
+  import PersonDetail from '@/components/big/personDetail'
+
     export default {
       name: "home",
       data () {
         return {
+          xiaoquData: {},
           louDongData: {
             childrenCount: "0",
             danYuan: [],
@@ -187,8 +250,7 @@
             zcCount: "0"
           },
           centerHeight: 0,
-        /*  mapUrl: '' +
-            '',*/
+          // mapUrl: '',
           mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
           imagePath: '/jeecg-boot/sys/common/view/',
           dialogShow: false,
@@ -211,9 +273,16 @@
         }
       },
       components:{
-        DialogCard
+        DialogCard,
+        PersonList,
+        PersonDetail
       },
       mounted() {
+        getMonitorPersonStat().then(rel => {
+          if(rel.code === 200) {
+            this.xiaoquData = rel.result
+          }
+        })
         this.getPersonMonitorList()
         this.getTodayStat()
         this.$nextTick(() => {
@@ -246,8 +315,7 @@
               console.log(_data)
 
               this.getLouDongInfo({
-                louDongHao: _data.ld,
-                xiaoQuId: '1'
+                louDongHao: _data.ld
               }, (data1) => {
                 data1.ld = _data.ld
                 this.$nextTick(() => {
@@ -362,13 +430,13 @@
     position:absolute;
     top:97px;
     left:20px;
-    height:374px;
+    height:274px;
     width:460px;
     z-index: 1;
   }
   .home_l_b{
     position:absolute;;
-    top:471px;
+    top:371px;
     left:20px;
     width:460px;
     bottom:70px;
@@ -379,13 +447,13 @@
     position:absolute;
     top:97px;
     right:20px;
-    height:374px;
+    height:274px;
     width:460px;
     z-index: 1;
   }
   .home_r_b{
     position:absolute;;
-    top:471px;
+    top:371px;
     right:20px;
     width:460px;
     bottom:70px;
@@ -406,7 +474,7 @@
     background-size:340px 46px;
     background-repeat: no-repeat;
     background-position:0 0;
-    padding-bottom:39px;
+    padding-bottom:29px;
   }
 
   .home_common_title_info{
@@ -427,34 +495,34 @@
   .home_common_number_box{
     width:50%;
     height:90px;
-    margin-bottom:50px;
+    margin-bottom:10px;
     float:left;
   }
   .home_common_number_title{
     height:19px;
     line-height: 19px;
-    padding-bottom:21px;
+    padding-bottom:11px;
     color:#fff;
-    font-size:18px;
+    font-size:16px;
   }
   .home_common_number_count>.count{
     position:relative;
-    width:42px;
-    height:52px;
+    width:31.5px;
+    height:39px;
     margin-right:14px;
     background-image: url("~@/assets/images/home_number_bg.png");
     background-position:0 0;
-    background-size:42px 52px;
+    background-size:31.5px 39px;
     background-repeat: no-repeat;
     float:left;
   }
   .count>span{
     display: block;
     position:relative;
-    width:42px;
-    height:52px;
+    width:31.5px;
+    height:39px;
     background-position:center center;
-    background-size:16px 26px;
+    background-size:12px 19.5px;
     background-repeat: no-repeat;
   }
   .count_0{
@@ -554,6 +622,7 @@
     height:142px;
     position:relative;
     margin-bottom:30px;
+    cursor: pointer;
   }
   .home_bottom_item_body{
     position:absolute;
@@ -698,5 +767,64 @@
     width:1px;
     background:#59C3DC;
     z-index: 2;
+  }
+  .home_tongji_list{
+    position:absolute;
+    bottom:0;
+    display: flex;
+    flex-direction: row;
+    left:20px;
+    right:20px;
+    height:119px;
+    z-index:3;
+  }
+  .home_tongji_item{
+    flex: 1;
+  }
+  .home_tongji_item_box{
+    margin:0 auto;
+    width:119px;
+    height:96px;
+    background-image: url("~@/assets/images/home_tip_bg.png");
+    background-size:100% 100%;
+    background-position:0 0 ;
+    background-repeat: no-repeat;
+  }
+  .home_tongji_item_title{
+    padding-top:15px;
+    line-height:35px;
+    height:35px;
+    font-size:14px;
+    color:#00E3FF;
+    text-align: center;
+  }
+  .home_tongji_item_info{
+    line-height:20px;
+    height:20px;
+    font-size:14px;
+    color:#00E3FF;
+    text-align: center;
+  }
+  .home_tongji_item_info span{
+    font-size:24px;
+  }
+
+</style>
+<style>
+  .ant-popover-inner{
+    background:none;
+  }
+  .ant-popover-inner-content{
+    padding:0;
+  }
+  .ant-popover-placement-top > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-topLeft > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-topRight > .ant-popover-content > .ant-popover-arrow{
+    border-right-color: rgba(44,92,235,0.6);
+    border-bottom-color: rgba(44,92,235,0.6);
+  }
+  .ant-popover-placement-right > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-rightTop > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-rightBottom > .ant-popover-content > .ant-popover-arrow{
+
+    /*border-right-color: #00F6FF;*/
+    border-bottom-color: #00F6FF;
+    border-left-color:#00F6FF;
   }
 </style>

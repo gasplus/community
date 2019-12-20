@@ -182,11 +182,7 @@
               }
             }
           },
-          {
-            title:'备注',
-            align:"center",
-            dataIndex: 'memo'
-          },
+
           {
             title: '操作',
             dataIndex: 'action',

@@ -25,6 +25,12 @@
         <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'memo', validatorRules.memo]" placeholder="请输入备注"></a-input>
         </a-form-item>
+        <a-form-item label="小区id" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'tenantId', validatorRules.tenantId]" placeholder="请输入小区id"></a-input>
+        </a-form-item>
+        <a-form-item label="数据id" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'dataId', validatorRules.dataId]" placeholder="请输入数据id"></a-input>
+        </a-form-item>
 
       </a-form>
     </a-spin>
@@ -65,6 +71,8 @@
         dataContent:{},
         status:{},
         memo:{},
+        tenantId:{},
+        dataId:{},
         },
         url: {
           add: "/monitor/monitorMessage/add",
@@ -84,7 +92,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'createTime','messageType','content','dataContent','status','memo'))
+          this.form.setFieldsValue(pick(this.model,'createTime','messageType','content','dataContent','status','memo','tenantId','dataId'))
         })
       },
       close () {
@@ -127,7 +135,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'createTime','messageType','content','dataContent','status','memo'))
+        this.form.setFieldsValue(pick(row,'createTime','messageType','content','dataContent','status','memo','tenantId','dataId'))
       },
 
       
