@@ -42,7 +42,7 @@
           <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
             <a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">
               <template slot="content">
-                <PersonDetail></PersonDetail>
+                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>
               </template>
               <div class="home_bottom_item">
                 <div class="home_bottom_item_jiao1"></div>
@@ -127,7 +127,8 @@
         </div>
       </collapse>
     </div>
-    <div class="home_c" ref="center" @mouseleave="leave">
+<!--    <div class="home_c" ref="center" @mouseleave="leave">-->
+    <div class="home_c" ref="center">
       <div class="home_c_l_t"></div>
       <div class="home_c_r_t"></div>
 
@@ -187,9 +188,10 @@
           </div>
         </div>
       </div>
-      <DialogCard :position="position" v-show="dialogShow" @leave="leave" ref="dialogDom"></DialogCard>
+      <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
+      <PersonList v-show="personListShow" :personListData="personListData" @close="closePersonList" ref="personListDom"></PersonList>
       <div class="home_c_body">
-        <iframe :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
+        <iframe ref="mapIframe" :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
       </div>
     </div>
 
@@ -213,6 +215,8 @@
       name: "home",
       data () {
         return {
+          personListData: undefined,
+          personListShow: false,
           active1: true,
           active2: false,
           activeIndex: '0',
@@ -228,8 +232,8 @@
           },
           // accordionHeight:400,
           centerHeight: 0,
-          mapUrl: '',
-          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          // mapUrl: '',
+          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
           imagePath: '/jeecg-boot/sys/common/view',
           dialogShow: false,
           userList: [],
@@ -257,6 +261,7 @@
         Collapse
       },
       mounted() {
+
         getMonitorPersonStat().then(rel => {
           if(rel.code === 200) {
             this.xiaoquData = rel.result
@@ -279,30 +284,26 @@
       created() {
         window.addEventListener('message', (event) => {
           if(event.data.funcName === 'showDialog'){
-            this.$nextTick(() => {
+            let x = event.data.x
+            let y = event.data.y
+            const dialogHeight = 420
+            const centerHeight = this.centerHeight
+            if(y + dialogHeight >= centerHeight) {
+              y = centerHeight - dialogHeight;
+            }
+            this.position.left = x + 'px'
+            this.position.top = y + 'px'
+            const _data = event.data.data;
+            console.log(_data)
 
-              let x = event.data.x
-              let y = event.data.y
-              const dialogHeight = 420
-              const centerHeight = this.centerHeight
-              if(y + dialogHeight >= centerHeight) {
-                y = centerHeight - dialogHeight;
+            this.getLouDongInfo({
+              louDongHao: _data.ld
+            }, (data1) => {
+              data1.ld = _data.ld
+              this.dialogShow = true
+              if(this.$refs.dialogDom.setLouDongData) {
+                this.$refs.dialogDom.setLouDongData(data1)
               }
-              this.position.left = x + 'px'
-              this.position.top = y + 'px'
-              const _data = event.data.data;
-              console.log(_data)
-
-              this.getLouDongInfo({
-                louDongHao: _data.ld
-              }, (data1) => {
-                data1.ld = _data.ld
-                this.$nextTick(() => {
-                  this.$refs.dialogDom.setLouDongData(data1)
-                  this.dialogShow = true
-                })
-              })
-
             })
           }else {
             this.dialogShow = false
@@ -311,6 +312,22 @@
         }, false);
       },
       methods: {
+        closePersonList() {
+          this.$nextTick(() => {
+            this.$refs.dialogDom.clearRoomSelect();
+          })
+          this.personListShow = false
+        },
+        showPersonList(data) {
+          this.personListData = data
+          this.personListShow = true
+        },
+        closeDialog() {
+          this.$nextTick(() => {
+            this.$refs.mapIframe.contentWindow.postMessage({funcName:'closeDialog'},'*');
+          })
+
+        },
         changeActiveIndex(index) {
           console.log(index)
           if (index === '0') {
@@ -361,6 +378,7 @@
           })
         },
         leave() {
+          this.closeDialog()
           this.dialogShow = false
         }
       }
@@ -897,10 +915,12 @@
   .ant-popover-placement-top > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-topLeft > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-topRight > .ant-popover-content > .ant-popover-arrow{
     border-right-color: rgba(44,92,235,0.6);
     border-bottom-color: rgba(44,92,235,0.6);
+    display: none;
   }
   .ant-popover-placement-right > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-rightTop > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-rightBottom > .ant-popover-content > .ant-popover-arrow{
     border-bottom-color: #00F6FF;
     border-left-color:#00F6FF;
+    display: none;
   }
   .ant-popover-placement-left > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-leftTop > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-leftBottom > .ant-popover-content > .ant-popover-arrow{
     border-top-color: #00F6FF;
