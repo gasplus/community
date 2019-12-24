@@ -12,18 +12,40 @@
       <div class="card1_bg_c"></div>
     </div>
     <div class="card1_body">
-      <div class="person_photo">
-        <img :src="imagePath+(photoUrl?photoUrl:'1.jpeg')" alt="">
+      <div class="person_card_box">
+        <div class="body_result">
+          <div class="person_photo">
+              <img v-if="bodyInfo.picture" :src="imagePath+bodyInfo.picture" alt="">
+          </div>
+          <div class="person_info">
+            <div class="person_name">外套颜色：{{bodyInfo.coat}}</div>
+            <div class="person_name">年龄：{{bodyInfo.age}}</div>
+            <div class="person_name">头发：{{bodyInfo.hair}}</div>
+<!--            <div class="person_type">-->
+<!--              &lt;!&ndash;        <a-tag color="#2db7f5">#2db7f5</a-tag>&ndash;&gt;-->
+<!--              &lt;!&ndash;        <a-tag color="#87d068">#87d068</a-tag>&ndash;&gt;-->
+<!--              <a-tag color="#108ee9">重点人员</a-tag>-->
+<!--              <a-tag color="#f50">关怀人员</a-tag>-->
+<!--            </div>-->
+          </div>
+        </div>
+        <div class="face_result">
+          <div class="person_photo">
+            <img v-if="bodyInfo.picture" :src="imagePath+faceInfo.picture" alt="">
+          </div>
+          <div class="person_info">
+            <div class="person_name">性别：{{faceInfo.gender}}</div>
+            <div class="person_name">年龄：{{faceInfo.age}}</div>
+            <div class="person_name">面部遮盖：{{faceInfo.mask}}</div>
+          </div>
+        </div>
+
+<!--        <div class="person_other">-->
+<!--          <div class="person_birthday">1988-08-08</div>-->
+<!--          <div class="person_address">123</div>-->
+<!--        </div>-->
       </div>
-      <div class="person_name">张三</div>
-      <div class="person_type">
-<!--        <a-tag color="#2db7f5">#2db7f5</a-tag>-->
-<!--        <a-tag color="#87d068">#87d068</a-tag>-->
-        <a-tag color="#108ee9">重点人员</a-tag>
-        <a-tag color="#f50">关怀人员</a-tag>
-      </div>
-      <div class="person_birthday">1988-08-08</div>
-      <div class="person_address">地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址地址</div>
+
     </div>
   </div>
 </template>
@@ -31,6 +53,7 @@
 <script>
     export default {
         name: "personDetail",
+        props: ['personData', 'bodyInfo', 'faceInfo'],
         data() {
           return {
             photoUrl: '',
@@ -87,8 +110,8 @@
   }
   .card1{
     position:relative;
-    width:300px;
-    min-height:300px;
+    width:400px;
+    min-height:200px;
     /*margin-top:-210px;*/
     /*margin-left:-325px;*/
     z-index: 3;
@@ -105,8 +128,8 @@
     position:absolute;
     left:0;
     top:0;
-    width:150px;
-    height:175px;
+    width:200px;
+    height:100px;
     background-image: url("~@/assets/images/bg-l_t.png");
     background-position:0 0;
     background-size:248px 175px;
@@ -115,9 +138,9 @@
   .card1_bg_l_c{
     position:absolute;
     left:0;
-    top:175px;
-    bottom:155px;
-    width:150px;
+    top:100px;
+    bottom:100px;
+    width:200px;
     background-image: url("~@/assets/images/bg-l_c.png");
     background-position:0 0;
     background-size:248px 1px;
@@ -127,10 +150,10 @@
     position:absolute;
     left:0;
     bottom:0;
-    width:150px;
-    height:155px;
+    width:200px;
+    height:100px;
     background-image: url("~@/assets/images/bg-l_b.png");
-    background-position:0 0;
+    background-position:left 0 bottom -23px;
     background-size:248px 175px;
     background-repeat: no-repeat;
   }
@@ -138,21 +161,21 @@
     position:absolute;
     right:0;
     top:0;
-    width:150px;
-    height:175px;
+    width:200px;
+    height:100px;
     background-image: url("~@/assets/images/bg-r_t.png");
-    background-position:top 0 right 0;
+    background-position:right 0 top 0;
     background-size:248px 175px;
     background-repeat: no-repeat;
   }
   .card1_bg_r_c{
     position:absolute;
     right:0;
-    top:175px;
-    bottom:155px;
-    width:150px;
+    top:100px;
+    bottom:100px;
+    width:200px;
     background-image: url("~@/assets/images/bg-r_c.png");
-    background-position:top 0 right 0;
+    background-position:right 0 top 0;
     background-size:248px 1px;
     background-repeat: repeat-y;
   }
@@ -160,18 +183,18 @@
     position:absolute;
     right:0;
     bottom:0;
-    width:150px;
-    height:155px;
+    width:200px;
+    height:100px;
     background-image: url("~@/assets/images/bg-r_b.png");
-    background-position:top 0 right 0;
+    background-position:right 0 bottom -23px;
     background-size:248px 175px;
     background-repeat: no-repeat;
   }
 
   .card1_bg_t_c{
     position:absolute;
-    right:248px;
-    left:248px;
+    right:200px;
+    left:200px;
     top:0;
     height:175px;
     background-image: url("~@/assets/images/bg-t_c.png");
@@ -181,8 +204,8 @@
   }
   .card1_bg_b_c{
     position:absolute;
-    right:248px;
-    left:248px;
+    right:200px;
+    left:200px;
     bottom:0;
     height:175px;
     background-image: url("~@/assets/images/bg-b_c.png");
@@ -192,9 +215,9 @@
   }
   .card1_bg_c{
     position:absolute;
-    right:248px;
+    right:200px;
     top:175px;
-    left:248px;
+    left:200px;
     bottom:175px;
     background-image: url("~@/assets/images/bg-c.png");
     background-position:0 0;
@@ -202,12 +225,12 @@
     background-repeat: repeat;
   }
 
+
   .card1_body{
     position:relative;
-    padding:40px 20px;
+    padding:10px 20px;
     z-index:100;
   }
-
 
   .card2{
     position:absolute;
@@ -554,18 +577,20 @@
   .person_photo{
     width:100px;
     height:100px;
-    border-radius: 100px;
+    border-radius: 10px;
     overflow: hidden;
-    margin:0 auto;
+    position:absolute;
+    left:10px;
+    top:10px;
+    background:rgba(255,255,255,0.2)
   }
   .person_photo img{
     width:100px;
     height:100px;
   }
   .person_name{
-    height:40px;
-    line-height: 40px;
-    text-align: center;
+    height:32px;
+    line-height: 32px;
     color:#fff;
     font-size:14px;
     font-weight: bold;
@@ -573,33 +598,49 @@
   .person_type{
     height:30px;
     line-height: 30px;
-    text-align: center;
   }
   .person_birthday{
     height:30px;
     line-height: 30px;
-    padding-left:60px;
+    padding-left:40px;
     background-image: url("~@/assets/images/icon_person_card.png");
     background-size:22px 16px;
-    background-position:30px center;
+    background-position:10px center;
     background-repeat: no-repeat;
     color:#fff;
     font-size:14px;
     position:relative;
     margin-top:15px;
   }
-
+  .person_info{
+    padding-left:130px;
+    height:100px;
+    padding-top:10px;
+  }
   .person_address{
     line-height: 30px;
-    padding-left:60px;
+    padding-left:40px;
     padding-right:30px;
     background-image: url("~@/assets/images/icon_person_address.png");
     background-size:16px 16px;
-    background-position:33px 7px;
+    background-position:13px 7px;
     background-repeat: no-repeat;
     color:#fff;
     font-size:14px;
     position:relative;
-    margin-top:10px;
   }
+
+  .person_card_box{
+    position:relative;
+  }
+  .body_result{
+    position:relative;
+    height:120px;
+    border-bottom:1px dashed rgba(255,255,255,0.2);
+  }
+  .face_result{
+    position:relative;
+    height:120px;
+  }
+
 </style>

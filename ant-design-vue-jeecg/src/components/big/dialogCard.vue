@@ -1,5 +1,6 @@
 <template>
-  <div class="card1" :style="'left:'+position.left+';top:'+position.top" @mouseleave="leave">
+<!--  <div class="card1" :style="'left:'+position.left+';top:'+position.top" @mouseleave="leave">-->
+  <div class="card1">
     <div class="card1_bg">
       <div class="card1_bg_l_t"></div>
       <div class="card1_bg_l_c"></div>
@@ -10,6 +11,8 @@
       <div class="card1_bg_t_c"></div>
       <div class="card1_bg_b_c"></div>
       <div class="card1_bg_c"></div>
+    </div>
+    <div class="close_btn" @click="leave">
     </div>
     <div class="card1_body">
       <div class="dialog_top_info">
@@ -44,7 +47,7 @@
         </div>
         <div class="card2_body">
           <div class="room_list" v-if="currentIndex!==undefined">
-            <div class="room_item" v-for="item in loudongData.danYuan[currentIndex].fangJian">
+            <div :class="'room_item '+(selectRoomIndex + '' === ind + ''?'active':'')" :key="ind" v-for="(item,ind) in loudongData.danYuan[currentIndex].fangJian" @click="selectRoom(ind)">
               <div class="room_item_type">
                 <div class="room_item_type_name">{{item.Type==='0'?'常住':'其它'}}</div>
                 <div class="room_item_type_r"></div>
@@ -67,6 +70,7 @@
         props:['position'],
         data() {
           return {
+            selectRoomIndex: -1,
             loudongData: {
               ld: '',
               childrenCount: 0,
@@ -92,8 +96,16 @@
           }
         },
         methods: {
+          clearRoomSelect() {
+            this.selectRoomIndex = -1
+          },
+          selectRoom(index){
+            this.selectRoomIndex = index
+            this.$emit('show', this.loudongData.danYuan[this.currentIndex].fangJian[index])
+          },
           changeDY(index) {
             this.currentIndex = index;
+            this.selectRoomIndex = -1
           },
           setLouDongData(data) {
             for(let key in data) {
@@ -117,12 +129,28 @@
   .card1 *{
     box-sizing:content-box;
   }
+  .close_btn{
+    position:absolute;
+    top:5px;
+    right:10px;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    z-index: 1000;
+    background-image: url("~@/assets/images/icon_close.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 100% 100%;
+    opacity: 0.8;
+  }
   .card1{
     position:absolute;
-    left:0;
-    top:0;
-    width:650px;
+    width:700px;
     min-height:420px;
+    top:50%;
+    left:50%;
+    margin-left:-350px;
+    margin-top:-210px;
     /*margin-top:-210px;*/
     /*margin-left:-325px;*/
     z-index: 3;
@@ -496,11 +524,12 @@
     border:1px solid #0F80D4;
     border-top-width:2px;
     height:60px;
-    width:88px;
+    width:105px;
     box-sizing: border-box;
     margin-right:10px;
     float:left;
     margin-bottom:20px;
+    cursor: pointer;
   }
   .room_item_type{
     display: inline-block;
@@ -545,6 +574,12 @@
     background-repeat: no-repeat;
     background-position: 0 0;
   }
+  .room_item.active,.room_item:hover{
+    border:1px solid orangered;
+  }
+
+
+
   .room_item_type_name{
     line-height: 19px;
     z-index: 2;

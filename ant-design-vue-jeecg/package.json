@@ -56,6 +56,7 @@
     "less-loader": "^4.1.0",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.0.1",
+    "vue-collapse": "^1.0.31",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {

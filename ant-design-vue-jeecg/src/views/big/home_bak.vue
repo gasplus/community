@@ -3,132 +3,158 @@
     <div class="home_head">
       <div class="home_head_title">龙崮社区治安态势智慧感知中心</div>
       <div class="home_head_info">
-        <div class="home_head_info_item message_box"><div class="message_icon"></div><div class="message_number">1</div></div>
         <div class="home_head_info_item">{{dateData.getFullYear()}}-{{dateData.getMonth()+1}}-{{dateData.getDate()}}</div>
         <div class="home_head_info_item">{{dateData.getHours()}}:{{dateData.getMinutes()}}:{{dateData.getSeconds()}}</div>
         <div class="home_head_info_item">星期{{weekMap[dateData.getDay()]}}</div>
       </div>
     </div>
-    <div class="home_r">
-      <collapse :selected="active1" ref="c1" @collapse-open="changeActiveIndex('0')">
-        <div slot="collapse-header">
-          <div class="accordion_head" style="width:100%;">
-            <div class="accordion_head_title accordion_person">
-              今日人员统计
-            </div>
-            <div class="accordion_head_info" style="padding:5px;display: block;position:relative;">
-              <div class="home_bottom_item" style="position:absolute;left:-10px;right:-10px;top:0;height:80px;display: block;margin:0;">
-                <div class="home_bottom_item_jiao1"></div>
-                <div class="home_bottom_item_jiao2"></div>
-                <div class="home_bottom_item_jiao3"></div>
-                <div class="home_bottom_item_jiao4"></div>
-                <div class="home_bottom_item_body" style="padding:0;">
-                  <div class="tongji_item">
-                    <div class="tongji_item_t">
-                      <div class="tongji_item_t_label">总次数</div>
-                      <div class="tongji_item_t_number">{{userToday.totalCount}}</div>
-                    </div>
-                    <div class="tongji_item_b">
-                      <div class="tongji_item_b_tongji">已登记 {{userToday.normalCount}} 人</div>
-                      <div class="tongji_item_b_tongji">未登记 {{userToday.anonymousCount}} 人</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
-          <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-            <a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">
-              <template slot="content">
-                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>
-              </template>
-              <div class="home_bottom_item">
-                <div class="home_bottom_item_jiao1"></div>
-                <div class="home_bottom_item_jiao2"></div>
-                <div class="home_bottom_item_jiao3"></div>
-                <div class="home_bottom_item_jiao4"></div>
-                <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
-                  <div class="home_bottom_item_img">
-                    <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
-                  </div>
-                  <div class="home_bottom_item_info card_name">{{item.personName}}</div>
-                  <div class="home_bottom_item_info card_address">{{item.address}}</div>
-                  <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                  <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
-                </div>
+    <!--<div class="home_l_t">-->
+      <!--<div class="home_common_title">-->
+        <!--<div class="home_common_title_info">今日人员进出统计</div>-->
+      <!--</div>-->
+      <!--<div class="home_common_number_box">-->
+        <!--<div class="home_common_number_title">总次数</div>-->
+        <!--<div class="home_common_number_count">-->
+          <!--<div class="count" v-for="(item,index) in userToday.totalCount" :key="index"><span :class="'count_'+item"></span></div>-->
+        <!--</div>-->
+      <!--</div>-->
 
-                <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
-                  <div class="home_bottom_item_img">
-                    <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
-                  </div>
-                  <div class="home_bottom_item_info card_name">陌生人</div>
-                  <div class="home_bottom_item_info card_address">{{item.hjdz}}</div>
-                  <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                  <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
-                </div>
-              </div>
-            </a-popover>
-          </div>
+      <!--<div class="home_common_number_box">-->
+        <!--<div class="home_common_number_title"></div>-->
+        <!--<div class="home_common_number_count">-->
+        <!--</div>-->
+      <!--</div>-->
+
+      <!--<div class="home_common_number_box">-->
+        <!--<div class="home_common_number_title">已登记人数</div>-->
+        <!--<div class="home_common_number_count">-->
+          <!--<div class="count" v-for="(item,index) in userToday.normalCount" :key="index"><span :class="'count_'+item"></span></div>-->
+        <!--</div>-->
+      <!--</div>-->
+
+      <!--<div class="home_common_number_box">-->
+        <!--<div class="home_common_number_title">未登记人数</div>-->
+        <!--<div class="home_common_number_count">-->
+          <!--<div class="count" v-for="(item,index) in userToday.anonymousCount" :key="index"><span :class="'count_'+item"></span></div>-->
+        <!--</div>-->
+      <!--</div>-->
+    <!--</div>-->
+    <!--<div class="home_l_b">-->
+      <!--<div class="home_bottom_title">信息列表</div>-->
+      <!--<div class="home_bottom_box scroll_body">-->
+        <!--<a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">-->
+          <!--<template slot="content">-->
+            <!--<PersonDetail></PersonDetail>-->
+          <!--</template>-->
+          <!--<div class="home_bottom_item">-->
+            <!--<div class="home_bottom_item_jiao1"></div>-->
+            <!--<div class="home_bottom_item_jiao2"></div>-->
+            <!--<div class="home_bottom_item_jiao3"></div>-->
+            <!--<div class="home_bottom_item_jiao4"></div>-->
+            <!--<div class="home_bottom_item_body">-->
+                  <!--<div class="home_bottom_item_img">-->
+                    <!--<img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">-->
+                  <!--</div>-->
+                  <!--<div class="home_bottom_item_info"><span>姓名：</span>{{item.personName}}</div>-->
+                  <!--<div class="home_bottom_item_info"><span>地点：</span>{{item.address}}</div>-->
+                  <!--&lt;!&ndash;            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>&ndash;&gt;-->
+                  <!--<div class="home_bottom_item_info"><span>时间：</span>{{item.outInTime}}</div>-->
+
+            <!--</div>-->
+          <!--</div>-->
+        <!--</a-popover>-->
+      <!--</div>-->
+    <!--</div>-->
+    <div class="home_r_t">
+      <div class="home_common_title">
+        <div class="home_common_title_info">今日车辆进出统计</div>
+      </div>
+      <div class="home_common_number_box">
+        <div class="home_common_number_title">进入车辆</div>
+        <div class="home_common_number_count">
+          <div class="count"><span class="count_1"></span></div>
+          <div class="count"><span class="count_4"></span></div>
+          <div class="count"><span class="count_6"></span></div>
+          <div class="count"><span class="count_0"></span></div>
         </div>
-      </collapse>
-      <collapse :selected="active2" ref="c2" @collapse-open="changeActiveIndex('1')">
-        <div slot="collapse-header">
-          <div class="accordion_head" style="width:100%;">
-            <div class="accordion_head_title accordion_car">
-              车辆进出统计
-            </div>
-            <div class="accordion_head_info" style="padding:5px;display: block;position:relative;">
-              <div class="home_bottom_item" style="position:absolute;left:-10px;right:-10px;top:0;height:80px;display: block;margin:0;">
-                <div class="home_bottom_item_jiao1"></div>
-                <div class="home_bottom_item_jiao2"></div>
-                <div class="home_bottom_item_jiao3"></div>
-                <div class="home_bottom_item_jiao4"></div>
-                <div class="home_bottom_item_body" style="padding:0;">
-                  <div class="tongji_item">
-                    <div class="tongji_item_t">
-                      <div class="tongji_item_t_label">总次数</div>
-                      <div class="tongji_item_t_number">1000</div>
-                    </div>
-                    <div class="tongji_item_b">
-                      <div class="tongji_item_b_tongji">已登记 1000 辆</div>
-                      <div class="tongji_item_b_tongji">未登记 1000 辆</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+      </div>
+
+      <div class="home_common_number_box">
+        <div class="home_common_number_title">外出车辆</div>
+        <div class="home_common_number_count">
+          <div class="count"><span class="count_1"></span></div>
+          <div class="count"><span class="count_4"></span></div>
+          <div class="count"><span class="count_6"></span></div>
+          <div class="count"><span class="count_0"></span></div>
         </div>
-        <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
-          <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-            <a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">
-              <template slot="content">
-                <PersonDetail></PersonDetail>
-              </template>
-              <div class="home_bottom_item">
-                <div class="home_bottom_item_jiao1"></div>
-                <div class="home_bottom_item_jiao2"></div>
-                <div class="home_bottom_item_jiao3"></div>
-                <div class="home_bottom_item_jiao4"></div>
-                <div class="home_bottom_item_body">
-                  <div class="home_bottom_item_img">
-                    <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
-                  </div>
-                  <div class="home_bottom_item_info card_name">{{item.personName}}</div>
-                  <div class="home_bottom_item_info card_address">{{item.address}}</div>
-                  <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                  <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
-                </div>
-              </div>
-            </a-popover>
-          </div>
+      </div>
+
+      <div class="home_common_number_box">
+        <div class="home_common_number_title">已登记车辆</div>
+        <div class="home_common_number_count">
+          <div class="count"><span class="count_1"></span></div>
+          <div class="count"><span class="count_4"></span></div>
+          <div class="count"><span class="count_6"></span></div>
+          <div class="count"><span class="count_0"></span></div>
         </div>
-      </collapse>
+      </div>
+
+      <div class="home_common_number_box">
+        <div class="home_common_number_title">未登记车辆</div>
+        <div class="home_common_number_count">
+          <div class="count"><span class="count_1"></span></div>
+          <div class="count"><span class="count_4"></span></div>
+          <div class="count"><span class="count_6"></span></div>
+          <div class="count"><span class="count_0"></span></div>
+        </div>
+      </div>
     </div>
-<!--    <div class="home_c" ref="center" @mouseleave="leave">-->
-    <div class="home_c" ref="center">
+    <div class="home_r_b">
+      <div class="home_bottom_title">信息列表</div>
+      <div class="home_bottom_box scroll_body">
+
+        <div class="home_bottom_item">
+          <div class="home_bottom_item_jiao1"></div>
+          <div class="home_bottom_item_jiao2"></div>
+          <div class="home_bottom_item_jiao3"></div>
+          <div class="home_bottom_item_jiao4"></div>
+          <div class="home_bottom_item_body">
+            <div class="home_bottom_item_img"></div>
+            <div class="home_bottom_item_info"><span>车牌号：</span>鲁A962ZP</div>
+            <div class="home_bottom_item_info"><span>地点：</span>1号门</div>
+            <div class="home_bottom_item_info"><span>方式：</span>进入</div>
+            <div class="home_bottom_item_info"><span>时间：</span>2019-11-11 22:22:22</div>
+          </div>
+        </div>
+        <div class="home_bottom_item">
+          <div class="home_bottom_item_jiao1"></div>
+          <div class="home_bottom_item_jiao2"></div>
+          <div class="home_bottom_item_jiao3"></div>
+          <div class="home_bottom_item_jiao4"></div>
+          <div class="home_bottom_item_body">
+            <div class="home_bottom_item_img"></div>
+            <div class="home_bottom_item_info"><span>车牌号：</span>鲁A962ZP</div>
+            <div class="home_bottom_item_info"><span>地点：</span>1号门</div>
+            <div class="home_bottom_item_info"><span>方式：</span>进入</div>
+            <div class="home_bottom_item_info"><span>时间：</span>2019-11-11 22:22:22</div>
+          </div>
+        </div>
+        <div class="home_bottom_item">
+          <div class="home_bottom_item_jiao1"></div>
+          <div class="home_bottom_item_jiao2"></div>
+          <div class="home_bottom_item_jiao3"></div>
+          <div class="home_bottom_item_jiao4"></div>
+          <div class="home_bottom_item_body">
+            <div class="home_bottom_item_img"></div>
+            <div class="home_bottom_item_info"><span>车牌号：</span>鲁A962ZP</div>
+            <div class="home_bottom_item_info"><span>地点：</span>1号门</div>
+            <div class="home_bottom_item_info"><span>方式：</span>进入</div>
+            <div class="home_bottom_item_info"><span>时间：</span>2019-11-11 22:22:22</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="home_c" ref="center" @mouseleave="leave">
       <div class="home_c_l_t"></div>
       <div class="home_c_r_t"></div>
 
@@ -188,10 +214,9 @@
           </div>
         </div>
       </div>
-      <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
-      <PersonList v-show="personListShow" :personListData="personListData" @close="closePersonList" ref="personListDom"></PersonList>
+      <DialogCard :position="position" v-show="dialogShow" @leave="leave" ref="dialogDom"></DialogCard>
       <div class="home_c_body">
-        <iframe ref="mapIframe" :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
+        <iframe :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
       </div>
     </div>
 
@@ -200,7 +225,7 @@
 </template>
 
 <script>
-  import Collapse from 'vue-collapse'
+
   import {
     getPersonMonitorList,
     getTodayStat,
@@ -215,12 +240,6 @@
       name: "home",
       data () {
         return {
-          personListData: undefined,
-          personListShow: false,
-          active1: true,
-          active2: false,
-          activeIndex: '0',
-          text: `A dog is a type of domesticated animal.Known for its loyalty and faithfulness,it can be found as a welcome guest in many households across the world.`,
           xiaoquData: {},
           louDongData: {
             childrenCount: "0",
@@ -230,11 +249,10 @@
             totalCount: "0",
             zcCount: "0"
           },
-          // accordionHeight:400,
           centerHeight: 0,
-          // mapUrl: '',
-          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
-          imagePath: '/jeecg-boot/sys/common/view',
+          mapUrl: '',
+          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          imagePath: '/jeecg-boot/sys/common/view/',
           dialogShow: false,
           userList: [],
           userToday: {},
@@ -257,11 +275,9 @@
       components:{
         DialogCard,
         PersonList,
-        PersonDetail,
-        Collapse
+        PersonDetail
       },
       mounted() {
-
         getMonitorPersonStat().then(rel => {
           if(rel.code === 200) {
             this.xiaoquData = rel.result
@@ -284,26 +300,30 @@
       created() {
         window.addEventListener('message', (event) => {
           if(event.data.funcName === 'showDialog'){
-            let x = event.data.x
-            let y = event.data.y
-            const dialogHeight = 420
-            const centerHeight = this.centerHeight
-            if(y + dialogHeight >= centerHeight) {
-              y = centerHeight - dialogHeight;
-            }
-            this.position.left = x + 'px'
-            this.position.top = y + 'px'
-            const _data = event.data.data;
-            console.log(_data)
+            this.$nextTick(() => {
 
-            this.getLouDongInfo({
-              louDongHao: _data.ld
-            }, (data1) => {
-              data1.ld = _data.ld
-              this.dialogShow = true
-              if(this.$refs.dialogDom.setLouDongData) {
-                this.$refs.dialogDom.setLouDongData(data1)
+              let x = event.data.x
+              let y = event.data.y
+              const dialogHeight = 420
+              const centerHeight = this.centerHeight
+              if(y + dialogHeight >= centerHeight) {
+                y = centerHeight - dialogHeight;
               }
+              this.position.left = x + 'px'
+              this.position.top = y + 'px'
+              const _data = event.data.data;
+              console.log(_data)
+
+              this.getLouDongInfo({
+                louDongHao: _data.ld
+              }, (data1) => {
+                data1.ld = _data.ld
+                this.$nextTick(() => {
+                  this.$refs.dialogDom.setLouDongData(data1)
+                  this.dialogShow = true
+                })
+              })
+
             })
           }else {
             this.dialogShow = false
@@ -312,40 +332,6 @@
         }, false);
       },
       methods: {
-        closePersonList() {
-          this.$nextTick(() => {
-            this.$refs.dialogDom.clearRoomSelect();
-          })
-          this.personListShow = false
-        },
-        showPersonList(data) {
-          this.personListData = data
-          this.personListShow = true
-        },
-        closeDialog() {
-          this.$nextTick(() => {
-            this.$refs.mapIframe.contentWindow.postMessage({funcName:'closeDialog'},'*');
-          })
-
-        },
-        changeActiveIndex(index) {
-          console.log(index)
-          if (index === '0') {
-
-            this.$nextTick(() => {
-              this.$refs.c1.active = true
-              this.$refs.c2.active = false
-            })
-          } else {
-            this.$nextTick(() => {
-              this.$refs.c1.active = false
-              this.$refs.c2.active = true
-            })
-          }
-        },
-        changeActivekey(key) {
-          console.log(key);
-        },
         getLouDongInfo(params, cb) {
           getLouDongInfo(params).then(rel => {
             if(rel.code === 200) {
@@ -363,9 +349,9 @@
             if(rel.code === 200) {
               const o = rel.result || {}
               this.userToday = {
-                anonymousCount: o.anonymousCount?(o.anonymousCount+''):'0',
-                normalCount: o.normalCount?(o.normalCount+''):'0',
-                totalCount: o.totalCount?(o.totalCount+''):'0'
+                anonymousCount: o.anonymousCount?(o.anonymousCount+'').split(''):['0'],
+                normalCount: o.normalCount?(o.normalCount+'').split(''):['0'],
+                totalCount: o.totalCount?(o.totalCount+'').split(''):['0']
               }
             }
           })
@@ -378,7 +364,6 @@
           })
         },
         leave() {
-          this.closeDialog()
           this.dialogShow = false
         }
       }
@@ -476,18 +461,10 @@
   }
   .home_c{
     position:absolute;
-    top:70px;
-    bottom:10px;
-    left:10px;
-    right:420px;
-    z-index: 1;
-  }
-  .home_r{
-    position:absolute;
-    top:70px;
-    bottom:10px;
-    right:10px;
-    width:400px;
+    top:97px;
+    bottom:70px;
+    left:500px;
+    right:500px;
     z-index: 1;
   }
   .home_common_title{
@@ -581,9 +558,9 @@
   .home_head{
     background-image:url("~@/assets/images/home_head_bg.png");
     background-size:1920px 76px;
-    background-position:center bottom 0;
+    background-position:center 0;
     background-repeat: no-repeat;
-    height:60px;
+    height:76px;
     position:relative;
   }
   .home_head_title{
@@ -592,7 +569,7 @@
     left:50%;
     margin-left:-300px;
     height:54px;
-    top:6px;
+    top:22px;
     line-height: 54px;
     font-size:36px;
     text-align: center;
@@ -605,7 +582,7 @@
   .home_head_info{
     position:absolute;
     right:20px;
-    top:25px;
+    top:41px;
     height:29px;
     line-height: 29px;
     font-size:16px;
@@ -642,9 +619,9 @@
     padding-right:20px;
   }
   .home_bottom_item{
-    height:102px;
+    height:142px;
     position:relative;
-    margin-bottom:10px;
+    margin-bottom:30px;
     cursor: pointer;
   }
   .home_bottom_item_body{
@@ -656,7 +633,7 @@
     background:rgba(6,7,107,0);
     border:1px solid rgba(55, 85, 218, 0.3);
     z-index: 1;
-    padding:10px;
+    padding:20px;
   }
   .home_bottom_item_jiao1,.home_bottom_item_jiao2,.home_bottom_item_jiao3,.home_bottom_item_jiao4{
     position:absolute;
@@ -698,10 +675,10 @@
   }
   .home_bottom_item_img{
     position:absolute;
-    left:10px;
-    top:10px;
-    width:70px;
-    height:80px;
+    left:20px;
+    top:20px;
+    width:90px;
+    height:100px;
     background:rgba(255,255,255,0.2);
   }
   .home_bottom_item_img img{
@@ -715,17 +692,19 @@
     height:100%;
   }
   .home_bottom_item_info{
-    margin-left:80px;
-    padding-left:20px;
-    font-size:12px;
+    padding-left:90px;
+    font-size:16px;
     font-family:Microsoft YaHei;
     font-weight:400;
     color:rgba(24,189,253,1);
-    line-height: 26px;
-    overflow: hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
-    opacity: 0.9;
+    line-height: 16px;
+    padding-bottom:10px;
+  }
+  .home_bottom_item_info span{
+    display: inline-block;
+    height:16px;
+    width:80px;
+    text-align: right;
   }
   .home_c_l_t{
     position:absolute;
@@ -829,81 +808,7 @@
   .home_tongji_item_info span{
     font-size:24px;
   }
-  .tongji_list{
-    position:absolute;
-    top:10px;
-    right:0;
-    bottom:0;
-    left:0;
-    border:1px solid rgba(255,255,255,0.2);
-    box-shadow: 0 0 10px rgba(255,255,255,0.2) inset;
-  }
-  .accordion_car{
-    padding-left:25px;
-    background-image: url("~@/assets/images/home_accordion_icon_car.png");
-    background-size:20px 20px;
-    background-position:0px center;
-    background-repeat: no-repeat;
-  }
 
-  .accordion_person{
-    padding-left:25px;
-    background-image: url("~@/assets/images/home_accordion_icon_person.png");
-    background-size:20px 20px;
-    background-position:0px center;
-    background-repeat: no-repeat;
-  }
-  .card_name{
-    background-image: url("~@/assets/images/card_name.png");
-    background-size:12px 12px;
-    background-position:0px center;
-    background-repeat: no-repeat;
-  }
-
-  .card_address{
-    background-image: url("~@/assets/images/card_address.png");
-    background-size:12px 12px;
-    background-position:0px center;
-    background-repeat: no-repeat;
-  }
-
-  .card_time{
-    background-image: url("~@/assets/images/card_time.png");
-    background-size:12px 12px;
-    background-position:0px center;
-    background-repeat: no-repeat;
-  }
-  .message_icon{
-    width: 30px;
-    height:30px;
-    position:absolute;
-    left:0;
-    top:0;
-    display: block;
-    background-image: url("~@/assets/images/message_icon.png");
-    background-size:30px 30px;
-    background-position:0px center;
-    background-repeat: no-repeat;
-  }
-  .message_box{
-    line-height: 40px;
-    font-size:10px;
-    font-weight: bold;
-    position:relative;
-    width:40px;
-    height:30px;
-  }
-  .message_box .message_number{
-    display: block;
-    position:absolute;
-    top:0;
-    right:0;
-    font-size:12px;
-    width:30px;
-    color:#fff;
-    text-align: center;
-    z-index: 100;
-  }
 </style>
 <style>
   .ant-popover-inner{
@@ -915,109 +820,11 @@
   .ant-popover-placement-top > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-topLeft > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-topRight > .ant-popover-content > .ant-popover-arrow{
     border-right-color: rgba(44,92,235,0.6);
     border-bottom-color: rgba(44,92,235,0.6);
-    display: none;
   }
   .ant-popover-placement-right > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-rightTop > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-rightBottom > .ant-popover-content > .ant-popover-arrow{
+
+    /*border-right-color: #00F6FF;*/
     border-bottom-color: #00F6FF;
     border-left-color:#00F6FF;
-    display: none;
-  }
-  .ant-popover-placement-left > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-leftTop > .ant-popover-content > .ant-popover-arrow, .ant-popover-placement-leftBottom > .ant-popover-content > .ant-popover-arrow{
-    border-top-color: #00F6FF;
-    border-right-color:#00F6FF;
-  }
-  .collapse .collapse-header::before{
-    top:0;
-    line-height: 20px;
-  }
-  .collapse .collapse-header{
-    background:none;
-  }
-  .accordion_head{
-    height:110px;
-    color:#fff;
-    display: block!important;
-  }
-  #big_home .accordion_head * {
-    display: block;
-  }
-  .accordion_head_title{
-    height:30px;
-    line-height: 30px;
-  }
-  .collapse .collapse-header{
-    padding:0 10px;
-  }
-  .collapse .collapse-content-box{
-    border:none;
-    padding:0;
-    color:#fff;
-  }
-  .tongji_item{
-    margin:5px;
-    box-sizing: border-box;
-    border:2px solid rgba(44,92,235,0.6);
-  }
-  .tongji_item_b{
-    height:24px;
-    line-height: 24px;
-    background:rgba(44,92,235,0.6);
-    clear: both;
-    position:relative;
-  }
-  .tongji_item_b_tongji{
-    height:24px;
-    line-height: 24px;
-    width:50%;
-    float:left;
-    position:relative;
-    text-align: center;
-    color:#fff;
-    font-size:12px;
-  }
-  .tongji_item_t{
-    height:40px;
-    background:rgba(255,255,255,0.1);
-  }
-  .tongji_item_t_label{
-    height:40px;
-    line-height: 40px;
-    width:45%;
-    text-align: right;
-    float:left;
-    font-size:16px;
-  }
-  .tongji_item_t_number{
-    height:40px;
-    line-height: 40px;
-    width:50%;
-    margin-left:5%;
-    text-align: left;
-    float:left;
-    font-size:24px;
-    color:#fadb14;
-  }
-  .collapse .collapse-header .tongji_item_b::before{
-    -webkit-transition: all .2s;
-    transition: all .2s;
-    content: url(/img/arrow-down.de28a4e4.svg);
-    position: absolute;
-    font-size: 0.4em;
-    top: calc(50% - 0.4em);
-    left: calc(50% - 0.4em);
-    color: #c5c9d0;
-    -webkit-transform: rotate(0deg);
-    transform: rotate(0deg);
-  }
-  .collapse .collapse-header .tongji_item_b::before{
-    top: 0;
-    line-height: 30px;
-  }
-  .collapse.is-active .collapse-header  .tongji_item_b::before {
-    -webkit-transform: rotate(-180deg);
-    transform: rotate(-180deg);
-  }
-  .collapse .collapse-header::before{
-    display: none;
   }
 </style>

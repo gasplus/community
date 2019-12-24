@@ -1,5 +1,5 @@
 <template>
-  <div class="card1" @mouseleave="leave">
+  <div class="card1">
     <div class="card1_bg">
       <div class="card1_bg_l_t"></div>
       <div class="card1_bg_l_c"></div>
@@ -11,8 +11,19 @@
       <div class="card1_bg_b_c"></div>
       <div class="card1_bg_c"></div>
     </div>
+
+    <div class="close_btn" @click="close"></div>
     <div class="card1_body">
-      123123
+      <div class="room_box">
+        <div class="room_title">
+          房间号
+        </div>
+        <div class="room_person_list">
+          <div class="room_person_item">
+            1
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -22,47 +33,20 @@
         name: "personList",
         data() {
           return {
-            loudongData: {
-              ld: '',
-              childrenCount: 0,
-              danYuan: [],
-              keyPersonCount: 0,
-              oldPersonCount:0,
-              totalCount: 0,
-              zcCount: 0
-            },
-            currentIndex: undefined,
-            danyuanMap: {
-              1: '一',
-              2: '二',
-              3: '三',
-              4: '四',
-              5: '五',
-              6: '六',
-              7: '七',
-              8: '八',
-              9: '九',
-              10: '十'
-            }
+            roomData: {},
+            personList: [],
           }
         },
         methods: {
           changeDY(index) {
-            this.currentIndex = index;
+            this.currentIndex = index
           },
-          setLouDongData(data) {
-            for(let key in data) {
-              this.loudongData[key] = data[key];
-            }
-            if(this.loudongData.danYuan && this.loudongData.danYuan.length > 0) {
-              this.currentIndex = 0;
-            } else {
-              this.currentIndex = undefined;
-            }
-            console.log(this.currentIndex)
+          setList(list, roomData) {
+            this.roomData = roomData
+            this.personList = list
           },
-          leave() {
-            this.$emit('leave')
+          close() {
+            this.$emit('close')
           }
         }
     }
@@ -72,12 +56,28 @@
   .card1 *{
     box-sizing:content-box;
   }
+  .close_btn{
+    position:absolute;
+    top:5px;
+    right:10px;
+    width:20px;
+    height:20px;
+    cursor: pointer;
+    z-index: 1000;
+    background-image: url("~@/assets/images/icon_close.png");
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 100% 100%;
+    opacity: 0.8;
+  }
   .card1{
-    position:relative;
-    width:650px;
-    min-height:360px;
-    /*margin-top:-210px;*/
-    /*margin-left:-325px;*/
+    position:absolute;
+    width:900px;
+    left:50%;
+    top:50%;
+    min-height:600px;
+    margin-top:-300px;
+    margin-left:-450px;
     z-index: 3;
   }
   .card1_bg{
@@ -190,6 +190,11 @@
   }
 
   .card1_body{
+    position:absolute;
+    top:20px;
+    left:20px;
+    right:20px;
+    bottom:20px;
   }
 
 
@@ -509,12 +514,12 @@
   }
 
 
-  .card2_body::-webkit-scrollbar {
+  .room_person_list::-webkit-scrollbar {
     /*滚动条整体样式*/
     width : 6px;  /*高宽分别对应横竖滚动条的尺寸*/
     height: 1px;
   }
-  .card2_body::-webkit-scrollbar-thumb {
+  .room_person_list::-webkit-scrollbar-thumb {
     /*滚动条里面小方块*/
     border-radius   : 6px;
     background-color: #0F80D4;
@@ -529,10 +534,25 @@
       transparent
     );
   }
-  .card2_body::-webkit-scrollbar-track {
+  .room_person_list::-webkit-scrollbar-track {
     /*滚动条里面轨道*/
     box-shadow   : inset 0 0 3px rgba(0, 0, 0, 0.2);
     background   : #0D1B61;
     border-radius: 6px;
+  }
+  .room_title{
+    height:40px;
+    text-align: center;
+    font-size:20px;
+    font-weight: bold;
+    color:#fff;
+  }
+  .room_person_list{
+    position:absolute;
+    top:40px;
+    bottom:0;
+    left:0;
+    right:0;
+    overflow: auto;
   }
 </style>
