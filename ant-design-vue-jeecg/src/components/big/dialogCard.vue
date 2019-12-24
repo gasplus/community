@@ -101,7 +101,14 @@
           },
           selectRoom(index){
             this.selectRoomIndex = index
-            this.$emit('show', this.loudongData.danYuan[this.currentIndex].fangJian[index])
+            const louDongHao = this.loudongData.ld
+            const danYuanHao = this.loudongData.danYuan[this.currentIndex].danYuanHao
+            const fangJianHao = this.loudongData.danYuan[this.currentIndex].fangJian[index].fangJianHao
+            this.$emit('show', this.loudongData.danYuan[this.currentIndex].fangJian[index],{
+              louDongHao: louDongHao,
+              danYuanHao: danYuanHao,
+              fangJianHao:fangJianHao
+            })
           },
           changeDY(index) {
             this.currentIndex = index;

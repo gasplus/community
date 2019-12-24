@@ -136,60 +136,17 @@
       <div class="home_c_line_b"></div>
       <div class="home_c_line_r_b"></div>
       <div class="home_tongji_list">
-        <div class="home_tongji_item" v-if="xiaoquData.fangJianCount!==undefined">
+        <div class="home_tongji_item" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
           <div class="home_tongji_item_box">
-            <div class="home_tongji_item_title">实有房间</div>
+            <div class="home_tongji_item_title">{{tongjiKeyMap[key]}}</div>
             <div class="home_tongji_item_info">
-              <span>{{xiaoquData.fangJianCount}}</span>个
-            </div>
-          </div>
-        </div>
-        <div class="home_tongji_item" v-if="xiaoquData.personCount!==undefined">
-          <div class="home_tongji_item_box">
-            <div class="home_tongji_item_title">实有人口</div>
-            <div class="home_tongji_item_info">
-              <span>{{xiaoquData.personCount}}</span>人
-            </div>
-          </div>
-        </div>
-
-        <div class="home_tongji_item" v-if="xiaoquData.dw !== undefined">
-          <div class="home_tongji_item_box">
-            <div class="home_tongji_item_title">实有单位</div>
-            <div class="home_tongji_item_info">
-              <span>{{xiaoquData.dw}}</span>个
-            </div>
-          </div>
-        </div>
-        <div class="home_tongji_item" v-if="xiaoquData.cl !== undefined">
-          <div class="home_tongji_item_box">
-            <div class="home_tongji_item_title">实有车辆</div>
-            <div class="home_tongji_item_info">
-              <span>{{xiaoquData.cl}}</span>辆
-            </div>
-          </div>
-        </div>
-
-        <div class="home_tongji_item" v-if="xiaoquData.cz !== undefined">
-          <div class="home_tongji_item_box">
-            <div class="home_tongji_item_title">出租房</div>
-            <div class="home_tongji_item_info">
-              <span>{{xiaoquData.cz}}</span>套
-            </div>
-          </div>
-        </div>
-
-        <div class="home_tongji_item" v-if="xiaoquData.gz !== undefined">
-          <div class="home_tongji_item_box">
-            <div class="home_tongji_item_title">关注人员</div>
-            <div class="home_tongji_item_info">
-              <span>{{xiaoquData.gz}}</span>人
+              <span>{{xiaoquData[key]}}</span>人
             </div>
           </div>
         </div>
       </div>
       <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
-      <PersonList v-show="personListShow" :personListData="personListData" @close="closePersonList" ref="personListDom"></PersonList>
+      <PersonList v-show="personListShow" :personListData="personListData" :roomData="roomData" @close="closePersonList"></PersonList>
       <div class="home_c_body">
         <iframe ref="mapIframe" :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
       </div>
@@ -205,7 +162,8 @@
     getPersonMonitorList,
     getTodayStat,
     getLouDongInfo,
-    getMonitorPersonStat
+    getMonitorPersonTypeStat,
+    getFangJianPerson
   } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
   import PersonList from '@/components/big/personList'
@@ -215,6 +173,21 @@
       name: "home",
       data () {
         return {
+          roomData: {},
+          tongjiList: [
+            'count', 'A01A01', 'A01A02', 'A01A03', 'A01A04'
+            // , 'A01A04A01', 'A01A04A02', 'A01A04A03'
+          ],
+          tongjiKeyMap:{
+            'A01A04': '重点人员',
+            'A01A04A03': '刑满释放',
+            'A01A04A02': '精神病人',
+            'A01A04A01': '五类外执人员',
+            'A01A03': '孤寡老人',
+            'A01A02': '留守儿童',
+            'A01A01': '普通',
+            'count': '实有人口'
+          },
           personListData: undefined,
           personListShow: false,
           active1: true,
@@ -232,9 +205,9 @@
           },
           // accordionHeight:400,
           centerHeight: 0,
-          // mapUrl: '',
-          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
-          imagePath: '/jeecg-boot/sys/common/view',
+          mapUrl: '',
+          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          imagePath: window._CONFIG['imgDomainURL'],
           dialogShow: false,
           userList: [],
           userToday: {},
@@ -261,8 +234,7 @@
         Collapse
       },
       mounted() {
-
-        getMonitorPersonStat().then(rel => {
+        getMonitorPersonTypeStat().then(rel => {
           if(rel.code === 200) {
             this.xiaoquData = rel.result
           }
@@ -280,6 +252,15 @@
             })
           })()
         }
+        this.getLouDongInfo({
+          louDongHao: '14'
+        }, (data1) => {
+          data1.ld = '14'
+          this.dialogShow = true
+          if(this.$refs.dialogDom.setLouDongData) {
+            this.$refs.dialogDom.setLouDongData(data1)
+          }
+        })
       },
       created() {
         window.addEventListener('message', (event) => {
@@ -312,15 +293,27 @@
         }, false);
       },
       methods: {
+        getFangJianPerson(params,cb) {
+          getFangJianPerson(params).then(rel => {
+            if(rel.code === 200) {
+              this.personListData = rel.result
+              if(cb && typeof cb === 'function') {
+                cb(rel.result)
+              }
+            }
+          })
+        },
         closePersonList() {
           this.$nextTick(() => {
             this.$refs.dialogDom.clearRoomSelect();
           })
           this.personListShow = false
         },
-        showPersonList(data) {
-          this.personListData = data
-          this.personListShow = true
+        showPersonList(data,params) {
+          this.getFangJianPerson(params,() => {
+            this.roomData = data
+            this.personListShow = true
+          })
         },
         closeDialog() {
           this.$nextTick(() => {
@@ -349,9 +342,7 @@
         getLouDongInfo(params, cb) {
           getLouDongInfo(params).then(rel => {
             if(rel.code === 200) {
-              console.log(rel)
               this.louDongData = rel.result
-              console.log(rel)
               if(cb && typeof cb === 'function') {
                 cb(rel.result)
               }

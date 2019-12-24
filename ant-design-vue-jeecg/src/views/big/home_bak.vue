@@ -252,7 +252,7 @@
           centerHeight: 0,
           mapUrl: '',
           // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
-          imagePath: '/jeecg-boot/sys/common/view/',
+          imagePath: window._CONFIG['imgDomainURL'],
           dialogShow: false,
           userList: [],
           userToday: {},

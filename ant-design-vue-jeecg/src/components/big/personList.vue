@@ -16,11 +16,11 @@
     <div class="card1_body">
       <div class="room_box">
         <div class="room_title">
-          房间号
+          {{roomData.fangJianHao}}室
         </div>
         <div class="room_person_list">
-          <div class="room_person_item">
-            1
+          <div class="room_person_item" v-for="(item,index) in personListData" :key="index">
+            {{item.xingMing}}
           </div>
         </div>
       </div>
@@ -31,19 +31,15 @@
 <script>
     export default {
         name: "personList",
+        props:['roomData','personListData'],
         data() {
           return {
-            roomData: {},
             personList: [],
           }
         },
         methods: {
           changeDY(index) {
             this.currentIndex = index
-          },
-          setList(list, roomData) {
-            this.roomData = roomData
-            this.personList = list
           },
           close() {
             this.$emit('close')

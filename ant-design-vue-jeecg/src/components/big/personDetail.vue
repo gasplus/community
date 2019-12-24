@@ -57,7 +57,7 @@
         data() {
           return {
             photoUrl: '',
-            imagePath: '/jeecg-boot/sys/common/view/',
+            imagePath: window._CONFIG['imgDomainURL'],
             loudongData: {
               ld: '',
               childrenCount: 0,
