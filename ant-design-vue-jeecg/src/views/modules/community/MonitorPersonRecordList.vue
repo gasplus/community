@@ -4,12 +4,34 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
+          <a-col :md="12" :sm="16">
+            <a-form-item label="进出时间">
+              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间" class="query-group-cust" v-model="queryParam.outInTime_begin"></j-date>
+              <span class="query-group-split-cust"></span>
+              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间" class="query-group-cust" v-model="queryParam.outInTime_end"></j-date>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="人员类型">
+              <j-dict-select-tag placeholder="请选择人员类型" v-model="queryParam.personType" dictCode="person_type"/>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8" >
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a @click="handleToggleSearch" style="margin-left: 8px">
+                {{ toggleSearchStatus ? '收起' : '展开' }}
+                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
+              </a>
+            </span>
+          </a-col>
 
         </a-row>
       </a-form>
     </div>
     <!-- 查询区域-END -->
-    
+
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
@@ -42,7 +64,7 @@
         :pagination="ipagination"
         :loading="loading"
         :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        
+
         @change="handleTableChange">
 
         <template slot="htmlSlot" slot-scope="text">
@@ -92,12 +114,16 @@
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import MonitorPersonRecordModal from './modules/MonitorPersonRecordModal'
+  import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
+  import JDate from '@/components/jeecg/JDate.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: "MonitorPersonRecordList",
     mixins:[JeecgListMixin],
     components: {
+      JDictSelectTag,
+      JDate,
       MonitorPersonRecordModal
     },
     data () {
@@ -125,7 +151,6 @@
             align:"center",
             dataIndex: 'personIdCard'
           },
-
           {
             title:'进出时间',
             align:"center",
@@ -154,7 +179,6 @@
             align:"center",
             dataIndex: 'address'
           },
-
           {
             title: '操作',
             dataIndex: 'action',
@@ -175,8 +199,7 @@
           importExcelUrl: "monitor/monitorPersonRecord/importExcel",
         },
         dictOptions:{
-         outInType:[],
-         personType:[],
+          personType:[],
         },
       }
     },
@@ -187,25 +210,20 @@
     },
     methods: {
       initDictConfig(){
-        initDictOptions('out_in_type').then((res) => {
-          if (res.success) {
-            this.$set(this.dictOptions, 'outInType', res.result)
-          }
-        })
         initDictOptions('person_type').then((res) => {
           if (res.success) {
             this.$set(this.dictOptions, 'personType', res.result)
           }
         })
       },
-    /* 图片预览 */
-    getImgViewRecord(text){
-      if(text && text.indexOf(",")>0){
-        text = text.substring(0,text.indexOf(","))
+      /* 图片预览 */
+      getImgViewRecord(text){
+        if(text && text.indexOf(",")>0){
+          text = text.substring(0,text.indexOf(","))
+        }
+        return window._CONFIG['imgDomainRecordURL']+text
       }
-      return window._CONFIG['imgDomainRecordURL']+text
-    }
-       
+
     }
   }
 </script>
