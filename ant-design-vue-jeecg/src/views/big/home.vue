@@ -44,17 +44,17 @@
 <!--              <template slot="content">-->
 <!--                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>-->
 <!--              </template>-->
-              <div class="home_bottom_item" v-for="item in userList" :key="item.id" @click="showPoint(item)">
+              <div class="home_bottom_item" v-for="item in userList" :key="item.id">
                 <div class="home_bottom_item_jiao1"></div>
                 <div class="home_bottom_item_jiao2"></div>
                 <div class="home_bottom_item_jiao3"></div>
                 <div class="home_bottom_item_jiao4"></div>
-                <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
+                <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
                   <div class="home_bottom_item_img">
                     <img :src="imagePath+item.photoUrl" alt="">
                   </div>
-                  <div class="home_bottom_item_btn">
-                    <a-tag color="blue">查看轨迹</a-tag>
+                  <div class="home_bottom_item_btn" >
+                    <a-tag color="blue" @click="drawLine(item)">查看轨迹</a-tag>
                   </div>
                   <div class="home_bottom_item_info card_name">{{item.personName}}</div>
                   <div class="home_bottom_item_info card_id_card">{{item.personIdCard}}1</div>
@@ -64,9 +64,12 @@
                   <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
                 </div>
 
-                <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
+                <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
                   <div class="home_bottom_item_img">
                     <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
+                  </div>
+                  <div class="home_bottom_item_btn"  >
+                    <a-tag color="blue" @click="showPoint(item)">查看位置</a-tag>
                   </div>
                   <div class="home_bottom_item_info card_name">陌生人</div>
                   <div class="home_bottom_item_info card_address">{{item.address}}</div>
@@ -305,6 +308,31 @@
         showPoint(item) {
           console.log(item)
           this.$refs.mapIframe.contentWindow.postMessage({funcName:'createPanel',data:[item]},'*');
+        },
+        drawLine(item) {
+          console.log(item)
+          getPersonMonitorList({
+            pageSize: 20,
+            pageNo: 1,
+            personId: item.personId
+          }).then(rel => {
+            if(rel.code === 200) {
+              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawLine',data:rel.result.records},'*');
+            }
+          })
+          // this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawLine',data:[{
+          //     deviceId: 'LG00100505',
+          //     outInTime: '2019-09-09',
+          //     address: '1'
+          //   },{
+          //     deviceId: 'LG00100602',
+          //     outInTime: '2019-09-09',
+          //     address: '2'
+          //   },{
+          //     deviceId: 'LG00100703',
+          //     outInTime: '2019-09-09',
+          //     address: '3'
+          //   }]},'*');
         },
         getFangJianPerson(params,cb) {
           getFangJianPerson(params).then(rel => {
@@ -908,6 +936,7 @@
     position:absolute;
     right:5px;
     top:15px;
+    z-index:200;
   }
   .message_icon{
     width: 30px;
