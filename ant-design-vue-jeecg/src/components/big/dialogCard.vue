@@ -1,6 +1,7 @@
 <template>
 <!--  <div class="card1" :style="'left:'+position.left+';top:'+position.top" @mouseleave="leave">-->
   <div class="card1">
+    <div class="mask"></div>
     <div class="card1_bg">
       <div class="card1_bg_l_t"></div>
       <div class="card1_bg_l_c"></div>
@@ -133,6 +134,16 @@
 </script>
 
 <style scoped>
+
+  .mask{
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index: 0;
+    background: rgba(0,0,0,0.6);
+  }
   .card1 *{
     box-sizing:content-box;
   }
@@ -156,7 +167,7 @@
     min-height:420px;
     top:50%;
     left:50%;
-    margin-left:-350px;
+    margin-left:-140px;
     margin-top:-210px;
     /*margin-top:-210px;*/
     /*margin-left:-325px;*/

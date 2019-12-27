@@ -1,5 +1,6 @@
 <template>
   <div class="card1">
+    <div class="mask"></div>
     <div class="card1_bg">
       <div class="card1_bg_l_t"></div>
       <div class="card1_bg_l_c"></div>
@@ -20,7 +21,64 @@
         </div>
         <div class="room_person_list">
           <div class="room_person_item" v-for="(item,index) in personListData" :key="index">
-            {{item.xingMing}}
+            <div class="room_person_bg"></div>
+            <div class="room_person_photo">
+              <img :src="imagePath + item.zhaoPian" alt="">
+            </div>
+            <div class="room_person_body">
+<!--              户籍、出生日期、身份证号、电话、标签、车辆-->
+              <a-row>
+                <a-col :span="12">
+                  <div class="room_person_info r_l">
+                    <div class="room_person_info_label">姓名</div>
+                    <div class="room_person_info_content">{{item.xingMing}}</div>
+                  </div>
+                </a-col>
+                <a-col :span="12">
+                  <div class="room_person_info">
+
+                    <div class="room_person_info_label">关系</div>
+                    <div class="room_person_info_content">{{item.guanXi}}</div>
+                  </div>
+                </a-col>
+              </a-row>
+              <a-row>
+                <a-col :span="12">
+                  <div class="room_person_info r_l">
+                    <div class="room_person_info_label">身份证号</div>
+                    <div class="room_person_info_content">{{item.sfzh}}</div>
+                  </div>
+                </a-col>
+                <a-col :span="12">
+                  <div class="room_person_info">
+                    <div class="room_person_info_label">出生日期</div>
+                    <div class="room_person_info_content">{{item.csrq}}</div>
+                  </div>
+                </a-col>
+              </a-row>
+
+              <a-row>
+                <a-col :span="12">
+                  <div class="room_person_info r_l">
+                    <div class="room_person_info_label">标签</div>
+                    <div class="room_person_info_content">
+                      <a-tag color="#f50" v-if="item.type.indexOf('A01A04')>=0">{{personKeyMap[item.type]}}</a-tag>
+                      <a-tag color="#87d068" v-if="item.type === 'A01A01'">{{personKeyMap[item.type]}}</a-tag>
+                      <a-tag color="#2db7f5" v-if="item.type === 'A01A02'">{{personKeyMap[item.type]}}</a-tag>
+                      <a-tag color="#108ee9" v-if="item.type === 'A01A03'">{{personKeyMap[item.type]}}</a-tag>
+
+                    </div>
+                  </div>
+                </a-col>
+                <a-col :span="12">
+                  <div class="room_person_info">
+                    <div class="room_person_info_label">电话</div>
+                    <div class="room_person_info_content">{{item.lxdh}}</div>
+                  </div>
+                </a-col>
+              </a-row>
+
+            </div>
           </div>
         </div>
       </div>
@@ -34,7 +92,17 @@
         props:['roomData','personListData'],
         data() {
           return {
+            imagePath: window._CONFIG['imgDomainURL'] + '/',
             personList: [],
+            personKeyMap:{
+              'A01A04': '重点人员',
+              'A01A04A03': '刑满释放',
+              'A01A04A02': '精神病人',
+              'A01A04A01': '五类外执人员',
+              'A01A03': '孤寡老人',
+              'A01A02': '留守儿童',
+              'A01A01': '普通'
+            },
           }
         },
         methods: {
@@ -68,12 +136,12 @@
   }
   .card1{
     position:absolute;
-    width:900px;
+    width:600px;
     left:50%;
     top:50%;
-    min-height:600px;
-    margin-top:-300px;
-    margin-left:-450px;
+    min-height:400px;
+    margin-top:-200px;
+    margin-left:-90px;
     z-index: 3;
   }
   .card1_bg{
@@ -546,9 +614,71 @@
   .room_person_list{
     position:absolute;
     top:40px;
-    bottom:0;
+    bottom:20px;
     left:0;
     right:0;
     overflow: auto;
+  }
+  .room_person_item{
+    position:relative;
+    min-height: 100px;
+    margin-right:5px;
+    margin-bottom:10px;
+  }
+  .room_person_bg{
+    position:absolute;
+    z-index: 0;
+    background:#222773;
+    border:1px solid #00E3FF;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    border-radius: 10px;
+  }
+  .room_person_photo{
+    position:absolute;
+    left:20px;
+    top:10px;
+    height:80px;
+    width:60px;
+    border:1px solid #00E3FF;
+  }
+  .room_person_body{
+    margin-left:80px;
+    padding:5px 0;
+  }
+  .room_person_info{
+    position:relative;
+  }
+  .room_person_info_label{
+    height:30px;
+    line-height: 30px;
+    position:absolute;
+    top:0;
+    left:0;
+    width:70px;
+    color:#fff;
+    text-align: right;
+    font-size:12px;
+  }
+  .r_l{
+    border-right:1px solid rgba(255,255,255,0.2);
+  }
+  .room_person_info_content{
+    margin-left:80px;
+    padding:5px 0;
+    line-height: 20px;
+    color:#fff;
+    font-size:12px;
+  }
+  .mask{
+    position:fixed;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index: 0;
+    background: rgba(0,0,0,0.6);
   }
 </style>
