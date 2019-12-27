@@ -17,7 +17,7 @@
               今日人员统计
             </div>
             <div class="accordion_head_info" style="padding:5px;display: block;position:relative;">
-              <div class="home_bottom_item" style="position:absolute;left:-10px;right:-10px;top:0;height:80px;display: block;margin:0;">
+              <div class="home_bottom_item" style="position:absolute;left:-10px;right:-10px;top:0;min-height:80px;height:80px!important;display: block;margin:0;">
                 <div class="home_bottom_item_jiao1"></div>
                 <div class="home_bottom_item_jiao2"></div>
                 <div class="home_bottom_item_jiao3"></div>
@@ -40,21 +40,26 @@
         </div>
         <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
           <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-            <a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">
-              <template slot="content">
-                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>
-              </template>
-              <div class="home_bottom_item">
+<!--            <a-popover  placement="right" trigger="hover">-->
+<!--              <template slot="content">-->
+<!--                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>-->
+<!--              </template>-->
+              <div class="home_bottom_item" v-for="item in userList" :key="item.id">
                 <div class="home_bottom_item_jiao1"></div>
                 <div class="home_bottom_item_jiao2"></div>
                 <div class="home_bottom_item_jiao3"></div>
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
                   <div class="home_bottom_item_img">
-                    <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
+                    <img :src="imagePath+item.photoUrl" alt="">
+                  </div>
+                  <div class="home_bottom_item_btn" >
+                    <a-tag color="blue" @click="drawLine(item)">查看轨迹</a-tag>
                   </div>
                   <div class="home_bottom_item_info card_name">{{item.personName}}</div>
-                  <div class="home_bottom_item_info card_address">{{item.address}}</div>
+                  <div class="home_bottom_item_info card_id_card">{{item.personIdCard}}1</div>
+                  <div class="home_bottom_item_info card_address">{{item.hjdz}}2</div>
+                  <div class="home_bottom_item_info card_find_address">{{item.address}}3</div>
                   <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
                   <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
                 </div>
@@ -63,13 +68,16 @@
                   <div class="home_bottom_item_img">
                     <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
                   </div>
+                  <div class="home_bottom_item_btn"  >
+                    <a-tag color="blue" @click="showPoint(item)">查看位置</a-tag>
+                  </div>
                   <div class="home_bottom_item_info card_name">陌生人</div>
-                  <div class="home_bottom_item_info card_address">{{item.hjdz}}</div>
+                  <div class="home_bottom_item_info card_address">{{item.address}}</div>
                   <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
                   <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
                 </div>
               </div>
-            </a-popover>
+<!--            </a-popover>-->
           </div>
         </div>
       </collapse>
@@ -114,7 +122,7 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body">
                   <div class="home_bottom_item_img">
-                    <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
+                    <img :src="imagePath+'/'+item.photoUrl" alt="">
                   </div>
                   <div class="home_bottom_item_info card_name">{{item.personName}}</div>
                   <div class="home_bottom_item_info card_address">{{item.address}}</div>
@@ -205,8 +213,8 @@
           },
           // accordionHeight:400,
           centerHeight: 0,
-          mapUrl: '',
-          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          // mapUrl: '',
+          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
           imagePath: window._CONFIG['imgDomainURL'],
           dialogShow: false,
           userList: [],
@@ -252,15 +260,19 @@
             })
           })()
         }
-        this.getLouDongInfo({
-          louDongHao: '14'
-        }, (data1) => {
-          data1.ld = '14'
-          this.dialogShow = true
-          if(this.$refs.dialogDom.setLouDongData) {
-            this.$refs.dialogDom.setLouDongData(data1)
-          }
-        })
+        // setTimeout(() => {
+        //   this.dialogShow = true
+        // },1000)
+        //
+        // this.getLouDongInfo({
+        //   louDongHao: '14'
+        // }, (data1) => {
+        //   data1.ld = '14'
+        //   this.dialogShow = true
+        //   if(this.$refs.dialogDom.setLouDongData) {
+        //     this.$refs.dialogDom.setLouDongData(data1)
+        //   }
+        // })
       },
       created() {
         window.addEventListener('message', (event) => {
@@ -276,11 +288,11 @@
             this.position.top = y + 'px'
             const _data = event.data.data;
             console.log(_data)
-
+            // return
             this.getLouDongInfo({
-              louDongHao: _data.ld
+              louDongHao: _data.ID
             }, (data1) => {
-              data1.ld = _data.ld
+              data1.ld = _data.ID
               this.dialogShow = true
               if(this.$refs.dialogDom.setLouDongData) {
                 this.$refs.dialogDom.setLouDongData(data1)
@@ -293,6 +305,35 @@
         }, false);
       },
       methods: {
+        showPoint(item) {
+          console.log(item)
+          this.$refs.mapIframe.contentWindow.postMessage({funcName:'createPanel',data:[item]},'*');
+        },
+        drawLine(item) {
+          console.log(item)
+          getPersonMonitorList({
+            pageSize: 20,
+            pageNo: 1,
+            personId: item.personId
+          }).then(rel => {
+            if(rel.code === 200) {
+              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawLine',data:rel.result.records},'*');
+            }
+          })
+          // this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawLine',data:[{
+          //     deviceId: 'LG00100505',
+          //     outInTime: '2019-09-09',
+          //     address: '1'
+          //   },{
+          //     deviceId: 'LG00100602',
+          //     outInTime: '2019-09-09',
+          //     address: '2'
+          //   },{
+          //     deviceId: 'LG00100703',
+          //     outInTime: '2019-09-09',
+          //     address: '3'
+          //   }]},'*');
+        },
         getFangJianPerson(params,cb) {
           getFangJianPerson(params).then(rel => {
             if(rel.code === 200) {
@@ -361,8 +402,23 @@
             }
           })
         },
+        getFormatDate(date) {
+          let month = (date.getMonth() + 1) + ''
+          let day = date.getDate() + ''
+          if(month.length === 1) {
+            month = '0' + month
+          }
+          if(day.length === 1) {
+            day = '0' + day
+          }
+          return date.getFullYear() + '-' + month + '-' + day
+        },
         getPersonMonitorList() {
-          getPersonMonitorList().then(rel => {
+          const nowDateStr = this.getFormatDate(new Date)
+          getPersonMonitorList({
+            outInTime_begin: nowDateStr + ' 00:00:00',
+            outInTime_end: nowDateStr + ' 23:59:59'
+          }).then(rel => {
             if(rel.code === 200) {
               this.userList = rel.result.records || []
             }
@@ -633,13 +689,13 @@
     padding-right:20px;
   }
   .home_bottom_item{
-    height:102px;
+    min-height:102px;
     position:relative;
     margin-bottom:10px;
     cursor: pointer;
   }
   .home_bottom_item_body{
-    position:absolute;
+    position:relative;
     left:0;
     right:0;
     top:0;
@@ -707,15 +763,15 @@
   }
   .home_bottom_item_info{
     margin-left:80px;
-    padding-left:20px;
     font-size:12px;
     font-family:Microsoft YaHei;
     font-weight:400;
     color:rgba(24,189,253,1);
-    line-height: 26px;
-    overflow: hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
+    line-height: 20px;
+    padding:5px 0 5px 25px;
+    /*overflow: hidden;*/
+    /*text-overflow:ellipsis;*/
+    /*white-space: nowrap;*/
     opacity: 0.9;
   }
   .home_c_l_t{
@@ -846,23 +902,41 @@
   }
   .card_name{
     background-image: url("~@/assets/images/card_name.png");
-    background-size:12px 12px;
-    background-position:0px center;
+    background-size:16px 16px;
+    background-position:4px 7px;
     background-repeat: no-repeat;
   }
 
   .card_address{
     background-image: url("~@/assets/images/card_address.png");
-    background-size:12px 12px;
-    background-position:0px center;
+    background-size:16px 16px;
+    background-position:4px 7px;
+    background-repeat: no-repeat;
+  }
+  .card_find_address{
+    background-image: url("~@/assets/images/icon_person_find_address.png");
+    background-size:18px 18px;
+    background-position:3px 7px;
+    background-repeat: no-repeat;
+  }
+  .card_id_card{
+    background-image: url("~@/assets/images/icon_person_card.png");
+    background-size:24px 18px;
+    background-position:0px 7px;
     background-repeat: no-repeat;
   }
 
   .card_time{
     background-image: url("~@/assets/images/card_time.png");
-    background-size:12px 12px;
-    background-position:0px center;
+    background-size:16px 16px;
+    background-position:4px 7px;
     background-repeat: no-repeat;
+  }
+  .home_bottom_item_btn{
+    position:absolute;
+    right:5px;
+    top:15px;
+    z-index:200;
   }
   .message_icon{
     width: 30px;
