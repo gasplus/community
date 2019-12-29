@@ -6,7 +6,8 @@ const api = {
   todayStat: 'monitor/monitorPersonRecord/getTodayStat',
   louDongInfo: 'monitor/monitorPerson/getLouDongInfo',
   monitorPersonStat: 'monitor/monitorPerson/getMonitorPersonTypeStat',
-  fangJianPerson: 'monitor/monitorPerson/getFangJianPerson'
+  fangJianPerson: 'monitor/monitorPerson/getFangJianPerson',
+  monitorMessage:'monitor/monitorMessage/list'
 }
 
 export default api
@@ -53,6 +54,16 @@ export function getFangJianPerson(parameter) {
   parameter.xiaoQuId = xiaoQuId
   return axios({
     url: api.fangJianPerson,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getMonitorMessage(parameter) {
+  parameter = parameter || {}
+  // parameter.xiaoQuId = xiaoQuId
+  return axios({
+    url: api.monitorMessage,
     method: 'get',
     params: parameter
   })

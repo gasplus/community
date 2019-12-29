@@ -5,9 +5,9 @@
       <div class="home_head_info">
         <a-popover  placement="bottom" trigger="hover">
           <template slot="content">
-            <message-box></message-box>
+            <message-box :list="messageList"></message-box>
           </template>
-          <div class="home_head_info_item message_icon" style="padding-left:30px;">10</div>
+          <div class="home_head_info_item message_icon" style="padding-left:30px;">{{messageTotal}}</div>
         </a-popover>
         <div class="home_head_info_item">{{dateData.getFullYear()}}-{{dateData.getMonth()+1}}-{{dateData.getDate()}}</div>
         <div class="home_head_info_item">{{dateData.getHours()}}:{{dateData.getMinutes()}}:{{dateData.getSeconds()}}</div>
@@ -57,7 +57,7 @@
                 <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
                   <div class="home_bottom_item_img">
                     <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
-                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">
+<!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">-->
                   </div>
                   <div class="home_bottom_item_btn" >
                     <a-tag color="blue" @click="drawLine(item)">查看轨迹</a-tag>
@@ -178,6 +178,7 @@
     getTodayStat,
     getLouDongInfo,
     getMonitorPersonTypeStat,
+    getMonitorMessage,
     getFangJianPerson
   } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
@@ -189,6 +190,7 @@
       data () {
         return {
           roomData: {},
+          interval: undefined,
           tongjiList: [
             'count', 'A01A01', 'A01A02', 'A01A03', 'A01A04'
             // , 'A01A04A01', 'A01A04A02', 'A01A04A03'
@@ -218,10 +220,12 @@
             totalCount: "0",
             zcCount: "0"
           },
+          messageTotal: 0,
+          messageList: [],
           // accordionHeight:400,
           centerHeight: 0,
-          mapUrl: '',
-          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          // mapUrl: '',
+          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
           imagePath: window._CONFIG['imgDomainURL'],
           jkImagePath: window._CONFIG['imgDomainRecordURL'],
           dialogShow: false,
@@ -236,7 +240,7 @@
             4: '四',
             5: '五',
             6: '六',
-            7: '日'
+            0: '日'
           },
           position:{
             left: '-100px',
@@ -259,6 +263,7 @@
         })
         this.getPersonMonitorList()
         this.getTodayStat()
+        this.getMonitorMessage()
         this.$nextTick(() => {
           this.centerHeight = this.$refs.center.offsetHeight
         })
@@ -270,19 +275,19 @@
             })
           })()
         }
-        setTimeout(() => {
-          this.dialogShow = true
-        },1000)
-
-        this.getLouDongInfo({
-          louDongHao: '14'
-        }, (data1) => {
-          data1.ld = '14'
-          this.dialogShow = true
-          if(this.$refs.dialogDom.setLouDongData) {
-            this.$refs.dialogDom.setLouDongData(data1)
-          }
-        })
+        // setTimeout(() => {
+        //   this.dialogShow = true
+        // },1000)
+        //
+        // this.getLouDongInfo({
+        //   louDongHao: '14'
+        // }, (data1) => {
+        //   data1.ld = '14'
+        //   this.dialogShow = true
+        //   if(this.$refs.dialogDom.setLouDongData) {
+        //     this.$refs.dialogDom.setLouDongData(data1)
+        //   }
+        // })
       },
       created() {
         window.addEventListener('message', (event) => {
@@ -313,9 +318,13 @@
           }
 
         }, false);
-        setInterval(() => {
+        if(this.interval) {
+          clearInterval(this.interval);
+        }
+        this.interval = setInterval(() => {
           this.getTodayStat()
           this.getPersonMonitorList()
+          this.getMonitorMessage()
         }, this.timeStep * 1000)
       },
       methods: {
@@ -394,6 +403,17 @@
         changeActivekey(key) {
           console.log(key);
         },
+        getMonitorMessage() {
+          getMonitorMessage({
+            pageSize:10
+          }).then(rel => {
+            if(rel.code === 200) {
+              console.log(rel)
+              this.messageTotal = rel.result.total
+              this.messageList = rel.result.records
+            }
+          })
+        },
         getLouDongInfo(params, cb) {
           getLouDongInfo(params).then(rel => {
             if(rel.code === 200) {
@@ -428,10 +448,13 @@
           return date.getFullYear() + '-' + month + '-' + day
         },
         getPersonMonitorList() {
-          const nowDateStr = this.getFormatDate(new Date)
+          const nowDateStr = this.getFormatDate(new Date())
           getPersonMonitorList({
             outInTime_begin: nowDateStr + ' 00:00:00',
-            outInTime_end: nowDateStr + ' 23:59:59'
+            outInTime_end: nowDateStr + ' 23:59:59',
+            column: 'outInTime',
+            pageSize:10,
+            order: 'desc'
           }).then(rel => {
             if(rel.code === 200) {
               this.userList = rel.result.records || []
@@ -762,7 +785,7 @@
     left:10px;
     top:10px;
     width:70px;
-    height:80px;
+    height:70px;
     background:rgba(255,255,255,0.2);
   }
   .home_bottom_item_img img{
@@ -779,7 +802,7 @@
     width:50px;
     height:50px;
     left:10px;
-    top:15px;
+    top:10px;
   }
   .home_bottom_item_info{
     margin-left:80px;
