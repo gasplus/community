@@ -3,7 +3,12 @@
     <div class="home_head">
       <div class="home_head_title">龙崮社区治安态势智慧感知中心</div>
       <div class="home_head_info">
-        <div class="home_head_info_item message_box"><div class="message_icon"></div><div class="message_number">1</div></div>
+        <a-popover  placement="bottom" trigger="hover">
+          <template slot="content">
+            <message-box></message-box>
+          </template>
+          <div class="home_head_info_item message_icon" style="padding-left:30px;">10</div>
+        </a-popover>
         <div class="home_head_info_item">{{dateData.getFullYear()}}-{{dateData.getMonth()+1}}-{{dateData.getDate()}}</div>
         <div class="home_head_info_item">{{dateData.getHours()}}:{{dateData.getMinutes()}}:{{dateData.getSeconds()}}</div>
         <div class="home_head_info_item">星期{{weekMap[dateData.getDay()]}}</div>
@@ -51,7 +56,8 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
                   <div class="home_bottom_item_img">
-                    <img :src="imagePath+item.photoUrl" alt="">
+                    <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
+                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">
                   </div>
                   <div class="home_bottom_item_btn" >
                     <a-tag color="blue" @click="drawLine(item)">查看轨迹</a-tag>
@@ -66,7 +72,7 @@
 
                 <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
                   <div class="home_bottom_item_img">
-                    <img :src="imagePath+(item.photoUrl?item.photoUrl:'1.jpeg')" alt="">
+                    <img :src="jkImagePath+item.photoUrl" alt="">
                   </div>
                   <div class="home_bottom_item_btn"  >
                     <a-tag color="blue" @click="showPoint(item)">查看位置</a-tag>
@@ -166,6 +172,7 @@
 
 <script>
   import Collapse from 'vue-collapse'
+  import MessageBox from '@/components/big/MessageBox'
   import {
     getPersonMonitorList,
     getTodayStat,
@@ -213,13 +220,15 @@
           },
           // accordionHeight:400,
           centerHeight: 0,
-          // mapUrl: '',
-          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          mapUrl: '',
+          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
           imagePath: window._CONFIG['imgDomainURL'],
+          jkImagePath: window._CONFIG['imgDomainRecordURL'],
           dialogShow: false,
           userList: [],
           userToday: {},
           dateData: new Date(),
+          timeStep: 10,
           weekMap: {
             1: '一',
             2: '二',
@@ -239,7 +248,8 @@
         DialogCard,
         PersonList,
         PersonDetail,
-        Collapse
+        Collapse,
+        MessageBox
       },
       mounted() {
         getMonitorPersonTypeStat().then(rel => {
@@ -260,19 +270,19 @@
             })
           })()
         }
-        // setTimeout(() => {
-        //   this.dialogShow = true
-        // },1000)
-        //
-        // this.getLouDongInfo({
-        //   louDongHao: '14'
-        // }, (data1) => {
-        //   data1.ld = '14'
-        //   this.dialogShow = true
-        //   if(this.$refs.dialogDom.setLouDongData) {
-        //     this.$refs.dialogDom.setLouDongData(data1)
-        //   }
-        // })
+        setTimeout(() => {
+          this.dialogShow = true
+        },1000)
+
+        this.getLouDongInfo({
+          louDongHao: '14'
+        }, (data1) => {
+          data1.ld = '14'
+          this.dialogShow = true
+          if(this.$refs.dialogDom.setLouDongData) {
+            this.$refs.dialogDom.setLouDongData(data1)
+          }
+        })
       },
       created() {
         window.addEventListener('message', (event) => {
@@ -303,6 +313,10 @@
           }
 
         }, false);
+        setInterval(() => {
+          this.getTodayStat()
+          this.getPersonMonitorList()
+        }, this.timeStep * 1000)
       },
       methods: {
         showPoint(item) {
@@ -761,6 +775,12 @@
     width:100%;
     height:100%;
   }
+  .home_bottom_item_img img.moshengren_photo{
+    width:50px;
+    height:50px;
+    left:10px;
+    top:15px;
+  }
   .home_bottom_item_info{
     margin-left:80px;
     font-size:12px;
@@ -939,16 +959,15 @@
     z-index:200;
   }
   .message_icon{
-    width: 30px;
-    height:30px;
-    position:absolute;
-    left:0;
-    top:0;
-    display: block;
+    font-size:10px;
+    margin-right:10px;
+    padding-top:10px;
+    line-height: 20px;
     background-image: url("~@/assets/images/message_icon.png");
     background-size:30px 30px;
-    background-position:0px center;
+    background-position:0px 0px;
     background-repeat: no-repeat;
+    cursor: pointer;
   }
   .message_box{
     line-height: 40px;

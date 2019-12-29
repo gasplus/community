@@ -644,6 +644,10 @@
     width:60px;
     border:1px solid #00E3FF;
   }
+  .room_person_photo img{
+    width:60px;
+    height:80px;
+  }
   .room_person_body{
     margin-left:80px;
     padding:5px 0;
