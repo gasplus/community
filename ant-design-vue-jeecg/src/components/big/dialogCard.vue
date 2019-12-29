@@ -163,11 +163,11 @@
   }
   .card1{
     position:absolute;
-    width:700px;
+    width:925px;
     min-height:420px;
     top:50%;
     left:50%;
-    margin-left:-140px;
+    margin-left:-252px;
     margin-top:-210px;
     /*margin-top:-210px;*/
     /*margin-left:-325px;*/
