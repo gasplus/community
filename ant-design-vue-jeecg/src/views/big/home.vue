@@ -145,10 +145,10 @@
     <div class="home_c" ref="center">
       <div class="home_c_l_t"></div>
       <div class="home_c_r_t"></div>
-
       <div class="home_c_line_l_b"></div>
       <div class="home_c_line_b"></div>
       <div class="home_c_line_r_b"></div>
+      <div class="home_clear_btn" @click="clearTag"></div>
       <div class="home_tongji_list">
         <div class="home_tongji_item" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
           <div class="home_tongji_item_box">
@@ -171,6 +171,7 @@
 </template>
 
 <script>
+  // password: Siwo@#$2019
   import Collapse from 'vue-collapse'
   import MessageBox from '@/components/big/MessageBox'
   import {
@@ -333,6 +334,9 @@
           console.log(item)
           this.$refs.mapIframe.contentWindow.postMessage({funcName:'createPanel',data:[item]},'*');
         },
+        clearTag() {
+          this.$refs.mapIframe.contentWindow.postMessage({funcName:'clearTag',data:{}},'*');
+        },
         drawLine(item) {
           console.log(item)
           getPersonMonitorList({
@@ -341,7 +345,33 @@
             personId: item.personId
           }).then(rel => {
             if(rel.code === 200) {
-              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawLine',data:rel.result.records},'*');
+              // drawPoint({
+              //   step: 0.001,
+              //   data: [{
+              //     deviceId:"LG00100201",
+              //     pointName: '1',
+              //     time: '2018-11-11'
+              //   },{
+              //     deviceId:"LG00100703",
+              //     pointName: '2',
+              //     time: '2018-11-01'
+              //   },{
+              //     deviceId:"LG00100605",
+              //     pointName: '3',
+              //     time: '2018-11-01'
+              //   }],
+              //   fields: [{
+              //     key: 'pointName'
+              //   },{
+              //     key: 'time'
+              //   }],
+              //   width: 300
+              // });
+              const data = rel.result.records
+              data.forEach((item,index) => {
+                item.index = index + 1
+              })
+              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:data,fields:[{key:'index'},{key:'outInTime'},{key:'address'}]}},'*');
             }
           })
           // this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawLine',data:[{
@@ -449,7 +479,7 @@
           return date.getFullYear() + '-' + month + '-' + day
         },
         getPersonMonitorList() {
-          const nowDateStr = this.getFormatDate(new Date())
+          const nowDateStr = this.getFormatDate(new Date('2019-12-27'))
           getPersonMonitorList({
             outInTime_begin: nowDateStr + ' 00:00:00',
             outInTime_end: nowDateStr + ' 23:59:59',
@@ -1012,6 +1042,25 @@
     text-align: center;
     z-index: 100;
   }
+  .home_clear_btn{
+    width:40px;
+    height:40px;
+    top:40px;
+    right:40px;
+    position:absolute;
+    z-index: 10000;
+    cursor: pointer;
+    background-color:rgba(0,0,0,0.6);
+    border-radius: 10px;
+    background-image: url("~@/assets/images/clear_btn.png");
+    background-size:30px 30px;
+    background-position:center center;
+    background-repeat: no-repeat;
+  }
+  .home_clear_btn:hover{
+    background-color:rgba(255,255,255,0.2);
+  }
+
 </style>
 <style>
   .ant-popover-inner{
