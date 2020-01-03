@@ -5,7 +5,7 @@
         <div class="header">
           <a href="/">
            <!-- <img src="~@/assets/logo.svg" class="logo" alt="logo">-->
-            <span class="title">龙固社区治安态势智慧感知中心</span>
+            <span class="title">龙堌中心社区智慧感知中心</span>
           </a>
         </div>
         <div class="desc">

@@ -1,7 +1,7 @@
 <template>
   <div id="big_home">
     <div class="home_head">
-      <div class="home_head_title">龙崮社区治安态势智慧感知中心</div>
+      <div class="home_head_title">龙堌中心社区智慧感知中心</div>
       <div class="home_head_info">
         <a-popover  placement="bottom" trigger="hover">
           <template slot="content">
@@ -226,7 +226,8 @@
           // accordionHeight:400,
           centerHeight: 0,
           // mapUrl: '',
-          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          mapUrl: 'http://20.36.24.100:9000',
           imagePath: window._CONFIG['imgDomainURL'],
           jkImagePath: window._CONFIG['imgDomainRecordURL'],
           dialogShow: false,
