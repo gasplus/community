@@ -3,14 +3,36 @@ import { axios } from '@/utils/request'
 const xiaoQuId = 1
 const api = {
   personMonitorList: 'monitor/monitorPersonRecord/list',
+  carMonitorList: 'monitor/monitorCarRecord/list',
   todayStat: 'monitor/monitorPersonRecord/getTodayStat',
+  todayCarStat: 'monitor/monitorCarRecord/getAllStat',
   louDongInfo: 'monitor/monitorPerson/getLouDongInfo',
   monitorPersonStat: 'monitor/monitorPerson/getMonitorPersonTypeStat',
   fangJianPerson: 'monitor/monitorPerson/getFangJianPerson',
-  monitorMessage:'monitor/monitorMessage/list'
+  monitorMessage:'monitor/monitorMessage/list',
+  monitorCarStat: 'monitor/monitorDevice/getMonitorCarStat',
+  deviceList: 'monitor/monitorDevice/getAll'
 }
 
 export default api
+
+export function getMonitorCarStat(parameter) {
+  parameter = parameter || {}
+  parameter.xiaoQuId = xiaoQuId
+  return axios({
+    url: api.monitorCarStat,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getDeviceList(parameter) {
+  return axios({
+    url: api.deviceList,
+    method: 'get',
+    params: parameter
+  })
+}
 
 export function getPersonMonitorList(parameter) {
   return axios({
@@ -20,9 +42,24 @@ export function getPersonMonitorList(parameter) {
   })
 }
 
+export function getCarMonitorList(parameter) {
+  return axios({
+    url: api.carMonitorList,
+    method: 'get',
+    params: parameter
+  })
+}
+
 export function getTodayStat(parameter) {
   return axios({
     url: api.todayStat,
+    method: 'get',
+    params: parameter
+  })
+}
+export function getTodayCarStat(parameter) {
+  return  axios({
+    url: api.todayCarStat,
     method: 'get',
     params: parameter
   })

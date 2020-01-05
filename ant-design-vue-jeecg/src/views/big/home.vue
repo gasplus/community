@@ -7,10 +7,10 @@
           <template slot="content">
             <message-box :list="messageList"></message-box>
           </template>
-          <div class="home_head_info_item message_icon" style="padding-left:30px;">{{messageTotal}}</div>
+          <div class="home_head_info_item message_icon ani" style="height:30px;width:30px;margin:0;"></div>
         </a-popover>
-        <div class="home_head_info_item">{{dateData.getFullYear()}}-{{dateData.getMonth()+1}}-{{dateData.getDate()}}</div>
-        <div class="home_head_info_item">{{dateData.getHours()}}:{{dateData.getMinutes()}}:{{dateData.getSeconds()}}</div>
+        <div class="home_head_info_item" style="width:40px;font-size:10px;margin:0;line-height:40px;">{{messageTotal}}</div>
+        <div class="home_head_info_item">{{formatDate(dateData, 'yyyy-MM-dd hh:mm:ss')}}</div>
         <div class="home_head_info_item">星期{{weekMap[dateData.getDay()]}}</div>
       </div>
     </div>
@@ -94,7 +94,7 @@
               车辆进出统计
             </div>
             <div class="accordion_head_info" style="padding:5px;display: block;position:relative;">
-              <div class="home_bottom_item" style="position:absolute;left:-10px;right:-10px;top:0;height:80px;display: block;margin:0;">
+              <div class="home_bottom_item" style="position:absolute;left:-10px;right:-10px;top:0;min-height:80px;height:80px!important;display: block;margin:0;">
                 <div class="home_bottom_item_jiao1"></div>
                 <div class="home_bottom_item_jiao2"></div>
                 <div class="home_bottom_item_jiao3"></div>
@@ -103,11 +103,11 @@
                   <div class="tongji_item">
                     <div class="tongji_item_t">
                       <div class="tongji_item_t_label">总次数</div>
-                      <div class="tongji_item_t_number">1000</div>
+                      <div class="tongji_item_t_number">{{carToday.totalCount}}</div>
                     </div>
                     <div class="tongji_item_b">
-                      <div class="tongji_item_b_tongji">已登记 1000 辆</div>
-                      <div class="tongji_item_b_tongji">未登记 1000 辆</div>
+                      <div class="tongji_item_b_tongji">已登记 {{carToday.normalCount}} 辆</div>
+                      <div class="tongji_item_b_tongji">未登记 {{carToday.anonymousCount}} 辆</div>
                     </div>
                   </div>
                 </div>
@@ -116,27 +116,49 @@
           </div>
         </div>
         <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
+
           <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-            <a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">
-              <template slot="content">
-                <PersonDetail></PersonDetail>
-              </template>
-              <div class="home_bottom_item">
-                <div class="home_bottom_item_jiao1"></div>
-                <div class="home_bottom_item_jiao2"></div>
-                <div class="home_bottom_item_jiao3"></div>
-                <div class="home_bottom_item_jiao4"></div>
-                <div class="home_bottom_item_body">
-                  <div class="home_bottom_item_img">
-                    <img :src="imagePath+'/'+item.photoUrl" alt="">
-                  </div>
-                  <div class="home_bottom_item_info card_name">{{item.personName}}</div>
-                  <div class="home_bottom_item_info card_address">{{item.address}}</div>
-                  <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                  <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
+            <!--            <a-popover  placement="right" trigger="hover">-->
+            <!--              <template slot="content">-->
+            <!--                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>-->
+            <!--              </template>-->
+            <div class="home_bottom_item" v-for="item in carList" :key="item.id">
+              <div class="home_bottom_item_jiao1"></div>
+              <div class="home_bottom_item_jiao2"></div>
+              <div class="home_bottom_item_jiao3"></div>
+              <div class="home_bottom_item_jiao4"></div>
+              <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
+                <div class="home_bottom_item_img">
+                  <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
+                  <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">-->
                 </div>
+                <div class="home_bottom_item_btn" >
+                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+                </div>
+                <div class="home_bottom_item_info card_name">{{item.personName}}</div>
+                <div class="home_bottom_item_info card_car">{{item.carNumber}}</div>
+                <div class="home_bottom_item_info card_id_card">{{item.personIdCard}}1</div>
+                <div class="home_bottom_item_info card_address">{{item.hjdz}}2</div>
+                <div class="home_bottom_item_info card_find_address">{{item.address}}3</div>
+                <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
+                <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
               </div>
-            </a-popover>
+
+              <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
+                <div class="home_bottom_item_img">
+                  <img :src="jkImagePath+item.photoUrl" alt="">
+                </div>
+                <div class="home_bottom_item_btn"  >
+                  <a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>
+                </div>
+                <div class="home_bottom_item_info card_name">陌生车辆</div>
+                <div class="home_bottom_item_info card_car">{{item.carNumber}}</div>
+                <div class="home_bottom_item_info card_address">{{item.address}}</div>
+                <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
+                <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
+              </div>
+            </div>
+            <!--            </a-popover>-->
           </div>
         </div>
       </collapse>
@@ -149,12 +171,39 @@
       <div class="home_c_line_b"></div>
       <div class="home_c_line_r_b"></div>
       <div class="home_clear_btn" @click="clearTag"></div>
+      <div class="home_search_box">
+        <div class="home_search_ope">
+          <a-select :defaultValue="searchType" style="width: 120px;" @change="changeSearchType">
+            <a-select-option value="person">人员</a-select-option>
+            <a-select-option value="car">车辆</a-select-option>
+          </a-select>
+          <a-input-search :placeholder="searchPlaceholderMap[searchType]" v-model="searchValue" style="width: 300px;" @search="onSearchList" />
+          <!--
+          <div class="home_search_list">
+            <div class="home_search_item">123</div>
+            <div class="home_search_item">123</div>
+            <div class="home_search_item">123</div>
+            <div class="home_search_item">123</div>
+            <div class="home_search_item">123</div>
+            <div class="home_search_item">123</div>
+          </div>
+          -->
+        </div>
+      </div>
       <div class="home_tongji_list">
         <div class="home_tongji_item" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
           <div class="home_tongji_item_box">
             <div class="home_tongji_item_title">{{tongjiKeyMap[key]}}</div>
             <div class="home_tongji_item_info">
               <span>{{xiaoquData[key]}}</span>人
+            </div>
+          </div>
+        </div>
+        <div class="home_tongji_item">
+          <div class="home_tongji_item_box" style="width:200px;">
+            <div class="home_tongji_item_title">实有设备</div>
+            <div class="home_tongji_item_info">
+              <span>{{deviceData.count}}</span>个({{deviceData.zcCount}}正常，{{deviceData.ycCount}}异常)
             </div>
           </div>
         </div>
@@ -176,11 +225,15 @@
   import MessageBox from '@/components/big/MessageBox'
   import {
     getPersonMonitorList,
+    getCarMonitorList,
     getTodayStat,
+    getTodayCarStat,
     getLouDongInfo,
     getMonitorPersonTypeStat,
     getMonitorMessage,
-    getFangJianPerson
+    getFangJianPerson,
+    getMonitorCarStat,
+    getDeviceList
   } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
   import PersonList from '@/components/big/personList'
@@ -190,6 +243,7 @@
       name: "home",
       data () {
         return {
+          mmm:0,
           roomData: {},
           interval: undefined,
           tongjiList: [
@@ -197,13 +251,13 @@
             // , 'A01A04A01', 'A01A04A02', 'A01A04A03'
           ],
           tongjiKeyMap:{
-            'A01A04': '重点人员',
+            'A01A04': '重点关注人口',
             'A01A04A03': '刑满释放',
             'A01A04A02': '精神病人',
             'A01A04A01': '五类外执人员',
-            'A01A03': '孤寡老人',
-            'A01A02': '留守儿童',
-            'A01A01': '普通',
+            'A01A03': '重点人口',
+            'A01A02': '流动人口',
+            'A01A01': '常住人口',
             'count': '实有人口'
           },
           personListData: undefined,
@@ -225,16 +279,18 @@
           messageList: [],
           // accordionHeight:400,
           centerHeight: 0,
-          // mapUrl: '',
+          mapUrl: '',
           // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
-          mapUrl: 'http://20.36.24.100:9000',
+          // mapUrl: 'http://20.36.24.100:9000',
           imagePath: window._CONFIG['imgDomainURL'],
           jkImagePath: window._CONFIG['imgDomainRecordURL'],
           dialogShow: false,
           userList: [],
+          carList: [],
           userToday: {},
+          carToday: {},
           dateData: new Date(),
-          timeStep: 10,
+          timeStep: 300,
           weekMap: {
             1: '一',
             2: '二',
@@ -244,6 +300,17 @@
             6: '六',
             0: '日'
           },
+          searchPlaceholderMap: {
+            person: '请输入姓名、身份证号',
+            car: '请输入车牌号码'
+          },
+          searchType: 'person',
+          deviceData: {
+            count: 0,
+            zcCount: 0,
+            ycCount: 0
+          },
+          searchValue: '',
           position:{
             left: '-100px',
             top: '100px'
@@ -263,9 +330,13 @@
             this.xiaoquData = rel.result
           }
         })
-        this.getPersonMonitorList()
         this.getTodayStat()
+        this.getTodayCarStat()
+        this.getPersonMonitorList()
+        this.getCarMonitorList()
         this.getMonitorMessage()
+        this.getMonitorCarStat()
+        this.getDeviceList()
         this.$nextTick(() => {
           this.centerHeight = this.$refs.center.offsetHeight
         })
@@ -292,6 +363,7 @@
         // })
       },
       created() {
+        this.timeAni()
         window.addEventListener('message', (event) => {
           if(event.data.funcName === 'showDialog'){
             let x = event.data.x
@@ -325,14 +397,65 @@
         }
         this.interval = setInterval(() => {
           this.getTodayStat()
+          this.getTodayCarStat()
           this.getPersonMonitorList()
+          this.getCarMonitorList()
           this.getMonitorMessage()
+          this.getMonitorCarStat()
         }, this.timeStep * 1000)
       },
       methods: {
-        showPoint(item) {
+        changeSearchType(value) {
+          this.searchType = value
+          this.searchValue = ''
+        },
+        onSearchList(value) {
+          console.log(value)
+        },
+        getMonitorCarStat() {
+          getMonitorCarStat().then(rel => {
+            this.deviceData = rel.result
+          })
+        },
+        getDeviceList() {
+          getDeviceList().then(rel => {
+            console.log(rel)
+          })
+        },
+        formatDate(date, fmt) {
+          if (typeof date == 'string') {
+            return date;
+          }
+
+          if (!fmt) fmt = "yyyy-MM-dd hh:mm:ss";
+
+          if (!date || date == null) return null;
+          var o = {
+            'M+': date.getMonth() + 1, // 月份
+            'd+': date.getDate(), // 日
+            'h+': date.getHours(), // 小时
+            'm+': date.getMinutes(), // 分
+            's+': date.getSeconds(), // 秒
+            'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
+            'S': date.getMilliseconds() // 毫秒
+          }
+          if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length))
+          for (var k in o) {
+            if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)))
+          }
+          return fmt
+        },
+        timeAni() {
+          const _this = this
+          setInterval(() => {
+            _this.dateData = new Date()
+          }, 1000)
+        },
+        showPoint(item, type) {
           console.log(item)
-          this.$refs.mapIframe.contentWindow.postMessage({funcName:'createPanel',data:[item]},'*');
+          const key = type === 'car' ? 'carNumber' : 'personName'
+          const fields = [{key: key},{key: 'outInTime'},{key: 'address'}]
+          this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:[item],fields:fields}},'*');
         },
         clearTag() {
           this.$refs.mapIframe.contentWindow.postMessage({funcName:'clearTag',data:{}},'*');
@@ -345,48 +468,31 @@
             personId: item.personId
           }).then(rel => {
             if(rel.code === 200) {
-              // drawPoint({
-              //   step: 0.001,
-              //   data: [{
-              //     deviceId:"LG00100201",
-              //     pointName: '1',
-              //     time: '2018-11-11'
-              //   },{
-              //     deviceId:"LG00100703",
-              //     pointName: '2',
-              //     time: '2018-11-01'
-              //   },{
-              //     deviceId:"LG00100605",
-              //     pointName: '3',
-              //     time: '2018-11-01'
-              //   }],
-              //   fields: [{
-              //     key: 'pointName'
-              //   },{
-              //     key: 'time'
-              //   }],
-              //   width: 300
-              // });
               const data = rel.result.records
               data.forEach((item,index) => {
                 item.index = index + 1
               })
-              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:data,fields:[{key:'index'},{key:'outInTime'},{key:'address'}]}},'*');
+              const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
+              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:data,fields:fields}},'*');
             }
           })
-          // this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawLine',data:[{
-          //     deviceId: 'LG00100505',
-          //     outInTime: '2019-09-09',
-          //     address: '1'
-          //   },{
-          //     deviceId: 'LG00100602',
-          //     outInTime: '2019-09-09',
-          //     address: '2'
-          //   },{
-          //     deviceId: 'LG00100703',
-          //     outInTime: '2019-09-09',
-          //     address: '3'
-          //   }]},'*');
+        },
+        drawCarLine(item) {
+          console.log(item)
+          getCarMonitorList({
+            pageSize: 20,
+            pageNo: 1,
+            carNumber: item.carNumber
+          }).then(rel => {
+            if(rel.code === 200) {
+              const data = rel.result.records
+              data.forEach((item,index) => {
+                item.index = index + 1
+              })
+              const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
+              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:data,fields:fields}},'*');
+            }
+          })
         },
         getFangJianPerson(params,cb) {
           getFangJianPerson(params).then(rel => {
@@ -467,6 +573,18 @@
             }
           })
         },
+        getTodayCarStat() {
+          getTodayCarStat().then(rel => {
+            if(rel.code === 200) {
+              const o = rel.result || {}
+              this.carToday = {
+                anonymousCount: o.anonymousCount?(o.anonymousCount+''):'0',
+                normalCount: o.normalCount?(o.normalCount+''):'0',
+                totalCount: o.totalCount?(o.totalCount+''):'0'
+              }
+            }
+          })
+        },
         getFormatDate(date) {
           let month = (date.getMonth() + 1) + ''
           let day = date.getDate() + ''
@@ -479,7 +597,9 @@
           return date.getFullYear() + '-' + month + '-' + day
         },
         getPersonMonitorList() {
-          const nowDateStr = this.getFormatDate(new Date('2019-12-27'))
+          // const nowDateStr = this.getFormatDate(new Date('2019-12-27'))
+
+          const nowDateStr = this.getFormatDate(new Date())
           getPersonMonitorList({
             outInTime_begin: nowDateStr + ' 00:00:00',
             outInTime_end: nowDateStr + ' 23:59:59',
@@ -489,6 +609,21 @@
           }).then(rel => {
             if(rel.code === 200) {
               this.userList = rel.result.records || []
+            }
+          })
+        },
+        getCarMonitorList() {
+          //const nowDateStr = this.getFormatDate(new Date('2019-12-19'))
+          const nowDateStr = this.getFormatDate(new Date())
+          getCarMonitorList({
+            outInTime_begin: nowDateStr + ' 00:00:00',
+            outInTime_end: nowDateStr + ' 23:59:59',
+            column: 'outInTime',
+            pageSize:10,
+            order: 'desc'
+          }).then(rel => {
+            if(rel.code === 200) {
+              this.carList = rel.result.records || []
             }
           })
         },
@@ -620,13 +755,6 @@
     height:46px;
     line-height: 46px;
     padding-left:30px;
-    background:
-      linear-gradient(92deg,
-      rgba(0,114,255,1) 0%,
-      rgba(0,234,255,1) 48.8525390625%,
-      rgba(1,170,255,1) 100%);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
     font-size:22px;
     color:rgba(0,184,255,1);
   }
@@ -711,11 +839,7 @@
     line-height: 54px;
     font-size:36px;
     text-align: center;
-    color:#fff;
-    color:rgba(255,255,255,1);
-    background:linear-gradient(0deg,rgba(81,151,255,1) 0%, rgba(128,242,255,1) 100%);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+    color:rgba(1,170,255,1);
   }
   .home_head_info{
     position:absolute;
@@ -724,10 +848,7 @@
     height:29px;
     line-height: 29px;
     font-size:16px;
-    color:rgba(255,255,255,1);
-    background:linear-gradient(0deg,rgba(141,211,255,1) 0%, rgba(255,255,255,1) 100%);
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
+    color:rgba(1,170,255,1);
   }
   .home_head_info_item{
     float:left;
@@ -1000,6 +1121,13 @@
     background-repeat: no-repeat;
   }
 
+  .card_car{
+    background-image: url("~@/assets/images/icon_message_moshengcheliang.png");
+    background-size:18px 18px;
+    background-position:3px 7px;
+    background-repeat: no-repeat;
+  }
+
   .card_time{
     background-image: url("~@/assets/images/card_time.png");
     background-size:16px 16px;
@@ -1018,10 +1146,46 @@
     padding-top:10px;
     line-height: 20px;
     background-image: url("~@/assets/images/message_icon.png");
-    background-size:30px 30px;
-    background-position:0px 0px;
+    background-size:20px 20px;
+    background-position:5px 5px;
     background-repeat: no-repeat;
     cursor: pointer;
+  }
+  .message_icon.ani {
+    -webkit-animation: Tada 1s 2s both infinite;
+    -moz-animation: Tada 1s 2s both infinite;
+    -ms-animation: Tada 1s 2s both infinite;
+    animation: Tada 1s 2s both infinite;
+  }
+  /*浏览器兼容性部分略过*/
+
+  @keyframes Tada {
+    0% {
+      transform: scale(1);
+      transform: scale(1)
+    }
+    10%,
+    20% {
+      transform: scale(0.9) rotate(-3deg);
+      transform: scale(0.9) rotate(-3deg)
+    }
+    30%,
+    50%,
+    70%,
+    90% {
+      transform: scale(1.1) rotate(3deg);
+      transform: scale(1.1) rotate(3deg)
+    }
+    40%,
+    60%,
+    80% {
+      transform: scale(1.1) rotate(-3deg);
+      transform: scale(1.1) rotate(-3deg)
+    }
+    100% {
+      transform: scale(1) rotate(0);
+      transform: scale(1) rotate(0)
+    }
   }
   .message_box{
     line-height: 40px;
@@ -1057,10 +1221,31 @@
     background-position:center center;
     background-repeat: no-repeat;
   }
+  .home_search_box{
+    position:absolute;
+    top:40px;
+    left:40px;
+    right:40px;
+    z-index: 10000;
+  }
+  .home_search_ope{
+    position:absolute;
+    width:420px;
+    top:0;
+    left:50%;
+    margin-left:-210px;
+  }
   .home_clear_btn:hover{
     background-color:rgba(255,255,255,0.2);
   }
-
+  .home_search_list{
+    position:absolute;
+    left:0;
+    right:0;
+    top:36px;
+    background:#fff;
+    border-radius: 4px;
+  }
 </style>
 <style>
   .ant-popover-inner{

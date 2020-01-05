@@ -48,9 +48,9 @@
         </div>
         <div class="card2_body">
           <div class="room_list" v-if="currentIndex!==undefined">
-            <div :class="'room_item '+(selectRoomIndex + '' === ind + ''?'active':'')" :key="ind" v-for="(item,ind) in loudongData.danYuan[currentIndex].fangJian" @click="selectRoom(ind)">
+            <div :class="'room_item '+(roomTypeMap[item.type])+' '+(selectRoomIndex + '' === ind + ''?'active':'')" :key="ind" v-for="(item,ind) in loudongData.danYuan[currentIndex].fangJian" @click="selectRoom(ind)">
               <div class="room_item_type">
-                <div class="room_item_type_name">{{item.Type==='0'?'常住':'其它'}}</div>
+                <div class="room_item_type_name">{{item.fwxz}}（{{item.zrs}}人）</div>
                 <div class="room_item_type_r"></div>
                 <div class="room_item_type_b"></div>
               </div>
@@ -71,6 +71,12 @@
         props:['position'],
         data() {
           return {
+            roomTypeMap: {
+              '0': 'room_blue',
+              '1': 'room_green',
+              '2': 'room_red',
+              '3': 'room_yellow'
+            },
             selectRoomIndex: -1,
             loudongData: {
               ld: '',
@@ -542,7 +548,7 @@
     border:1px solid #0F80D4;
     border-top-width:2px;
     height:60px;
-    width:105px;
+    width:128px;
     box-sizing: border-box;
     margin-right:10px;
     float:left;
@@ -584,7 +590,7 @@
     position:absolute;
     height:8px;
     left:0;
-    right:0;
+    right:-1px;
     bottom:-8px;
     z-index: 1;
     background-image: url("~@/assets/images/tag_b.png");
@@ -592,10 +598,21 @@
     background-repeat: no-repeat;
     background-position: 0 0;
   }
-  .room_item.active,.room_item:hover{
+  /*.room_item.active,.room_item:hover{
     border:1px solid orangered;
+  }*/
+  .room_blue{
+    border:1px solid #0F80D4;
   }
-
+  .room_green{
+    border:1px solid green;
+  }
+  .room_red{
+    border:1px solid red;
+  }
+  .room_yellow{
+    border:1px solid yellow;
+  }
 
 
   .room_item_type_name{

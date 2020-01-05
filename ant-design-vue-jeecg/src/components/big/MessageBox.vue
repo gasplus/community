@@ -1,7 +1,7 @@
 <template>
   <div class="message_list scroll_body">
     <div class="message_list_item" v-for="(item, index) in list" :key="index">
-      <div :title="item.content" :class="'message_list_item_content '+messageTypeMap[item.messageType]">{{item.content}}</div>
+      <div :class="'message_list_item_content '+messageTypeMap[item.messageType]">{{item.content}}</div>
       <div class="message_list_item_btn">
         <!--<a-tag color="#87d068">查看</a-tag>-->
         {{item.createTime}}
@@ -68,8 +68,9 @@
   }
 
   .message_list_item {
-    height: 40px;
-    line-height: 40px;
+    min-height: 20px;
+    line-height: 20px;
+    padding:5px 0;
     border-bottom: 1px dashed #2eabff;
     position: relative;
   }
@@ -86,7 +87,8 @@
   .message_list_item_btn {
     position: absolute;
     right: 0;
-    top: 0px;
+    top: 50%;
+    margin-top:-20px;
     font-size: 10px;
     line-height: 15px;
     padding: 5px 5px 5px 0;
@@ -98,14 +100,10 @@
   .message_list_item_content {
     position: relative;
     margin-right: 80px;
-    height: 40px;
-    line-height: 40px;
-    overflow: hidden;
+    min-height: 20px;
+    line-height: 20px;
+    padding:5px 0 5px 40px;
     color: #fff;
-    padding-left: 40px;
-    overflow: hidden;
-    text-overflow:ellipsis;
-    white-space: nowrap;
   }
 
   .message_icon_gdlr {
