@@ -18,12 +18,14 @@
     <div class="card1_body">
       <div class="dialog_top_info">
         <div class="dialog_top_info_left"><b>{{loudongData.ld}}栋</b>（{{loudongData.totalCount||0}}人）</div>
+        <!--
         <div class="dialog_top_info_right">
           <div class="shangfang">正常：{{loudongData.zcCount||0}}人</div>
           <div class="children">留守儿童：{{loudongData.childrenCount||0}}人</div>
           <div class="keyPerson">重点人员：{{loudongData.keyPersonCount||0}}人</div>
           <div class="gudu">孤独老人：{{loudongData.oldPersonCount||0}}人</div>
         </div>
+        -->
       </div>
       <div class="dialog_danyuan_box">
         <div class="dialog_danyuan_line"></div>

@@ -10,6 +10,8 @@ import Antd from 'ant-design-vue'
 import Viser from 'viser-vue'
 import 'ant-design-vue/dist/antd.less';  // or 'ant-design-vue/dist/antd.less'
 import 'video.js/dist/video-js.css'
+import Viewer from 'v-viewer'
+import 'viewerjs/dist/viewer.css'
 
 import '@/permission' // permission control
 import '@/utils/filter' // base filter
@@ -55,6 +57,10 @@ Vue.component('apexchart', VueApexCharts)
 Vue.use(preview)
 Vue.use(vueBus);
 Vue.use(JeecgComponents);
+Vue.use(Viewer);
+Viewer.setDefaults({
+  Options: { "inline": true, "button": true, "navbar": true, "title": true, "toolbar": true, "tooltip": true, "movable": true, "zoomable": true, "rotatable": true, "scalable": true, "transition": true, "fullscreen": true, "keyboard": true, "url": "data-source" }
+});
 
 new Vue({
   router,

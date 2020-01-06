@@ -5,16 +5,34 @@ const api = {
   personMonitorList: 'monitor/monitorPersonRecord/list',
   carMonitorList: 'monitor/monitorCarRecord/list',
   todayStat: 'monitor/monitorPersonRecord/getTodayStat',
-  todayCarStat: 'monitor/monitorCarRecord/getAllStat',
+  todayCarStat: 'monitor/monitorCarRecord/getTodayStat',
   louDongInfo: 'monitor/monitorPerson/getLouDongInfo',
   monitorPersonStat: 'monitor/monitorPerson/getMonitorPersonTypeStat',
   fangJianPerson: 'monitor/monitorPerson/getFangJianPerson',
   monitorMessage:'monitor/monitorMessage/list',
+  carList: 'monitor/monitorCar/list',
+  personList: 'monitor/monitorPerson/list',
   monitorCarStat: 'monitor/monitorDevice/getMonitorCarStat',
   deviceList: 'monitor/monitorDevice/getAll'
 }
 
 export default api
+
+export function getPersonList(parameter) {
+  return axios({
+    url: api.personList,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getCarList(parameter) {
+  return axios({
+    url: api.carList,
+    method: 'get',
+    params: parameter
+  })
+}
 
 export function getMonitorCarStat(parameter) {
   parameter = parameter || {}

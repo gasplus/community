@@ -23,57 +23,72 @@
           <div class="room_person_item" v-for="(item,index) in personListData" :key="index">
             <div class="room_person_bg"></div>
             <div class="room_person_photo">
-              <img :src="imagePath + item.zhaoPian" alt="">
+<!--              <viewer :images="['https://img-blog.csdn.net/20180831102732255?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2d1b3poYW5ncWlhbmc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70']">-->
+<!--                <img src="https://img-blog.csdn.net/20180831102732255?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2d1b3poYW5ncWlhbmc=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" alt="">-->
+<!--              </viewer>-->
+              <viewer :images="[imagePath + item.zhaoPian]">
+                <img :src="imagePath + item.zhaoPian" alt="">
+              </viewer>
             </div>
             <div class="room_person_body">
 <!--              户籍、出生日期、身份证号、电话、标签、车辆-->
               <a-row>
-                <a-col :span="12">
+                <a-col :span="8">
                   <div class="room_person_info r_l">
                     <div class="room_person_info_label">姓名</div>
                     <div class="room_person_info_content">{{item.xingMing}}</div>
                   </div>
                 </a-col>
-                <a-col :span="12">
+                <a-col :span="8">
+                  <div class="room_person_info r_l">
+
+                    <div class="room_person_info_label">性别</div>
+                    <div class="room_person_info_content">{{item.xingBie}}</div>
+                  </div>
+                </a-col>
+                <a-col :span="8">
                   <div class="room_person_info">
+                    <div class="room_person_info_label">年龄</div>
+                    <div class="room_person_info_content">{{item.age}}</div>
+                  </div>
+                </a-col>
+                <a-col :span="8">
+                  <div class="room_person_info r_l">
 
                     <div class="room_person_info_label">关系</div>
                     <div class="room_person_info_content">{{item.guanXi}}</div>
                   </div>
                 </a-col>
-              </a-row>
-              <a-row>
-                <a-col :span="12">
-                  <div class="room_person_info r_l">
-                    <div class="room_person_info_label">身份证号</div>
-                    <div class="room_person_info_content">{{item.sfzh}}</div>
-                  </div>
-                </a-col>
-                <a-col :span="12">
+
+                <a-col :span="16">
                   <div class="room_person_info">
-                    <div class="room_person_info_label">出生日期</div>
-                    <div class="room_person_info_content">{{item.csrq}}</div>
-                  </div>
-                </a-col>
-              </a-row>
-
-              <a-row>
-                <a-col :span="12">
-                  <div class="room_person_info r_l">
-                    <div class="room_person_info_label">标签</div>
+                    <div class="room_person_info_label">身份证号</div>
                     <div class="room_person_info_content">
-                      <a-tag color="#f50" v-if="item.type.indexOf('A01A04')>=0">{{personKeyMap[item.type]}}</a-tag>
-                      <a-tag color="#87d068" v-if="item.type === 'A01A01'">{{personKeyMap[item.type]}}</a-tag>
-                      <a-tag color="#2db7f5" v-if="item.type === 'A01A02'">{{personKeyMap[item.type]}}</a-tag>
-                      <a-tag color="#108ee9" v-if="item.type === 'A01A03'">{{personKeyMap[item.type]}}</a-tag>
-
+                      {{item.sfzh}}
                     </div>
                   </div>
                 </a-col>
-                <a-col :span="12">
+                <a-col :span="8">
+                  <div class="room_person_info r_l">
+                    <div class="room_person_info_label">民族</div>
+                    <div class="room_person_info_content">{{item.minZu}}</div>
+                  </div>
+                </a-col>
+                <a-col :span="16">
                   <div class="room_person_info">
                     <div class="room_person_info_label">电话</div>
                     <div class="room_person_info_content">{{item.lxdh}}</div>
+                  </div>
+                </a-col>
+
+                <a-col :span="24">
+                  <div class="room_person_info" style="padding: 5px 20px;">
+                      <!--                      <a-tag color="#f50" v-if="item.type.indexOf('A01A04')>=0">{{personKeyMap[item.type]}}</a-tag>-->
+                      <!--                      <a-tag color="#87d068" v-if="item.type === 'A01A01'">{{personKeyMap[item.type]}}</a-tag>-->
+                      <!--                      <a-tag color="#2db7f5" v-if="item.type === 'A01A02'">{{personKeyMap[item.type]}}</a-tag>-->
+                      <!--                      <a-tag color="#108ee9" v-if="item.type === 'A01A03'">{{personKeyMap[item.type]}}</a-tag>-->
+                      <a-tag color="#2db7f5">{{item.typeText}}</a-tag>
+                      <a-tag color="#87d068">{{item.rkxz}}</a-tag>
                   </div>
                 </a-col>
               </a-row>
@@ -95,13 +110,13 @@
             imagePath: window._CONFIG['imgDomainURL'] + '/',
             personList: [],
             personKeyMap:{
-              'A01A04': '重点人员',
+              'A01A04': '重点关注人口',
               'A01A04A03': '刑满释放',
               'A01A04A02': '精神病人',
               'A01A04A01': '五类外执人员',
-              'A01A03': '孤寡老人',
-              'A01A02': '留守儿童',
-              'A01A01': '普通'
+              'A01A03': '重点人口',
+              'A01A02': '流动人口',
+              'A01A01': '常住人口'
             },
           }
         },
@@ -649,11 +664,14 @@
     height:80px;
   }
   .room_person_body{
-    margin-left:85px;
-    padding:5px 0;
+    margin-left:95px;
+    margin-right:10px;
+    padding:10px 0;
   }
   .room_person_info{
     position:relative;
+    border: 1px solid rgba(255,255,255,0.2);
+    margin: -1px 0 0 -1px;
   }
   .room_person_info_label{
     height:30px;
@@ -675,6 +693,7 @@
     line-height: 20px;
     color:#fff;
     font-size:12px;
+    min-height:20px;
   }
   .mask{
     position:fixed;
