@@ -164,7 +164,7 @@
       </collapse>
     </div>
 <!--    <div class="home_c" ref="center" @mouseleave="leave">-->
-    <div class="home_c" ref="center">
+    <div class="home_c" ref="center" @click="closeSearchBox">
       <div class="home_c_l_t"></div>
       <div class="home_c_r_t"></div>
       <div class="home_c_line_l_b"></div>
@@ -178,16 +178,27 @@
             <a-select-option value="car">车辆</a-select-option>
           </a-select>
           <a-input-search :placeholder="searchPlaceholderMap[searchType]" v-model="searchValue" style="width: 300px;" @search="onSearchList" />
-          <!--
-          <div class="home_search_list">
-            <div class="home_search_item">123</div>
-            <div class="home_search_item">123</div>
-            <div class="home_search_item">123</div>
-            <div class="home_search_item">123</div>
-            <div class="home_search_item">123</div>
-            <div class="home_search_item">123</div>
+          <div class="home_search_list scroll_body" v-if="searchResultShow">
+            <div class="home_search_item" v-for="(item,index) in searchResultData" :key="index" @click="go2Detail(item)">
+              <div class="home_search_info" v-if="searchType==='person'">
+                <div class="home_search_info_left" style="width:70%;">{{item.hjdz}}</div>
+                <div class="home_search_info_right" style="width:30%;"></div>
+              </div>
+              <div class="home_search_info" v-if="searchType==='person'">
+                <div class="home_search_info_left" style="width:30%;font-size:16px;">{{item.xingMing}}</div>
+                <div class="home_search_info_right" style="width:70%;font-size:16px;">{{item.sfzh}}</div>
+              </div>
+
+              <div class="home_search_info" v-if="searchType==='car'">
+                <div class="home_search_info_left" style="width:50%;font-size:16px;">{{item.carNumber}}</div>
+                <div class="home_search_info_right" style="width:50%;font-size:16px;">{{item.personName}}</div>
+              </div>
+              <div class="home_search_info" v-if="searchType==='car'">
+                <div class="home_search_info_left" style="width:70%;font-size:14px;">{{item.personCardId}}</div>
+                <div class="home_search_info_right" style="width:30%;">{{item.personId==='anonymous'?'陌生人':''}}</div>
+              </div>
+            </div>
           </div>
-          -->
         </div>
       </div>
       <div class="home_tongji_list">
@@ -233,7 +244,9 @@
     getMonitorMessage,
     getFangJianPerson,
     getMonitorCarStat,
-    getDeviceList
+    getDeviceList,
+    getPersonList,
+    getCarList
   } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
   import PersonList from '@/components/big/personList'
@@ -243,7 +256,8 @@
       name: "home",
       data () {
         return {
-          mmm:0,
+          searchResultShow:false,
+          searchResultData: [],
           roomData: {},
           interval: undefined,
           tongjiList: [
@@ -279,9 +293,9 @@
           messageList: [],
           // accordionHeight:400,
           centerHeight: 0,
-         // mapUrl: '',
-          // mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
-           mapUrl: 'http://20.36.24.100:9000',
+          // mapUrl: '',
+          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          // mapUrl: 'http://20.36.24.100:9000',
           imagePath: window._CONFIG['imgDomainURL'],
           jkImagePath: window._CONFIG['imgDomainRecordURL'],
           dialogShow: false,
@@ -290,7 +304,7 @@
           userToday: {},
           carToday: {},
           dateData: new Date(),
-          timeStep: 300,
+          timeStep: 3,
           weekMap: {
             1: '一',
             2: '二',
@@ -405,11 +419,38 @@
         }, this.timeStep * 1000)
       },
       methods: {
+        go2Detail(item) {
+          if(this.searchType === 'car') {
+            this.searchValue = item.carNumber
+          } else {
+            this.searchValue = item.xingMing
+          }
+        },
+        closeSearchBox() {
+          this.searchResultShow = false
+        },
         changeSearchType(value) {
           this.searchType = value
           this.searchValue = ''
+          this.searchResultShow = false
+          this.searchResultData = []
         },
         onSearchList(value) {
+          if(!value) {
+            return
+          }
+          this.searchResultData = []
+          if (this.searchType === 'car') {
+            getCarList({query: value}).then(rel => {
+              this.searchResultData = rel.result.records
+              this.searchResultShow = true
+            })
+          } else {
+            getPersonList({query: value}).then(rel => {
+              this.searchResultData = rel.result.records
+              this.searchResultShow = true
+            })
+          }
           console.log(value)
         },
         getMonitorCarStat() {
@@ -542,6 +583,9 @@
         },
         getMonitorMessage() {
           getMonitorMessage({
+            page: 1,
+            column: 'createTime',
+            order: 'desc',
             pageSize:10
           }).then(rel => {
             if(rel.code === 200) {
@@ -613,8 +657,8 @@
           })
         },
         getCarMonitorList() {
-          //const nowDateStr = this.getFormatDate(new Date('2019-12-19'))
-          const nowDateStr = this.getFormatDate(new Date())
+          const nowDateStr = this.getFormatDate(new Date('2019-01-12'))
+          // const nowDateStr = this.getFormatDate(new Date())
           getCarMonitorList({
             outInTime_begin: nowDateStr + ' 00:00:00',
             outInTime_end: nowDateStr + ' 23:59:59',
@@ -1226,7 +1270,7 @@
     top:40px;
     left:40px;
     right:40px;
-    z-index: 10000;
+    z-index: 3;
   }
   .home_search_ope{
     position:absolute;
@@ -1243,8 +1287,42 @@
     left:0;
     right:0;
     top:36px;
-    background:#fff;
+    background: rgba(44, 92, 235, 1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 4px;
+    max-height: 400px;
+    overflow: auto;
+  }
+  .home_search_item{
+    min-heigh:60px;
+    padding:5px 10px;
+    border-bottom:1px dashed #2eabff;
+    position:relative;
+  }
+  .home_search_info{
+    min-height:20px;
+    line-height: 20px;
+    padding:5px 0;
+    font-size:12px;
+    color:#fff;
+    position:relative;
+  }
+  .home_search_info_left{
+    position:relative;
+  }
+  .home_search_info_right{
+    position:absolute;
+    height:30px;
+    line-height: 30px;
+    color:#fff;
+    top:50%;
+    margin-top:-15px;
+    right:0;
+    text-align: right;
+  }
+  .home_search_item:hover {
+    background: rgba(13, 23, 97, 0.5);
+    cursor: pointer;
   }
 </style>
 <style>
