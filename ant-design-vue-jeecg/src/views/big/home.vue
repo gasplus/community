@@ -657,8 +657,8 @@
           })
         },
         getCarMonitorList() {
-          const nowDateStr = this.getFormatDate(new Date('2019-01-12'))
-          // const nowDateStr = this.getFormatDate(new Date())
+          // const nowDateStr = this.getFormatDate(new Date('2019-01-12'))
+          const nowDateStr = this.getFormatDate(new Date()) 
           getCarMonitorList({
             outInTime_begin: nowDateStr + ' 00:00:00',
             outInTime_end: nowDateStr + ' 23:59:59',
