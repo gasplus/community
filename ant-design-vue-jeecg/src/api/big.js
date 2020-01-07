@@ -13,10 +13,19 @@ const api = {
   carList: 'monitor/monitorCar/list',
   personList: 'monitor/monitorPerson/list',
   monitorCarStat: 'monitor/monitorDevice/getMonitorCarStat',
-  deviceList: 'monitor/monitorDevice/getAll'
+  deviceList: 'monitor/monitorDevice/getAll',
+  personById: 'monitor/monitorPerson/queryById'
 }
 
 export default api
+
+export function getPersonById(parameter) {
+  return axios({
+    url: api.personList,
+    method: 'get',
+    params: parameter
+  })
+}
 
 export function getPersonList(parameter) {
   return axios({
@@ -45,6 +54,8 @@ export function getMonitorCarStat(parameter) {
 }
 
 export function getDeviceList(parameter) {
+  parameter = parameter || {}
+  parameter.xiaoQuId = xiaoQuId
   return axios({
     url: api.deviceList,
     method: 'get',

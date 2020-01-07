@@ -21,8 +21,8 @@
 
 <script>
     export default {
-        name: "personDetail",
-        props: ['personData'],
+        name: "carDetail",
+        props: ['carData'],
         data() {
           return {
             photoUrl: '',
@@ -52,7 +52,7 @@
           }
         },
         mounted() {
-          console.log(this.personData)
+          console.log(this.carData)
         },
         methods: {
           changeDY(index) {
@@ -77,7 +77,6 @@
 </script>
 
 <style scoped>
-
   .mask{
     position:fixed;
     top:0;
