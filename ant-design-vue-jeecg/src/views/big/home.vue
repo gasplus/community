@@ -137,13 +137,13 @@
                 <div class="home_bottom_item_btn" >
                   <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
                 </div>
-                <div class="home_bottom_item_info card_name">{{item.personName}}</div>
-                <div class="home_bottom_item_info card_car">{{item.carNumber}}</div>
-                <div class="home_bottom_item_info card_id_card">{{item.personIdCard}}1</div>
-                <div class="home_bottom_item_info card_address">{{item.hjdz}}2</div>
-                <div class="home_bottom_item_info card_find_address">{{item.address}}3</div>
+                <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
+                <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
+                <div class="home_bottom_item_info card_id_card" v-if="item.personIdCard">{{item.personIdCard}}</div>
+                <div class="home_bottom_item_info card_address" v-if="item.hjdz">{{item.hjdz}}</div>
+                <div class="home_bottom_item_info card_find_address" v-if="item.address">{{item.address}}</div>
                 <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
+                <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
               </div>
 
               <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
@@ -155,11 +155,11 @@
                 <div class="home_bottom_item_btn"  >
                   <a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>
                 </div>
-                <div class="home_bottom_item_info card_name">陌生车辆</div>
-                <div class="home_bottom_item_info card_car">{{item.carNumber}}</div>
-                <div class="home_bottom_item_info card_address">{{item.address}}</div>
+                <div class="home_bottom_item_info card_name">临时车辆</div>
+                <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
+                <div class="home_bottom_item_info card_address" v-if="item.address">{{item.address}}</div>
                 <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
+                <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
               </div>
             </div>
             <!--            </a-popover>-->
