@@ -85,6 +85,12 @@ service.interceptors.request.use(config => {
       }
     }
   }
+  if(config.method=='post'){
+    if(config.url.indexOf('opdag')>=0){
+      config.baseURL = '/'
+      config.headers['Content-Type'] = 'application/json'
+    }
+  }
   return config
 },(error) => {
   return Promise.reject(error)

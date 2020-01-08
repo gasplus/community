@@ -55,10 +55,15 @@
 <!--              :src="videoUrl"-->
 <!--              type="application/x-mpegURL"-->
 <!--            >-->
-            <source
+            <!--<source
               v-if="videoUrl"
               :src="videoUrl"
               type="video/mp4"
+            >-->
+            <source
+              v-if="videoUrl"
+              :src="videoUrl"
+              type="application/x-mpegURL"
             >
 
           </video>
@@ -69,11 +74,14 @@
 </template>
 
 <script>
+
   import videojs from 'video.js'
   import 'videojs-contrib-hls'
 
   import {
-    getDeviceList
+    getDeviceList,
+    getVideoUrlConfig,
+    setVideo
   } from "@/api/big"
 
   export default {
@@ -120,7 +128,22 @@
       //   });
       // },
       showVideo(item) {
-        this.videoUrl = 'http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4'
+        console.log(item)
+        if(item.type !== '20') {
+          this.$message.error('该设备暂不支持播放');
+          return
+        }
+        const params = {
+          deviceId: item.deviceId
+        }
+        getVideoUrlConfig(params).then(rel => {
+          const setting = rel.result
+          setVideo(setting).then(_rel => {
+            const url = _rel.hlsurl
+            this.videoUrl = url
+          })
+        })
+        // this.videoUrl = 'http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4'
       },
       getDeviceList() {
         this.loading = true;
