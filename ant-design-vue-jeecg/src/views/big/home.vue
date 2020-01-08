@@ -129,7 +129,9 @@
               <div class="home_bottom_item_jiao4"></div>
               <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
                 <div class="home_bottom_item_img">
-                  <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
+                  <viewer>
+                    <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
+                  </viewer>
                   <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">-->
                 </div>
                 <div class="home_bottom_item_btn" >
@@ -146,7 +148,9 @@
 
               <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
                 <div class="home_bottom_item_img">
-                  <img :src="jkImagePath+item.photoUrl" alt="">
+                  <viewer>
+                    <img :src="jkImagePath+item.photoUrl" alt="">
+                  </viewer>
                 </div>
                 <div class="home_bottom_item_btn"  >
                   <a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>
@@ -210,7 +214,7 @@
             </div>
           </div>
         </div>
-        <div class="home_tongji_item">
+        <div class="home_tongji_item" @click="showDeviceList" style="cursor:pointer">
           <div class="home_tongji_item_box" style="width:200px;">
             <div class="home_tongji_item_title">实有设备</div>
             <div class="home_tongji_item_info">
@@ -221,6 +225,10 @@
       </div>
       <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
       <PersonList v-show="personListShow" :personListData="personListData" :roomData="roomData" @close="closePersonList"></PersonList>
+      <deviceList v-if="deviceListShow" @leave="closeDeviceList"></deviceList>
+      <PersonDetail v-if="personDetailShow" @leave="closePersonDetail" :personData="personData"></PersonDetail>
+      <carDetail v-if="carDetailShow" @leave="closeCarDetail" :carData="carData"></carDetail>
+
       <div class="home_c_body">
         <iframe ref="mapIframe" :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
       </div>
@@ -244,18 +252,25 @@
     getMonitorMessage,
     getFangJianPerson,
     getMonitorCarStat,
-    getDeviceList,
     getPersonList,
-    getCarList
+    getCarList,
+    getPersonById
   } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
   import PersonList from '@/components/big/personList'
   import PersonDetail from '@/components/big/personDetail'
+  import carDetail from '@/components/big/carDetail'
+  import deviceList from '@/components/big/deviceList'
 
     export default {
       name: "home",
       data () {
         return {
+          carData: {},
+          carDetailShow: false,
+          personData: {},
+          personDetailShow: false,
+          deviceListShow: false,
           searchResultShow:false,
           searchResultData: [],
           roomData: {},
@@ -335,8 +350,10 @@
         DialogCard,
         PersonList,
         PersonDetail,
+        carDetail,
         Collapse,
-        MessageBox
+        MessageBox,
+        deviceList
       },
       mounted() {
         getMonitorPersonTypeStat().then(rel => {
@@ -350,7 +367,6 @@
         this.getCarMonitorList()
         this.getMonitorMessage()
         this.getMonitorCarStat()
-        this.getDeviceList()
         this.$nextTick(() => {
           this.centerHeight = this.$refs.center.offsetHeight
         })
@@ -390,16 +406,24 @@
             this.position.left = x + 'px'
             this.position.top = y + 'px'
             const _data = event.data.data;
-            console.log(_data)
+            const roomData = event.data.roomData;
             // return
             this.getLouDongInfo({
               louDongHao: _data.ID
             }, (data1) => {
               data1.ld = _data.ID
               this.dialogShow = true
-              if(this.$refs.dialogDom.setLouDongData) {
-                this.$refs.dialogDom.setLouDongData(data1)
-              }
+              this.$nextTick(() => {
+                try{
+                  if(this.$refs.dialogDom.setLouDongData) {
+                    this.$refs.dialogDom.setLouDongData(data1,roomData)
+                  } else if(this.$refs.dialogDom[0].setLouDongData) {
+                    this.$refs.dialogDom[0].setLouDongData(data1,roomData)
+                  }
+                } catch {
+                }
+
+              })
             })
           }else {
             this.dialogShow = false
@@ -419,11 +443,73 @@
         }, this.timeStep * 1000)
       },
       methods: {
+        closePersonDetail() {
+          this.personDetailShow = false
+        },
+        showPersonDetail(item) {
+          this.personData = item
+          this.personDetailShow = true
+        },
+        closeCarDetail() {
+          this.carDetailShow = false
+        },
+        showCarDetail(item) {
+          this.carData = item
+          this.carDetailShow = true
+        },
+        closeDeviceList() {
+          this.deviceListShow = false
+        },
+        showDeviceList() {
+          this.deviceListShow = true
+        },
         go2Detail(item) {
           if(this.searchType === 'car') {
             this.searchValue = item.carNumber
+
+            if(item.personId==='anonymous') {
+              this.$message.warning('车辆：'+item.carNumber+'为临时车辆');
+              return
+            }
+            if(item.personId!=='anonymous') {
+              getPersonById({id: item.personId}).then(rel => {
+                if(rel.result.records.length>=1){
+                  const o = rel.result.records[0]
+                  o.carNumber = item.carNumber
+                  const fields = [{key: 'carNumber', name: '车牌号'},{key: 'xingMing', name: '车主姓名'},{key: 'louDongHao', name: '楼号'},{key: 'danYuanHao',name: '单元号'},{key: 'fangJianHao',name: '房间号'}]
+                  const data = [o];
+                  console.log(JSON.stringify({
+                    data,
+                    fields
+                  }))
+                  this.$refs.mapIframe.contentWindow.postMessage({
+                    funcName:'drawSearchResult',
+                    option: {
+                      data,
+                      fields
+                    }
+                  },'*');
+                }
+
+              })
+            }
+            // this.showCarDetail(item)
           } else {
             this.searchValue = item.xingMing
+            const fields = [{key: 'xingMing', name: '姓名'},{key: 'louDongHao', name: '楼号'},{key: 'danYuanHao',name: '单元号'},{key: 'fangJianHao',name: '房间号'}]
+            const data = [item];
+            console.log(JSON.stringify({
+              data,
+              fields
+            }))
+            this.$refs.mapIframe.contentWindow.postMessage({
+              funcName:'drawSearchResult',
+              option: {
+                data,
+                fields
+              }
+            },'*');
+            // this.showPersonDetail(item)
           }
         },
         closeSearchBox() {
@@ -451,16 +537,10 @@
               this.searchResultShow = true
             })
           }
-          console.log(value)
         },
         getMonitorCarStat() {
           getMonitorCarStat().then(rel => {
             this.deviceData = rel.result
-          })
-        },
-        getDeviceList() {
-          getDeviceList().then(rel => {
-            console.log(rel)
           })
         },
         formatDate(date, fmt) {
@@ -493,7 +573,6 @@
           }, 1000)
         },
         showPoint(item, type) {
-          console.log(item)
           const key = type === 'car' ? 'carNumber' : 'personName'
           const fields = [{key: key},{key: 'outInTime'},{key: 'address'}]
           this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:[item],fields:fields}},'*');
@@ -502,7 +581,6 @@
           this.$refs.mapIframe.contentWindow.postMessage({funcName:'clearTag',data:{}},'*');
         },
         drawLine(item) {
-          console.log(item)
           getPersonMonitorList({
             pageSize: 20,
             pageNo: 1,
@@ -519,7 +597,6 @@
           })
         },
         drawCarLine(item) {
-          console.log(item)
           getCarMonitorList({
             pageSize: 20,
             pageNo: 1,
@@ -564,7 +641,6 @@
 
         },
         changeActiveIndex(index) {
-          console.log(index)
           if (index === '0') {
 
             this.$nextTick(() => {
@@ -579,7 +655,6 @@
           }
         },
         changeActivekey(key) {
-          console.log(key);
         },
         getMonitorMessage() {
           getMonitorMessage({
@@ -589,7 +664,6 @@
             pageSize:10
           }).then(rel => {
             if(rel.code === 200) {
-              console.log(rel)
               this.messageTotal = rel.result.total
               this.messageList = rel.result.records
             }
@@ -658,7 +732,7 @@
         },
         getCarMonitorList() {
           // const nowDateStr = this.getFormatDate(new Date('2019-01-12'))
-          const nowDateStr = this.getFormatDate(new Date()) 
+          const nowDateStr = this.getFormatDate(new Date())
           getCarMonitorList({
             outInTime_begin: nowDateStr + ' 00:00:00',
             outInTime_end: nowDateStr + ' 23:59:59',
@@ -1256,7 +1330,7 @@
     top:40px;
     right:40px;
     position:absolute;
-    z-index: 10000;
+    z-index: 4;
     cursor: pointer;
     background-color:rgba(0,0,0,0.6);
     border-radius: 10px;

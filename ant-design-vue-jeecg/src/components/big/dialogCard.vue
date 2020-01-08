@@ -123,16 +123,29 @@
             this.currentIndex = index;
             this.selectRoomIndex = -1
           },
-          setLouDongData(data) {
+          setLouDongData(data, roomData) {
             for(let key in data) {
               this.loudongData[key] = data[key];
             }
+
             if(this.loudongData.danYuan && this.loudongData.danYuan.length > 0) {
-              this.currentIndex = 0;
+              if(roomData) {
+                this.loudongData.danYuan.forEach((itt, ind) => {
+                  if (itt.danYuanHao === roomData.danYuanHao) {
+                    this.currentIndex = ind
+                  }
+                })
+                this.loudongData.danYuan[this.currentIndex].fangJian.forEach((itt, ind) => {
+                  if(itt.fangJianHao === roomData.fangJianHao) {
+                    this.selectRoom(ind)
+                  }
+                })
+              } else {
+                this.currentIndex = 0;
+              }
             } else {
               this.currentIndex = undefined;
             }
-            console.log(this.currentIndex)
           },
           leave() {
             this.$emit('leave')
