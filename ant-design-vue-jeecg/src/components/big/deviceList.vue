@@ -37,6 +37,8 @@
           </a-table>
         </div>
         <div class="device_video">
+          <iframe ref="videoIframe" :src="videoIframeUrl" frameborder="0" style="width:935px;height:525px;"></iframe>
+          <!--
           <video
             id="hls-video"
             width="846"
@@ -50,6 +52,7 @@
             x5-video-player-fullscreen="true"
             x5-video-player-typ="h5"
           >
+          -->
 <!--            <source-->
 <!--              v-if="videoUrl"-->
 <!--              :src="videoUrl"-->
@@ -60,13 +63,13 @@
               :src="videoUrl"
               type="video/mp4"
             >-->
-            <source
+            <!--<source
               v-if="videoUrl"
               :src="videoUrl"
               type="application/x-mpegURL"
             >
 
-          </video>
+          </video>-->
         </div>
       </div>
     </div>
@@ -89,6 +92,7 @@
     props: ['position'],
     data() {
       return {
+        videoIframeUrl: 'http://20.36.24.110:19888/video.html',
         videoUrl: '',
         loading: false,
         data: [],
@@ -138,10 +142,10 @@
         }
         getVideoUrlConfig(params).then(rel => {
           const setting = rel.result
-          setVideo(setting).then(_rel => {
-            const url = _rel.hlsurl
-            this.videoUrl = url
-          })
+          this.$refs.videoIframe.contentWindow.postMessage({
+            funcName:'changeVideo',
+            setting: setting
+          },'*');
         })
         // this.videoUrl = 'http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4'
       },
@@ -361,8 +365,8 @@
     left:351px;
     top:0;
     width:935px;
-    bottom:0;
-    overflow: auto;
+    height:525px;
+    overflow: hidden;
     background:rgba(255,255,255,0.1);
   }
   .device_video video{

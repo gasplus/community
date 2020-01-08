@@ -56,7 +56,9 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
                   <div class="home_bottom_item_img">
-                    <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
+                    <viewer>
+                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
+                    </viewer>
 <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">-->
                   </div>
                   <div class="home_bottom_item_btn" >
@@ -72,7 +74,9 @@
 
                 <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
                   <div class="home_bottom_item_img">
-                    <img :src="jkImagePath+item.photoUrl" alt="">
+                    <viewer>
+                      <img :src="jkImagePath+item.photoUrl" alt="">
+                    </viewer>
                   </div>
                   <div class="home_bottom_item_btn"  >
                     <a-tag color="blue" @click="showPoint(item)">查看位置</a-tag>

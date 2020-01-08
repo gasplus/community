@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link href="https://vjs.zencdn.net/7.5.5/video-js.css" rel="stylesheet" />
+  <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
+  <script src="https://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script>
+  <script src="https://vjs.zencdn.net/7.5.5/video.js"></script>
+  <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script>
+  <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+</head>
+<body style="padding:0;margin:0;overflow: hidden;width:935px;height:525px;">
+<section id="videoPlayer">
+  <video id="example-video" width="935" height="525" class="video-js vjs-default-skin vjs-big-play-centered" poster="">
+    <source id="video_url" type="application/x-mpegURL" id="target">
+  </video>
+</section>
+<script type="text/javascript">
+  var player = videojs('example-video', { "poster": "", "controls": "true" }, function() {
+    this.on('play', function() {
+      console.log('正在播放');
+    });
+    //暂停--播放完毕后也会暂停
+    this.on('pause', function() {
+      console.log("暂停中")
+    });
+    // 结束
+    this.on('ended', function() {
+      console.log('结束');
+    })
+
+  });
+  window.addEventListener('message', (event) => {
+    if(event.data.funcName === 'changeVideo'){
+      var setting = event.data.setting
+      $.ajax({
+        url: 'http://20.36.24.114:19666/opdag',
+        type: 'POST',
+        dataType: 'json',
+        //contentType:"application/json",
+        data: JSON.stringify(setting),
+        success: function(result){
+          player.src(result.hlsurl); /*动态设置video.js播放的地址。*/
+          player.autoplay();
+        }
+      })
+    }else {
+    }
+  }, false);
+</script>
+</body>
+</html>
