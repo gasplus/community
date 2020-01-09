@@ -230,6 +230,7 @@
       <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
       <PersonList v-show="personListShow" :personListData="personListData" :roomData="roomData" @close="closePersonList"></PersonList>
       <deviceList v-if="deviceListShow" @leave="closeDeviceList"></deviceList>
+      <deviceDetail ref="deviceDetail" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
       <PersonDetail v-if="personDetailShow" @leave="closePersonDetail" :personData="personData"></PersonDetail>
       <carDetail v-if="carDetailShow" @leave="closeCarDetail" :carData="carData"></carDetail>
 
@@ -258,18 +259,21 @@
     getMonitorCarStat,
     getPersonList,
     getCarList,
-    getPersonById
+    getPersonById,
+    getDeviceList
   } from "@/api/big"
   import DialogCard from '@/components/big/dialogCard'
   import PersonList from '@/components/big/personList'
   import PersonDetail from '@/components/big/personDetail'
   import carDetail from '@/components/big/carDetail'
   import deviceList from '@/components/big/deviceList'
+  import deviceDetail from '@/components/big/deviceDetail'
 
     export default {
       name: "home",
       data () {
         return {
+          deviceDetailShow: false,
           carData: {},
           carDetailShow: false,
           personData: {},
@@ -357,7 +361,8 @@
         carDetail,
         Collapse,
         MessageBox,
-        deviceList
+        deviceList,
+        deviceDetail
       },
       mounted() {
         getMonitorPersonTypeStat().then(rel => {
@@ -371,6 +376,7 @@
         this.getCarMonitorList()
         this.getMonitorMessage()
         this.getMonitorCarStat()
+        this.getDeviceList()
         this.$nextTick(() => {
           this.centerHeight = this.$refs.center.offsetHeight
         })
@@ -432,7 +438,17 @@
           }else {
             this.dialogShow = false
           }
-
+          if(event.data.funcName === 'showDeviceDetail'){
+            this.deviceDetailShow = true
+            this.$nextTick(() => {
+              const deviceId = event.data.deviceId
+              if(this.$refs.deviceDetail.showVideo) {
+                this.$refs.deviceDetail.showVideo(deviceId)
+              } else if(this.$refs.deviceDetail[0].showVideo) {
+                this.$refs.deviceDetail[0].showVideo(deviceId)
+              }
+            })
+          }
         }, false);
         if(this.interval) {
           clearInterval(this.interval);
@@ -444,9 +460,13 @@
           this.getCarMonitorList()
           this.getMonitorMessage()
           this.getMonitorCarStat()
+          this.getDeviceList()
         }, this.timeStep * 1000)
       },
       methods: {
+        closeDeviceDetail() {
+          this.deviceDetailShow = false
+        },
         closePersonDetail() {
           this.personDetailShow = false
         },
@@ -515,6 +535,22 @@
             },'*');
             // this.showPersonDetail(item)
           }
+        },
+        getDeviceList() {
+          getDeviceList().then(rel => {
+            const data = rel.result;
+            const deviceList = data.map(item => {
+              return {
+                deviceId: item.deviceId,
+                type: item.type,
+                status: item.status
+              }
+            })
+            this.$refs.mapIframe.contentWindow.postMessage({
+              funcName:'drawDeviceList',
+              option: deviceList
+            },'*');
+          })
         },
         closeSearchBox() {
           this.searchResultShow = false
