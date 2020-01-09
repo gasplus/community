@@ -15,20 +15,10 @@ const api = {
   monitorCarStat: 'monitor/monitorDevice/getMonitorCarStat',
   deviceList: 'monitor/monitorDevice/getAll',
   personById: 'monitor/monitorPerson/queryById',
-  videoUrlConfig: 'monitor/monitorDevice/getVideoUrlConfig',
-  setVideoUrl: 'opdag'
+  videoUrlConfig: 'monitor/monitorDevice/getVideoUrlConfig'
 }
 
 export default api
-
-export function setVideo(parameter) {
-  parameter = parameter || {}
-  return axios({
-    url: api.setVideoUrl,
-    method:"post",
-    data:parameter
-  })
-}
 
 export function getVideoUrlConfig(parameter) {
   parameter = parameter || {}
