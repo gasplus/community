@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <link href="https://vjs.zencdn.net/7.5.5/video-js.css" rel="stylesheet" />
+  <link href="vendor/video-js.css" rel="stylesheet" />
   <!-- If you'd like to support IE8 (for Video.js versions prior to v7) -->
-  <script src="https://vjs.zencdn.net/ie8/1.1.2/videojs-ie8.min.js"></script>
-  <script src="https://vjs.zencdn.net/7.5.5/video.js"></script>
-  <script src="https://unpkg.com/videojs-contrib-hls/dist/videojs-contrib-hls.js"></script>
-  <script src="https://code.jquery.com/jquery-1.11.3.js"></script>
+  <script src="vendor/videojs-ie8.min.js"></script>
+  <script src="vendor/video.js"></script>
+  <script src="vendor/videojs-contrib-hls.js"></script>
+  <script src="vendor/jquery-1.11.3.js"></script>
 </head>
 <body style="padding:0;margin:0;overflow: hidden;width:935px;height:525px;">
 <section id="videoPlayer">
@@ -38,6 +38,21 @@
     "The media playback was aborted due to a corruption problem or because the media used features your browser did not support.": "由于视频文件损坏或是该视频使用了你的浏览器不支持的功能，播放终止。",
     "No compatible source was found for this media.": "请选择设备进行播放。",
   });
+  /*
+  $(function() {
+	  var setting ={"devtype":"hiksdk","passwd":"lskj12345_","opcmd":"startstream","devip":"20.36.24.34","chan":1,"username":"admin"}
+	  $.ajax({
+		type: "post",
+		async: false,
+		cache: false,
+		url: 'http://20.36.24.110:19666/opdag',
+        data: JSON.stringify(setting),
+		success: function(result){
+		  player.src(result.hlsurl);
+		  player.autoplay();
+		}
+	  })
+  })*/
   window.addEventListener('message', (event) => {
     if(event.data.funcName === 'changeVideo'){
       videojs.addLanguage('zh-CN', {
@@ -48,11 +63,12 @@
         "No compatible source was found for this media.": "无法找到此视频兼容的源。",
       });
       var setting = event.data.setting
+      setting.chan = parseInt(setting.chan)
       $.ajax({
-        url: 'http://20.36.24.114:19666/opdag',
-        type: 'POST',
-        dataType: 'json',
-        //contentType:"application/json",
+        type: "post",
+        async: false,
+        cache: false,
+        url: 'http://20.36.24.110:19666/opdag',
         data: JSON.stringify(setting),
         success: function(result){
           player.src(result.hlsurl); /*动态设置video.js播放的地址。*/
