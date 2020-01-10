@@ -9,7 +9,7 @@
           </template>
           <div class="home_head_info_item message_icon ani" style="height:30px;width:30px;margin:0;"></div>
         </a-popover>
-        <div class="home_head_info_item" style="width:40px;font-size:10px;margin:0;line-height:40px;">{{messageTotal}}</div>
+        <div class="home_head_info_item" style="width:40px;font-size:10px;margin:0;line-height:40px;">{{messageTotal>999?'999+':messageTotal}}</div>
         <div class="home_head_info_item">{{formatDate(dateData, 'yyyy-MM-dd hh:mm:ss')}}</div>
         <div class="home_head_info_item">星期{{weekMap[dateData.getDay()]}}</div>
       </div>
@@ -45,11 +45,14 @@
         </div>
         <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
           <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-<!--            <a-popover  placement="right" trigger="hover">-->
-<!--              <template slot="content">-->
-<!--                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>-->
-<!--              </template>-->
-              <div class="home_bottom_item" v-for="item in userList" :key="item.id">
+            <a-popover  placement="right" trigger="hover" v-for="item in userList" :key="item.id">
+              <template slot="content">
+                <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
+                  <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="" style="width:200px;height:200px;"/>
+                  <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
+                </div>
+              </template>
+              <div class="home_bottom_item">
                 <div class="home_bottom_item_jiao1"></div>
                 <div class="home_bottom_item_jiao2"></div>
                 <div class="home_bottom_item_jiao3"></div>
@@ -59,17 +62,16 @@
                     <viewer>
                       <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
                     </viewer>
-<!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">-->
                   </div>
                   <div class="home_bottom_item_btn" >
                     <a-tag color="blue" @click="drawLine(item)">查看轨迹</a-tag>
                   </div>
-                  <div class="home_bottom_item_info card_name">{{item.personName}}</div>
-                  <div class="home_bottom_item_info card_id_card">{{item.personIdCard}}1</div>
-                  <div class="home_bottom_item_info card_address">{{item.hjdz}}2</div>
-                  <div class="home_bottom_item_info card_find_address">{{item.address}}3</div>
+                  <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
+                  <div class="home_bottom_item_info card_id_card" v-if="item.personIdCard">{{tuomin(item.personIdCard,5,4)}}</div>
+                  <div class="home_bottom_item_info card_address" v-if="item.hjdz">{{item.hjdz}}</div>
+                  <div class="home_bottom_item_info card_find_address" v-if="item.address">{{item.address}}</div>
                   <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                  <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
+                  <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
                 </div>
 
                 <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
@@ -82,12 +84,13 @@
                     <a-tag color="blue" @click="showPoint(item)">查看位置</a-tag>
                   </div>
                   <div class="home_bottom_item_info card_name">陌生人</div>
-                  <div class="home_bottom_item_info card_address">{{item.address}}</div>
+                  <div class="home_bottom_item_info card_address" v-if="item.address">{{item.address}}</div>
+<!--                  <div class="home_bottom_item_info card_id_card">{{tuomin('371121198710250230',5,4)}}</div>-->
                   <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                  <div class="home_bottom_item_info card_time">{{item.outInTime}}</div>
+                  <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
                 </div>
               </div>
-<!--            </a-popover>-->
+            </a-popover>
           </div>
         </div>
       </collapse>
@@ -122,51 +125,54 @@
         <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
 
           <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-            <!--            <a-popover  placement="right" trigger="hover">-->
-            <!--              <template slot="content">-->
-            <!--                <PersonDetail :personData="item" :bodyInfo="JSON.parse(item.bodyInfo)"  :faceInfo="JSON.parse(item.faceInfo)"></PersonDetail>-->
-            <!--              </template>-->
-            <div class="home_bottom_item" v-for="item in carList" :key="item.id">
-              <div class="home_bottom_item_jiao1"></div>
-              <div class="home_bottom_item_jiao2"></div>
-              <div class="home_bottom_item_jiao3"></div>
-              <div class="home_bottom_item_jiao4"></div>
-              <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
-                <div class="home_bottom_item_img">
-                  <viewer>
-                    <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
-                  </viewer>
-                  <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/icon_message_moshengren.png" alt="">-->
+            <a-popover  placement="right" trigger="hover" v-for="item in carList" :key="item.id">
+              <template slot="content">
+                <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
+                  <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="" style="width:200px;height:200px;"/>
+                  <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
                 </div>
-                <div class="home_bottom_item_btn" >
-                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+              </template>
+              <div class="home_bottom_item">
+                <div class="home_bottom_item_jiao1"></div>
+                <div class="home_bottom_item_jiao2"></div>
+                <div class="home_bottom_item_jiao3"></div>
+                <div class="home_bottom_item_jiao4"></div>
+                <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
+                  <div class="home_bottom_item_img">
+                    <viewer>
+                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
+                    </viewer>
+                    <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/pdf4.jpg" alt="">-->
+                  </div>
+                  <div class="home_bottom_item_btn" >
+                    <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+                  </div>
+                  <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
+                  <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
+                  <div class="home_bottom_item_info card_id_card" v-if="item.personIdCard">{{tuomin(item.personIdCard,5,4)}}</div>
+                  <div class="home_bottom_item_info card_address" v-if="item.hjdz">{{item.hjdz}}</div>
+                  <div class="home_bottom_item_info card_find_address" v-if="item.address">{{item.address}}</div>
+                  <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
+                  <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
                 </div>
-                <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
-                <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
-                <div class="home_bottom_item_info card_id_card" v-if="item.personIdCard">{{item.personIdCard}}</div>
-                <div class="home_bottom_item_info card_address" v-if="item.hjdz">{{item.hjdz}}</div>
-                <div class="home_bottom_item_info card_find_address" v-if="item.address">{{item.address}}</div>
-                <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
-              </div>
 
-              <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
-                <div class="home_bottom_item_img">
-                  <viewer>
-                    <img :src="jkImagePath+item.photoUrl" alt="">
-                  </viewer>
+                <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
+                  <div class="home_bottom_item_img">
+                    <viewer>
+                      <img :src="jkImagePath+item.photoUrl" alt="">
+                    </viewer>
+                  </div>
+                  <div class="home_bottom_item_btn"  >
+                    <a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>
+                  </div>
+                  <div class="home_bottom_item_info card_name">临时车辆</div>
+                  <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
+                  <div class="home_bottom_item_info card_address" v-if="item.address">{{item.address}}</div>
+                  <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
+                  <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
                 </div>
-                <div class="home_bottom_item_btn"  >
-                  <a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>
-                </div>
-                <div class="home_bottom_item_info card_name">临时车辆</div>
-                <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
-                <div class="home_bottom_item_info card_address" v-if="item.address">{{item.address}}</div>
-                <!--            <div class="home_bottom_item_info"><span>方式：</span>{{item.outInType}}</div>-->
-                <div class="home_bottom_item_info card_time" v-if="item.outInTime">{{item.outInTime}}</div>
               </div>
-            </div>
-            <!--            </a-popover>-->
+            </a-popover>
           </div>
         </div>
       </collapse>
@@ -219,10 +225,10 @@
           </div>
         </div>
         <div class="home_tongji_item" @click="showDeviceList" style="cursor:pointer">
-          <div class="home_tongji_item_box" style="width:200px;">
-            <div class="home_tongji_item_title">实有设备</div>
+          <div class="home_tongji_item_box">
+            <div class="home_tongji_item_title">感知设备</div>
             <div class="home_tongji_item_info">
-              <span>{{deviceData.count}}</span>个({{deviceData.zcCount}}正常，{{deviceData.ycCount}}异常)
+              <span>{{deviceData.count}}</span>个(<i style="color:greenyellow">{{deviceData.zcCount}}</i>/<i style="color:red">{{deviceData.ycCount}}</i>)
             </div>
           </div>
         </div>
@@ -464,6 +470,19 @@
         }, this.timeStep * 1000)
       },
       methods: {
+        tuomin(str,startLength,endLength) {
+          if(str.length>startLength+endLength){
+            const arr = str.split('')
+            const addArr = []
+            for(let i=0;i<arr.length-(startLength+endLength);i++) {
+              addArr.push('*')
+            }
+            arr.splice(startLength,arr.length-(startLength+endLength),...addArr)
+            return arr.join('')
+          }else {
+            return str
+          }
+        },
         closeDeviceDetail() {
           this.deviceDetailShow = false
         },
@@ -1043,10 +1062,7 @@
   }
   .home_bottom_item_body{
     position:relative;
-    left:0;
-    right:0;
-    top:0;
-    bottom:0;
+    min-height: 80px;
     background:rgba(6,7,107,0);
     border:1px solid rgba(55, 85, 218, 0.3);
     z-index: 1;
