@@ -164,7 +164,8 @@
                   </viewer>
                 </div>
                 <div class="home_bottom_item_btn"  >
-                  <a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>
+                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+                  <!--<a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>-->
                 </div>
                 <div class="home_bottom_item_info card_name">临时车辆</div>
                 <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
@@ -661,6 +662,10 @@
           })
         },
         drawCarLine(item) {
+          if(!item.carNumber){
+            this.$message.warning('车辆车牌号未识别');
+            return
+          }
           getCarMonitorList({
             pageSize: 20,
             pageNo: 1,
