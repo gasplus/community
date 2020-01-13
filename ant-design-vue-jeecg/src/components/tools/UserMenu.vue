@@ -50,6 +50,12 @@
       </a-menu>
     </a-dropdown>
     <span class="action">
+
+      <router-link  class="logout_title"  tag="a" target="_blank" :to="{name:'bigHome',params:{id:0}}"><span v-if="isDesktop()">&nbsp;大屏展示</span></router-link>
+
+    </span>
+
+    <span class="action">
       <a class="logout_title" href="javascript:;" @click="handleLogout">
         <a-icon type="logout"/>
         <span v-if="isDesktop()">&nbsp;退出登录</span>
