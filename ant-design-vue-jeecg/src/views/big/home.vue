@@ -76,11 +76,19 @@
               </div>
 
               <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
-                <div class="home_bottom_item_img">
-                  <viewer>
-                    <img :src="jkImagePath+item.photoUrl" alt="">
-                  </viewer>
-                </div>
+                <a-popover  placement="left" trigger="hover">
+                  <template slot="content">
+                    <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
+                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="" style="width:200px;height:200px;"/>
+                      <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
+                    </div>
+                  </template>
+                  <div class="home_bottom_item_img">
+                    <viewer>
+                      <img :src="jkImagePath+item.photoUrl" alt="">
+                    </viewer>
+                  </div>
+                </a-popover>
                 <div class="home_bottom_item_btn"  >
                   <a-tag color="blue" @click="showPoint(item)">查看位置</a-tag>
                 </div>
@@ -145,7 +153,7 @@
                     <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/pdf4.jpg" alt="">-->
                   </div>
                 </a-popover>
-                <div class="home_bottom_item_btn" >
+                <div class="home_bottom_item_btn" v-if="item.carNumber.indexOf('无法识别')<0" >
                   <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
                 </div>
                 <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
@@ -158,12 +166,20 @@
               </div>
 
               <div class="home_bottom_item_body" v-if="item.personId==='anonymous'">
-                <div class="home_bottom_item_img">
-                  <viewer>
-                    <img :src="jkImagePath+item.photoUrl" alt="">
-                  </viewer>
-                </div>
-                <div class="home_bottom_item_btn"  >
+                <a-popover  placement="left" trigger="hover">
+                  <template slot="content">
+                    <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
+                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="" style="width:200px;height:200px;"/>
+                      <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
+                    </div>
+                  </template>
+                  <div class="home_bottom_item_img">
+                    <viewer>
+                      <img :src="jkImagePath+item.photoUrl" alt="">
+                    </viewer>
+                  </div>
+                </a-popover>
+                <div class="home_bottom_item_btn"  v-if="item.carNumber.indexOf('无法识别')<0" >
                   <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
                   <!--<a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>-->
                 </div>
