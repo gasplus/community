@@ -59,9 +59,9 @@
                     </div>
                   </template>
                   <div class="home_bottom_item_img">
-                    <viewer>
+<!--                    <viewer>-->
                       <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
-                    </viewer>
+<!--                    </viewer>--> 
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn" >
@@ -84,9 +84,9 @@
                     </div>
                   </template>
                   <div class="home_bottom_item_img">
-                    <viewer>
+<!--                    <viewer>-->
                       <img :src="jkImagePath+item.photoUrl" alt="">
-                    </viewer>
+<!--                    </viewer>-->
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn"  >
@@ -147,9 +147,9 @@
                     </div>
                   </template>
                   <div class="home_bottom_item_img">
-                    <viewer>
+<!--                    <viewer>-->
                       <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
-                    </viewer>
+<!--                    </viewer>-->
                     <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/pdf4.jpg" alt="">-->
                   </div>
                 </a-popover>
@@ -174,9 +174,9 @@
                     </div>
                   </template>
                   <div class="home_bottom_item_img">
-                    <viewer>
+<!--                    <viewer>-->
                       <img :src="jkImagePath+item.photoUrl" alt="">
-                    </viewer>
+<!--                    </viewer>-->
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn"  v-if="item.carNumber.indexOf('无法识别')<0" >
