@@ -811,7 +811,6 @@
           }).then(rel => {
             if(rel.code === 200) {
               this.carList = rel.result.records || []
-              this.carList = [{},{}]
             }
           })
         },
