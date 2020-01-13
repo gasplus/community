@@ -61,7 +61,7 @@
                   <div class="home_bottom_item_img">
 <!--                    <viewer>-->
                       <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
-<!--                    </viewer>--> 
+<!--                    </viewer>-->
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn" >
@@ -153,8 +153,9 @@
                     <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/pdf4.jpg" alt="">-->
                   </div>
                 </a-popover>
-                <div class="home_bottom_item_btn" v-if="item.carNumber.indexOf('无法识别')<0" >
-                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+                <div class="home_bottom_item_btn">
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')<0" color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')>=0" color="blue" @click="drawLine(item)">查看位置</a-tag>
                 </div>
                 <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
                 <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
@@ -179,8 +180,10 @@
 <!--                    </viewer>-->
                   </div>
                 </a-popover>
-                <div class="home_bottom_item_btn"  v-if="item.carNumber.indexOf('无法识别')<0" >
-                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+                <div class="home_bottom_item_btn">
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')<0" color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')>=0" color="blue" @click="drawLine(item)">查看位置</a-tag>
+<!--                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>-->
                   <!--<a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>-->
                 </div>
                 <div class="home_bottom_item_info card_name">临时车辆</div>
