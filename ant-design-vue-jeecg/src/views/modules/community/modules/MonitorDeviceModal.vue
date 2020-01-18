@@ -43,6 +43,9 @@
         <a-form-item label="功能" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'funcType', validatorRules.funcType]" placeholder="请输入功能"></a-input>
         </a-form-item>
+        <a-form-item label="播放url" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'liveUrl', validatorRules.liveUrl]" placeholder="请输入播放url"></a-input>
+        </a-form-item>
         
       </a-form>
     </a-spin>
@@ -86,6 +89,7 @@
         status:{},
         deviceIp:{},
         funcType:{},
+        liveUrl:{},
         },
         url: {
           add: "/monitor/monitorDevice/add",
@@ -107,7 +111,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'pid','name','deviceId','type','address','status','deviceIp','memo','funcType'))
+          this.form.setFieldsValue(pick(this.model,'pid','name','deviceId','type','address','status','deviceIp','memo','funcType','liveUrl'))
         })
       },
       close () {
@@ -152,7 +156,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'pid','name','deviceId','type','address','status','deviceIp','memo','funcType'))
+        this.form.setFieldsValue(pick(row,'pid','name','deviceId','type','address','status','deviceIp','memo','funcType','liveUrl'))
       },
       submitSuccess(formData,flag){
         if(!formData.id){

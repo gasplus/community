@@ -135,6 +135,11 @@
             dataIndex: 'funcType'
           },
           {
+            title:'播放url',
+            align:"left",
+            dataIndex: 'liveUrl'
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align:"center",
