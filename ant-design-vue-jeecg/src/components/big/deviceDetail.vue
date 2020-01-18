@@ -17,15 +17,11 @@
     <div class="card1_body">
       <div style="position:absolute;left:20px;right:20px;top:20px;bottom:36px;">
         <div class="device_video">
-          <video id="my-player"
-                 class="video-js vjs-default-skin vjs-big-play-centered"
-                 controls
-                 preload="auto"
-                 autoplay="autoplay"
-                 width="640"
-                 height="525"
-                 data-setup='{}'>
-            <source :src='videoPlayUrl' type='rtmp/flv'/>
+          <video
+            id="videoId"
+            controls = "true"
+            height="525"
+            width="auto">
           </video>
 <!--          <iframe ref="videoIframe" :src="videoIframeUrl" frameborder="0" style="width:935px;height:525px;"></iframe>-->
         </div>
@@ -40,6 +36,7 @@
 <script>
 
   import videojs from 'video.js'
+  import flvjs from 'flv.js'
   // import 'videojs-contrib-hls'
   import "videojs-flash";
 
@@ -65,12 +62,18 @@
           deviceId: deviceId
         }
         getFLVUrl(params).then(rel => {
-          console.log(rel)
           if(rel.result && rel.result.liveUrl){
-            videojs.options.flash.swf = '/video-js.swf';
-            const player = videojs('my-player');
-            this.videoPlayUrl = rel.result.liveUrl
-            player.play()
+            if (flvjs.isSupported()){
+              const videoElement = document.getElementById('videoId');
+              const flvPlayer = flvjs.createPlayer({
+                type: 'flv',
+                url: rel.result.liveUrl
+                // url: 'https://mister-ben.github.io/videojs-flvjs/bbb.flv'
+              });
+              flvPlayer.attachMediaElement(videoElement);
+              flvPlayer.load();
+              flvPlayer.play();
+            }
           }
         })
       },
@@ -282,7 +285,7 @@
     position:absolute;
     left:0;
     top:0;
-    width:935px;
+    width:640px;
     height:525px;
     overflow: hidden;
     background:rgba(255,255,255,0.1);
@@ -299,7 +302,7 @@
     text-align: center;
   }
   .device_video video{
-    width:935px;
+    width:640px;
     height:525px;
   }
 </style>
