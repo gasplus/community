@@ -21,6 +21,7 @@
             :columns="columns"
             :dataSource="data"
             :loading="loading"
+            rowKey="id"
             size="small"
             bordered>
             <template slot="status" slot-scope="text">
@@ -37,7 +38,17 @@
           </a-table>
         </div>
         <div class="device_video">
-          <iframe ref="videoIframe" :src="videoIframeUrl" frameborder="0" style="width:935px;height:525px;"></iframe>
+<!--          <iframe ref="videoIframe" :src="videoIframeUrl" frameborder="0" style="width:935px;height:525px;"></iframe>-->
+          <video id="my-player"
+                 class="video-js vjs-default-skin vjs-big-play-centered"
+                 controls
+                 preload="auto"
+                 autoplay="autoplay"
+                 width="640"
+                 height="525"
+                 data-setup='{}'>
+            <source :src='videoPlayUrl' type='rtmp/flv'/>
+          </video>
           <!--
           <video
             id="hls-video"
@@ -79,11 +90,12 @@
 <script>
 
   import videojs from 'video.js'
-  import 'videojs-contrib-hls'
+  // import 'videojs-contrib-hls'
+  import "videojs-flash";
 
   import {
     getDeviceList,
-    getVideoUrlConfig,
+    getFLVUrl,
     setVideo
   } from "@/api/big"
 
@@ -93,6 +105,7 @@
     data() {
       return {
         videoIframeUrl: 'http://20.36.24.110:19888/video.html',
+        videoPlayUrl: '',
         videoUrl: '',
         loading: false,
         data: [],
@@ -118,7 +131,9 @@
       //   size: this.pagination.pageSize,
       //   current: this.pagination.current
       // }
+
       this.getDeviceList()
+
     },
     methods: {
       // handleTableChange(pagination, filters, sorter) {
@@ -140,12 +155,15 @@
         const params = {
           deviceId: item.deviceId
         }
-        getVideoUrlConfig(params).then(rel => {
-          const setting = rel.result
-          this.$refs.videoIframe.contentWindow.postMessage({
-            funcName:'changeVideo',
-            setting: setting
-          },'*');
+        getFLVUrl(params).then(rel => {
+          console.log(rel)
+          if(rel.result && rel.result.liveUrl){
+            videojs.options.flash.swf = '/video-js.swf';
+            const player = videojs('my-player');
+            this.videoPlayUrl = rel.result.liveUrl
+            // this.videoPlayUrl = url
+            player.play()
+          }
         })
         // this.videoUrl = 'http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4'
       },
@@ -221,11 +239,11 @@
 
   .card1 {
     position: absolute;
-    width: 1330px;
+    width: 1035px;
     height: 582px;
     top: 50%;
     left: 50%;
-    margin-left: -455px;
+    margin-left: -308px;
     margin-top: -291px;
     /*margin-top:-210px;*/
     /*margin-left:-325px;*/
@@ -364,13 +382,13 @@
     position:absolute;
     left:351px;
     top:0;
-    width:935px;
+    width:640px;
     height:525px;
     overflow: hidden;
     background:rgba(255,255,255,0.1);
   }
   .device_video video{
-    width:935px;
+    width:640px;
     height:525px;
 
   }
