@@ -39,15 +39,11 @@
         </div>
         <div class="device_video">
 <!--          <iframe ref="videoIframe" :src="videoIframeUrl" frameborder="0" style="width:935px;height:525px;"></iframe>-->
-          <video id="my-player"
-                 class="video-js vjs-default-skin vjs-big-play-centered"
-                 controls
-                 preload="auto"
-                 autoplay="autoplay"
-                 width="640"
-                 height="525"
-                 data-setup='{}'>
-            <source :src='videoPlayUrl' type='rtmp/flv'/>
+          <video
+            id="videoId"
+            controls = "true"
+            height="525"
+            width="auto">
           </video>
           <!--
           <video
@@ -90,8 +86,9 @@
 <script>
 
   import videojs from 'video.js'
+  import flvjs from 'flv.js'
   // import 'videojs-contrib-hls'
-  import "videojs-flash";
+  // import "videojs-flash";
 
   import {
     getDeviceList,
@@ -105,7 +102,6 @@
     data() {
       return {
         videoIframeUrl: 'http://20.36.24.110:19888/video.html',
-        videoPlayUrl: '',
         videoUrl: '',
         loading: false,
         data: [],
@@ -156,16 +152,20 @@
           deviceId: item.deviceId
         }
         getFLVUrl(params).then(rel => {
-          console.log(rel)
           if(rel.result && rel.result.liveUrl){
-            videojs.options.flash.swf = '/video-js.swf';
-            const player = videojs('my-player');
-            this.videoPlayUrl = rel.result.liveUrl
-            // this.videoPlayUrl = url
-            player.play()
+            if (flvjs.isSupported()){
+              const videoElement = document.getElementById('videoId');
+              const flvPlayer = flvjs.createPlayer({
+                type: 'flv',
+                url: rel.result.liveUrl
+                // url: 'https://mister-ben.github.io/videojs-flvjs/bbb.flv'
+              });
+              flvPlayer.attachMediaElement(videoElement);
+              flvPlayer.load();
+              flvPlayer.play();
+            }
           }
         })
-        // this.videoUrl = 'http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4'
       },
       getDeviceList() {
         this.loading = true;
