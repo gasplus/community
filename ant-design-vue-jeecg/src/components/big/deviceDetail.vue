@@ -17,7 +17,17 @@
     <div class="card1_body">
       <div style="position:absolute;left:20px;right:20px;top:20px;bottom:36px;">
         <div class="device_video">
-          <iframe ref="videoIframe" :src="videoIframeUrl" frameborder="0" style="width:935px;height:525px;"></iframe>
+          <video id="my-player"
+                 class="video-js vjs-default-skin vjs-big-play-centered"
+                 controls
+                 preload="auto"
+                 autoplay="autoplay"
+                 width="640"
+                 height="525"
+                 data-setup='{}'>
+            <source :src='videoPlayUrl' type='rtmp/flv'/>
+          </video>
+<!--          <iframe ref="videoIframe" :src="videoIframeUrl" frameborder="0" style="width:935px;height:525px;"></iframe>-->
         </div>
       </div>
       <div class="device_id">
@@ -30,48 +40,39 @@
 <script>
 
   import videojs from 'video.js'
-  import 'videojs-contrib-hls'
+  // import 'videojs-contrib-hls'
+  import "videojs-flash";
 
   import {
-    getDeviceList,
-    getVideoUrlConfig,
-    setVideo
+    getFLVUrl
   } from "@/api/big"
 
   export default {
     name: "deviceDetail",
     data() {
       return {
+        videoPlayUrl: '',
         deviceId: '',
-        videoIframeUrl: 'http://20.36.24.110:19888/video.html'
+        // videoIframeUrl: 'http://20.36.24.110:19888/video.html'
       }
     },
     mounted() {
     },
     methods: {
-      // handleTableChange(pagination, filters, sorter) {
-      //   console.log(pagination);
-      //   const pager = { ...this.pagination };
-      //   pager.current = pagination.current;
-      //   this.pagination = pager;
-      //   this.getDeviceList({
-      //     size: pagination.pageSize,
-      //     current: pagination.current
-      //   });
-      // },
       showVideo(deviceId) {
         this.deviceId = deviceId
         const params = {
           deviceId: deviceId
         }
-        getVideoUrlConfig(params).then(rel => {
-          const setting = rel.result
-          this.$refs.videoIframe.contentWindow.postMessage({
-            funcName:'changeVideo',
-            setting: setting
-          },'*');
+        getFLVUrl(params).then(rel => {
+          console.log(rel)
+          if(rel.result && rel.result.liveUrl){
+            videojs.options.flash.swf = '/video-js.swf';
+            const player = videojs('my-player');
+            this.videoPlayUrl = rel.result.liveUrl
+            player.play()
+          }
         })
-        // this.videoUrl = 'http://vfx.mtime.cn/Video/2019/02/04/mp4/190204084208765161.mp4'
       },
       leave() {
         this.$emit('leave')
@@ -138,11 +139,11 @@
 
   .card1 {
     position: absolute;
-    width: 980px;
+    width: 685px;
     height: 582px;
     top: 50%;
     left: 50%;
-    margin-left: -380px;
+    margin-left: -233px;
     margin-top: -291px;
     /*margin-top:-210px;*/
     /*margin-left:-325px;*/
