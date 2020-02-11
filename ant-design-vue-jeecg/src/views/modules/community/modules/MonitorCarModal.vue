@@ -14,19 +14,21 @@
           <a-input v-decorator="[ 'carNumber', validatorRules.carNumber]" placeholder="请输入车牌号"></a-input>
         </a-form-item>
         <a-form-item label="车辆类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['carType']" :trigger-change="true" dictCode="" placeholder="请选择车辆类型"/>
+          <j-dict-select-tag type="list" v-decorator="['carType']" :trigger-change="true" dictCode="carType"
+                             placeholder="请选择车辆类型"/>
         </a-form-item>
         <a-form-item label="图片地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-upload v-decorator="['photoUrl']" :trigger-change="true"></j-upload>
-        </a-form-item>
-        <a-form-item label="租户id" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['tenantId']" :trigger-change="true" dictCode="" placeholder="请选择租户id"/>
         </a-form-item>
         <a-form-item label="姓名" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'personName', validatorRules.personName]" placeholder="请输入姓名"></a-input>
         </a-form-item>
         <a-form-item label="身份证" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'personCardId', validatorRules.personCardId]" placeholder="请输入身份证"></a-input>
+        </a-form-item>
+        <a-form-item label="布控类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag type="list" v-decorator="['alarmType']" :trigger-change="true" dictCode="isYN"
+                             placeholder="请选择布控类型"/>
         </a-form-item>
 
       </a-form>
@@ -43,7 +45,7 @@
 
   export default {
     name: "MonitorCarModal",
-    components: { 
+    components: {
       JUpload,
       JDictSelectTag,
     },
@@ -64,19 +66,19 @@
         },
 
         confirmLoading: false,
-        validatorRules:{
-        carNumber:{},
-        carType:{rules: [{ required: true, message: '请输入车辆类型!' }]},
-        photoUrl:{},
-        tenantId:{rules: [{ required: true, message: '请输入租户id!' }]},
-        personName:{},
-        personCardId:{},
+        validatorRules: {
+          carNumber: {rules: [{required: true, message: '请输入车牌号!'}]},
+          carType: {rules: [{required: true, message: '请输入车辆类型!'}]},
+          photoUrl: {},
+          personName: {rules: [{required: true, message: '请输入姓名!'}]},
+          personCardId: {rules: [{required: true, message: '请输入身份证!'}]},
+          alarmType: {rules: [{required: true, message: '请输入布控类型!'}]},
         },
         url: {
           add: "/monitor/monitorCar/add",
           edit: "/monitor/monitorCar/edit",
         }
-     
+
       }
     },
     created () {
@@ -90,7 +92,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model,'carNumber','carType','photoUrl','tenantId','personName','personCardId'))
+          this.form.setFieldsValue(pick(this.model, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'alarmType'))
         })
       },
       close () {
@@ -109,8 +111,8 @@
               httpurl+=this.url.add;
               method = 'post';
             }else{
-              httpurl+=this.url.edit;
-               method = 'put';
+              httpurl += this.url.edit;
+              method = 'put';
             }
             let formData = Object.assign(this.model, values);
             console.log("表单提交数据",formData)
@@ -126,17 +128,17 @@
               that.close();
             })
           }
-         
+
         })
       },
       handleCancel () {
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row,'carNumber','carType','photoUrl','tenantId','personName','personCardId'))
+        this.form.setFieldsValue(pick(row, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'alarmType'))
       },
 
-      
+
     }
   }
 </script>

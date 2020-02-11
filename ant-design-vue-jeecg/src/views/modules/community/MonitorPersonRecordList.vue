@@ -4,19 +4,33 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
-          <a-col :md="12" :sm="16">
-            <a-form-item label="进出时间">
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间" class="query-group-cust" v-model="queryParam.outInTime_begin"></j-date>
-              <span class="query-group-split-cust"></span>
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间" class="query-group-cust" v-model="queryParam.outInTime_end"></j-date>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="人员姓名">
+              <a-input placeholder="请输入人员姓名" v-model="queryParam.personName"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="人员类型">
-              <j-dict-select-tag placeholder="请选择人员类型" v-model="queryParam.personType" dictCode="person_type"/>
+            <a-form-item label="身份证">
+              <a-input placeholder="请输入身份证" v-model="queryParam.personIdCard"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="6" :sm="8" >
+          <template v-if="toggleSearchStatus">
+            <a-col :md="12" :sm="16">
+              <a-form-item label="进出时间">
+                <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间"
+                        class="query-group-cust" v-model="queryParam.outInTime_begin"></j-date>
+                <span class="query-group-split-cust"></span>
+                <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间"
+                        class="query-group-cust" v-model="queryParam.outInTime_end"></j-date>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="人员类型">
+                <j-dict-select-tag placeholder="请选择人员类型" v-model="queryParam.personType" dictCode="person_type"/>
+              </a-form-item>
+            </a-col>
+          </template>
+          <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>

@@ -14,20 +14,22 @@
           <a-input v-decorator="[ 'xingMing', validatorRules.xingMing]" placeholder="请输入姓名"></a-input>
         </a-form-item>
         <a-form-item label="性别" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['xingBie']" :trigger-change="true" dictCode="sex" placeholder="请选择性别"/>
+          <j-dict-select-tag type="list" v-decorator="['xingBie']" :trigger-change="true" dictCode="sex"
+                             placeholder="请选择性别"/>
         </a-form-item>
         <a-form-item label="出生日期" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-date placeholder="请选择出生日期" v-decorator="[ 'csrq', validatorRules.csrq]" :trigger-change="true" style="width: 100%"/>
+          <j-date placeholder="请选择出生日期" v-decorator="[ 'csrq', validatorRules.csrq]" :trigger-change="true"
+                  style="width: 100%"/>
         </a-form-item>
         <a-form-item label="公民身份证号" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'sfzh', validatorRules.sfzh]" placeholder="请输入公民身份证号"></a-input>
         </a-form-item>
-        <a-form-item label="所属派出所" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'pcs', validatorRules.pcs]" placeholder="请输入所属派出所"></a-input>
+
+        <a-form-item label="人员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-category-select v-decorator="['type']" pcode="A01" placeholder="请选择人员类型" back="type_text"
+                             @change="handleCategoryChange"/>
         </a-form-item>
-        <a-form-item label="所属居委会" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'jwh', validatorRules.jwh]" placeholder="请输入所属居委会"></a-input>
-        </a-form-item>
+
         <a-form-item label="户籍地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'hjdz', validatorRules.hjdz]" placeholder="请输入户籍地址"></a-input>
         </a-form-item>
@@ -37,20 +39,12 @@
         <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'lxdh', validatorRules.lxdh]" placeholder="请输入联系电话"></a-input>
         </a-form-item>
-        <a-form-item label="租户id" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'tenantId', validatorRules.tenantId]" placeholder="请输入租户id"></a-input>
-        </a-form-item>
+
         <a-form-item label="楼栋号" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'louDongHao', validatorRules.louDongHao]" placeholder="请输入楼栋号"></a-input>
         </a-form-item>
         <a-form-item label="民族" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag type="list" v-decorator="['minZu']" :trigger-change="true" dictCode="hu_mz" placeholder="请选择民族"/>
-        </a-form-item>
-        <a-form-item label="街路巷" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'jieLuXiang', validatorRules.jieLuXiang]" placeholder="请输入街路巷"></a-input>
-        </a-form-item>
-        <a-form-item label="所属分局" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'fenJu', validatorRules.fenJu]" placeholder="请输入所属分局"></a-input>
         </a-form-item>
         <a-form-item label="单元号" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'danYuanHao', validatorRules.danYuanHao]" placeholder="请输入单元号"></a-input>
@@ -61,21 +55,11 @@
         <a-form-item label="照片" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-upload v-decorator="['zhaoPian']" :trigger-change="true"></j-upload>
         </a-form-item>
-        <a-form-item label="户号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'huHao', validatorRules.huHao]" placeholder="请输入户号"></a-input>
-        </a-form-item>
-        <a-form-item label="人员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-category-select v-decorator="['type']" pcode="A01" placeholder="请选择人员类型" back="type_text" @change="handleCategoryChange"/>
-        </a-form-item>
+
         <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-textarea v-decorator="['memo']" rows="4" placeholder="请输入备注"/>
         </a-form-item>
-        <a-form-item label="xxxdz" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'xxdz', validatorRules.xxdz]" placeholder="请输入xxxdz"></a-input>
-        </a-form-item>
-        <a-form-item label="人员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'typeText', validatorRules.typeText]" placeholder="请输入人员类型"></a-input>
-        </a-form-item>
+
         <a-form-item v-show="false">
           <a-input v-decorator="[ 'type_text']"></a-input>
         </a-form-item>
