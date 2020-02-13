@@ -129,39 +129,38 @@
             dataIndex: 'title'
           },
           {
-            title: '关联数据id',
-            align: "center",
-            dataIndex: 'dataId'
-          },
-          {
             title: '监控类型',
             align: "center",
-            dataIndex: 'alarmType'
-          },
-          {
-            title: '报警规则',
-            align: "center",
-            dataIndex: 'alarmRuleType'
-          },
-          {
-            title: '间隔天数',
-            align: "center",
-            dataIndex: 'intervalDays'
-          },
-          {
-            title: '时间区间定义',
-            align: "center",
-            dataIndex: 'alarmTimeConfig'
-          },
-          {
-            title: '报警模板',
-            align: "center",
-            dataIndex: 'alarmTemplate',
+            dataIndex: 'alarmType',
             customRender: (text) => {
               if (!text) {
                 return ''
               } else {
-                return filterMultiDictText(this.dictOptions['alarmTemplate'], text + "")
+                return filterMultiDictText(this.dictOptions['alarmType'], text + "")
+              }
+            }
+          },
+          {
+            title: '报警规则',
+            align: "center",
+            dataIndex: 'alarmRuleType',
+            customRender: (text) => {
+              if (!text) {
+                return ''
+              } else {
+                return filterMultiDictText(this.dictOptions['alarmRuleType'], text + "")
+              }
+            }
+          },
+          {
+            title: '是否有效',
+            align: "center",
+            dataIndex: 'status',
+            customRender: (text) => {
+              if (!text) {
+                return ''
+              } else {
+                return filterMultiDictText(this.dictOptions['status'], text + "")
               }
             }
           },
@@ -180,7 +179,9 @@
           importExcelUrl: "monitor/monitorAlarmConfig/importExcel",
         },
         dictOptions: {
-          alarmTemplate: [],
+          alarmType: [],
+          alarmRuleType: [],
+          status: [],
         },
       }
     },
@@ -191,9 +192,19 @@
     },
     methods: {
       initDictConfig() {
-        initDictOptions('monitor_alarm_template').then((res) => {
+        initDictOptions('monitor_alarm_type').then((res) => {
           if (res.success) {
-            this.$set(this.dictOptions, 'alarmTemplate', res.result)
+            this.$set(this.dictOptions, 'alarmType', res.result)
+          }
+        })
+        initDictOptions('alarm__rule_type').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'alarmRuleType', res.result)
+          }
+        })
+        initDictOptions('isYN').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'status', res.result)
           }
         })
       }

@@ -28,7 +28,11 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-
+      <a-button type="primary" icon="download" @click="handleExportXls('搜索任务')">导出</a-button>
+      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
+                @change="handleImportExcel">
+        <a-button type="primary" icon="import">导入</a-button>
+      </a-upload>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel">
@@ -143,6 +147,16 @@
             align: "center",
             dataIndex: 'searchUrl',
             scopedSlots: {customRender: 'imgSlot'}
+          },
+          {
+            title: '开始时间',
+            align: "center",
+            dataIndex: 'beginTime'
+          },
+          {
+            title: '结束时间',
+            align: "center",
+            dataIndex: 'endTime'
           },
           {
             title: '操作',

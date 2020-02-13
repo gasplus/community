@@ -16,6 +16,14 @@
         <a-form-item label="搜索图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-upload v-decorator="['searchUrl']" :trigger-change="true"></j-upload>
         </a-form-item>
+        <a-form-item label="开始时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择开始时间" v-decorator="[ 'beginTime', validatorRules.beginTime]" :trigger-change="true"
+                  :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+        </a-form-item>
+        <a-form-item label="结束时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-date placeholder="请选择结束时间" v-decorator="[ 'endTime', validatorRules.endTime]" :trigger-change="true"
+                  :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
+        </a-form-item>
 
       </a-form>
     </a-spin>
@@ -26,11 +34,13 @@
 
   import {httpAction} from '@/api/manage'
   import pick from 'lodash.pick'
+  import JDate from '@/components/jeecg/JDate'
   import JUpload from '@/components/jeecg/JUpload'
 
   export default {
     name: "MonitorSearchTaskModal",
     components: {
+      JDate,
       JUpload,
     },
     data() {
@@ -53,6 +63,8 @@
         validatorRules: {
           searchTitle: {rules: [{required: true, message: '请输入搜索标题!'}]},
           searchUrl: {rules: [{required: true, message: '请输入搜索图片!'}]},
+          beginTime: {rules: [{required: true, message: '请输入开始时间!'}]},
+          endTime: {rules: [{required: true, message: '请输入结束时间!'}]},
         },
         url: {
           add: "/monitor/monitorSearchTask/add",
@@ -72,7 +84,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'searchTitle', 'searchUrl'))
+          this.form.setFieldsValue(pick(this.model, 'searchTitle', 'searchUrl', 'beginTime', 'endTime'))
         })
       },
       close() {
@@ -115,7 +127,7 @@
         this.close()
       },
       popupCallback(row) {
-        this.form.setFieldsValue(pick(row, 'searchTitle', 'searchUrl'))
+        this.form.setFieldsValue(pick(row, 'searchTitle', 'searchUrl', 'beginTime', 'endTime'))
       },
 
 

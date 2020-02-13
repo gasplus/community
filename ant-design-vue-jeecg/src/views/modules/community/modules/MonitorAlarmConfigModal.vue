@@ -13,25 +13,20 @@
         <a-form-item label="监控标题" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'title', validatorRules.title]" placeholder="请输入监控标题"></a-input>
         </a-form-item>
-        <a-form-item label="关联数据id" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'dataId', validatorRules.dataId]" placeholder="请输入关联数据id"></a-input>
-        </a-form-item>
         <a-form-item label="监控类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'alarmType', validatorRules.alarmType]" placeholder="请输入监控类型"></a-input>
+          <j-dict-select-tag type="list" v-decorator="['alarmType']" :trigger-change="true"
+                             dictCode="monitor_alarm_type" placeholder="请选择监控类型"/>
         </a-form-item>
         <a-form-item label="报警规则" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'alarmRuleType', validatorRules.alarmRuleType]" placeholder="请输入报警规则"></a-input>
-        </a-form-item>
-        <a-form-item label="间隔天数" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input-number v-decorator="[ 'intervalDays', validatorRules.intervalDays]" placeholder="请输入间隔天数"
-                          style="width: 100%"/>
+          <j-dict-select-tag type="list" v-decorator="['alarmRuleType']" :trigger-change="true"
+                             dictCode="alarm__rule_type" placeholder="请选择报警规则"/>
         </a-form-item>
         <a-form-item label="时间区间定义" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'alarmTimeConfig', validatorRules.alarmTimeConfig]" placeholder="请输入时间区间定义"></a-input>
         </a-form-item>
-        <a-form-item label="报警模板" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['alarmTemplate']" :trigger-change="true"
-                             dictCode="monitor_alarm_template" placeholder="请选择报警模板"/>
+        <a-form-item label="是否有效" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <j-dict-select-tag type="list" v-decorator="['status']" :trigger-change="true" dictCode="isYN"
+                             placeholder="请选择是否有效"/>
         </a-form-item>
 
       </a-form>
@@ -68,13 +63,11 @@
 
         confirmLoading: false,
         validatorRules: {
-          title: {},
-          dataId: {rules: [{required: true, message: '请输入关联数据id!'}]},
+          title: {rules: [{required: true, message: '请输入监控标题!'}]},
           alarmType: {rules: [{required: true, message: '请输入监控类型!'}]},
           alarmRuleType: {rules: [{required: true, message: '请输入报警规则!'}]},
-          intervalDays: {},
           alarmTimeConfig: {},
-          alarmTemplate: {},
+          status: {},
         },
         url: {
           add: "/monitor/monitorAlarmConfig/add",
@@ -94,7 +87,7 @@
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'title', 'dataId', 'alarmType', 'alarmRuleType', 'intervalDays', 'alarmTimeConfig', 'alarmTemplate'))
+          this.form.setFieldsValue(pick(this.model, 'title', 'alarmType', 'alarmRuleType', 'alarmTimeConfig', 'status'))
         })
       },
       close() {
@@ -137,7 +130,7 @@
         this.close()
       },
       popupCallback(row) {
-        this.form.setFieldsValue(pick(row, 'title', 'dataId', 'alarmType', 'alarmRuleType', 'intervalDays', 'alarmTimeConfig', 'alarmTemplate'))
+        this.form.setFieldsValue(pick(row, 'title', 'alarmType', 'alarmRuleType', 'alarmTimeConfig', 'status'))
       },
 
 
