@@ -1,52 +1,5 @@
 <template>
   <a-card :bordered="false">
-    <!-- 查询区域 -->
-    <div class="table-page-search-wrapper">
-      <a-form layout="inline" @keyup.enter.native="searchQuery">
-        <a-row :gutter="24">
-          <a-col :md="6" :sm="8">
-            <a-form-item label="人员姓名">
-              <a-input placeholder="请输入人员姓名" v-model="queryParam.personName"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="6" :sm="8">
-            <a-form-item label="身份证">
-              <a-input placeholder="请输入身份证" v-model="queryParam.personIdCard"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="12" :sm="8">
-            <a-form-item label="进出时间">
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间"
-                      class="query-group-cust" v-model="queryParam.outInTime_begin"></j-date>
-              <span class="query-group-split-cust"></span>
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间"
-                      class="query-group-cust" v-model="queryParam.outInTime_end"></j-date>
-            </a-form-item>
-          </a-col>
-          <a-col :md="18" :sm="18">
-            <a-form-item label="设备选择">
-              <a-select
-                mode="multiple"
-                placeholder="请选择设备"
-                v-model="selectedDevices"
-                @deselect="removeSelected"
-                @dropdownVisibleChange="showDeviceSelect"
-              >
-              </a-select>
-            </a-form-item>
-          </a-col>
-
-          <a-col :md="6" :sm="6">
-            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
-              <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-            </span>
-          </a-col>
-
-        </a-row>
-      </a-form>
-    </div>
-    <!-- 查询区域-END -->
 
     <!-- table区域-begin -->
     <div>
@@ -125,28 +78,26 @@
 
       </a-table>
     </div>
-    <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
-    <monitorPersonRecord-modal ref="modalForm" @ok="modalFormOk"></monitorPersonRecord-modal>
   </a-card>
 </template>
 
 <script>
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
-  import MonitorPersonRecordModal from './modules/MonitorPersonRecordModal'
-  import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
-  import SelectDeviceListModal from "./modules/SelectDeviceListModal";
-  import JDate from '@/components/jeecg/JDate.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
-    name: "MonitorPersonRecordList",
+    name: "SelectMonitorPersonRecordList",
     mixins:[JeecgListMixin],
+    props: {
+      selectId:{
+        type: String,
+        default() {
+          return ''
+        }
+      }
+    },
     components: {
-      JDictSelectTag,
-      JDate,
-      SelectDeviceListModal,
-      MonitorPersonRecordModal
     },
     data () {
       return {
@@ -204,18 +155,22 @@
           order: 'desc',
         },
         url: {
-          list: "/monitor/monitorPersonRecord/list",
-          delete: "/monitor/monitorPersonRecord/delete",
-          deleteBatch: "/monitor/monitorPersonRecord/deleteBatch",
-          exportXlsUrl: "/monitor/monitorPersonRecord/exportXls",
-          importExcelUrl: "monitor/monitorPersonRecord/importExcel",
+          list: "/monitor/monitorPersonRecord/list"
         },
-        deviceIds: [],
-        selectedDevices:[],
         dictOptions:{
           personType:[],
         },
+        disableMixinCreated: true
       }
+    },
+    created() {
+      if(this.selectId){
+        this.queryParam.id = this.selectId
+        this.loadData();
+      }
+
+      //初始化字典配置 在自己页面定义
+      this.initDictConfig();
     },
     computed: {
       importExcelUrl: function(){
@@ -223,33 +178,6 @@
       }
     },
     methods: {
-      showDeviceSelect() {
-        this.$refs.DeviceListModal.add(this.selectedDevices,this.deviceIds);
-      },
-      removeSelected(value) {
-        let deleteInd = -1
-        const deviceIds = this.deviceIds.split(',')
-        this.selectedDevices.forEach((item,index) => {
-          if(item === value) {
-            deleteInd = index
-          }
-        })
-        if(deleteInd!==-1){
-          this.selectedDevices.splice(deleteInd,1)
-          deviceIds.splice(deleteInd,1)
-          this.deviceIds = deviceIds.join(',')
-        }
-      },
-      choseDeviceList(deviceList) {
-        console.log(deviceList)
-        this.selectedDevices = [];
-        this.deviceIds = '';
-        for(let i=0;i<deviceList.length;i++){
-          this.selectedDevices.push(deviceList[i].address);
-        }
-        this.deviceIds += deviceList.map(item => item.deviceId).join(",")
-        this.queryParam.deviceId = this.deviceIds
-      },
       initDictConfig(){
         initDictOptions('person_type').then((res) => {
           if (res.success) {

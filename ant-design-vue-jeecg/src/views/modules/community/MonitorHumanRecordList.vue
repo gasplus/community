@@ -6,11 +6,28 @@
         <a-row :gutter="24">
           <a-col :md="12" :sm="16">
             <a-form-item label="进出时间">
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间" class="query-group-cust"
-                      v-model="queryParam.outInTime_begin"></j-date>
+              <a-date-picker
+                :disabledDate="disabledStartDate"
+                :allowClear="false"
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                :defaultValue="moment(queryParam.outInTime_begin, 'YYYY-MM-DD HH:mm:ss')"
+                v-model="startValue"
+                placeholder="请选择开始时间"
+                @openChange="handleStartOpenChange"
+              />
               <span class="query-group-split-cust"></span>
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间" class="query-group-cust"
-                      v-model="queryParam.outInTime_end"></j-date>
+              <a-date-picker
+                :allowClear="false"
+                :disabledDate="disabledEndDate"
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="请选择结束时间"
+                :defaultValue="moment(queryParam.outInTime_end, 'YYYY-MM-DD HH:mm:ss')"
+                v-model="endValue"
+                :open="endOpen"
+                @openChange="handleEndOpenChange"
+              />
             </a-form-item>
           </a-col>
           <a-col :md="12" :sm="16">
@@ -20,6 +37,19 @@
               <a-input placeholder="请输入最大值" class="query-group-cust" v-model="queryParam.bodyInfoAge_end"></a-input>
             </a-form-item>
           </a-col>
+          <a-col :md="24" :sm="24">
+            <a-form-item label="设备选择">
+              <a-select
+                mode="multiple"
+                placeholder="请选择设备"
+                v-model="selectedDevices"
+                @deselect="removeSelected"
+                @dropdownVisibleChange="showDeviceSelect"
+              >
+              </a-select>
+            </a-form-item>
+          </a-col>
+
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
               <a-form-item label="人体识别性别">
@@ -73,7 +103,7 @@
     </div>
 -->
     <!-- table区域-begin -->
-    <div>
+    <div id="bd">
       <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
         <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
@@ -112,34 +142,88 @@
             下载
           </a-button>
         </template>
+        <span slot="action1" slot-scope="text, record">
+          <a-popover title="监控结果" trigger="hover">
+            <template slot="content">
+              <a-row>
+                <a-col span="12" v-if="record.bodyInfo">
+                  <a-card hoverable style="width: 240px;margin:0 10px;" title="人体识别结果" size="small">
+                    <img
+                      alt="example"
+                      :src="imgBasePath+JSON.parse(record.bodyInfo).picture"
+                      slot="cover"
+                    />
+                    <a-card-meta>
+                      <template slot="description">
+                        <a-row>
+                          <a-col span="12">年龄</a-col>
+                          <a-col span="12">{{JSON.parse(record.bodyInfo).age}}</a-col>
+                          <a-col span="12">性别</a-col>
+                          <a-col span="12">{{JSON.parse(record.bodyInfo).gender}}</a-col>
+                        </a-row>
+                      </template>
+                    </a-card-meta>
+                  </a-card>
+                </a-col>
+                <a-col span="12" v-if="record.faceInfo">
+                  <a-card hoverable style="width: 240px;margin:0 10px;" title="人脸识别结果" size="small">
+                    <img
+                      alt="example"
+                      :src="imgBasePath+JSON.parse(record.faceInfo).picture"
+                      slot="cover"
+                    />
+                    <a-card-meta title="">
+                      <template slot="description">
+                         <a-row>
+                          <a-col span="12">年龄</a-col>
+                          <a-col span="12">{{JSON.parse(record.faceInfo).age}}</a-col>
+                          <a-col span="12">性别</a-col>
+                          <a-col span="12">{{JSON.parse(record.faceInfo).gender}}</a-col>
+                        </a-row>
+                      </template>
+                    </a-card-meta>
+                  </a-card>
+                </a-col>
+              </a-row>
 
+            </template>
+            <a-button type="primary">查看</a-button>
+          </a-popover>
+        </span>
         <span slot="action" slot-scope="text, record">
-          <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical" />
-          <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
+          <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+            <a>删除</a>
+          </a-popconfirm>
         </span>
 
       </a-table>
     </div>
-
+    <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorHumanRecord-modal ref="modalForm" @ok="modalFormOk"></monitorHumanRecord-modal>
   </a-card>
 </template>
 
 <script>
-
+  Date.prototype.Format = function (fmt) { //author: meizz
+    const o = {
+      "M+": this.getMonth() + 1, //月份
+      "d+": this.getDate(), //日
+      "h+": this.getHours(), //小时
+      "m+": this.getMinutes(), //分
+      "s+": this.getSeconds(), //秒
+      "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+      "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (let k in o)
+      if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+  }
+  import moment from 'moment';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import MonitorHumanRecordModal from './modules/MonitorHumanRecordModal'
+  import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import JDate from '@/components/jeecg/JDate.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
@@ -150,10 +234,12 @@
     components: {
       JDictSelectTag,
       JDate,
+      SelectDeviceListModal,
       MonitorHumanRecordModal
     },
     data() {
       return {
+        imgBasePath: window._CONFIG['imgDomainRecordURL'],
         description: '人体检测结果管理页面',
         // 表头
         columns: [
@@ -168,25 +254,9 @@
             }
           },
           {
-            title:'人员姓名',
-            align:"center",
-            dataIndex: 'personName'
-          },
-          {
-            title:'身份证',
-            align:"center",
-            dataIndex: 'personIdCard'
-          },
-          {
             title:'进出时间',
             align:"center",
             dataIndex: 'outInTime'
-          },
-          {
-            title: '图片地址',
-            align: "center",
-            dataIndex: 'photoUrl',
-            scopedSlots: {customRender: 'imgSlot'}
           },
           {
             title: '进出地址',
@@ -194,50 +264,10 @@
             dataIndex: 'address'
           },
           {
-            title: '人体识别年龄',
+            title: '识别结果',
             align: "center",
-            dataIndex: 'bodyInfoAge'
-          },
-          {
-            title: '人体识别性别',
-            align: "center",
-            dataIndex: 'bodyInfoGender',
-            customRender: (text) => {
-              if (!text) {
-                return ''
-              } else {
-                return filterMultiDictText(this.dictOptions['bodyInfoGender'], text + "")
-              }
-            }
-          },
-          {
-            title: '人体识别头发',
-            align: "center",
-            dataIndex: 'bodyInfoHair',
-            customRender: (text) => {
-              if (!text) {
-                return ''
-              } else {
-                return filterMultiDictText(this.dictOptions['bodyInfoHair'], text + "")
-              }
-            }
-          },
-          {
-            title: '人脸识别年龄',
-            align: "center",
-            dataIndex: 'faceInfoAge'
-          },
-          {
-            title: '人脸识别性别',
-            align: "center",
-            dataIndex: 'faceInfoGender',
-            customRender: (text) => {
-              if (!text) {
-                return ''
-              } else {
-                return filterMultiDictText(this.dictOptions['faceInfoGender'], text + "")
-              }
-            }
+            dataIndex: 'action1',
+            scopedSlots: {customRender: 'action1'}
           },
           {
             title: '操作',
@@ -264,7 +294,31 @@
           bodyInfoHair: [],
           faceInfoGender: [],
         },
+        startValue: null,
+        endValue: null,
+        endOpen: false,
+        deviceIds: [],
+        selectedDevices:[],
+        disableMixinCreated: true
       }
+    },
+    watch: {
+      startValue(val) {
+        console.log('startValue', val);
+      },
+      endValue(val) {
+        console.log('endValue', val);
+      },
+    },
+    created() {
+      const endDate = new Date()
+      const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+      this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd hh:mm:ss')
+      this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+
+      this.loadData();
+      //初始化字典配置 在自己页面定义
+      this.initDictConfig();
     },
     computed: {
       importExcelUrl: function(){
@@ -272,6 +326,56 @@
       }
     },
     methods: {
+      showDeviceSelect() {
+        this.$refs.DeviceListModal.add(this.selectedDevices,this.deviceIds);
+      },
+      removeSelected(value) {
+        let deleteInd = -1
+        const deviceIds = this.deviceIds.split(',')
+        this.selectedDevices.forEach((item,index) => {
+          if(item === value) {
+            deleteInd = index
+          }
+        })
+        if(deleteInd!==-1){
+          this.selectedDevices.splice(deleteInd,1)
+          deviceIds.splice(deleteInd,1)
+          this.deviceIds = deviceIds.join(',')
+        }
+      },
+      choseDeviceList(deviceList) {
+        console.log(deviceList)
+        this.selectedDevices = [];
+        this.deviceIds = '';
+        for(let i=0;i<deviceList.length;i++){
+          this.selectedDevices.push(deviceList[i].address);
+        }
+        this.deviceIds += deviceList.map(item => item.deviceId).join(",")
+        this.queryParam.deviceId = this.deviceIds
+      },
+      moment,
+      disabledStartDate(startValue) {
+        const endValue = this.endValue;
+        if (!startValue || !endValue) {
+          return false;
+        }
+        return startValue.valueOf() > endValue.valueOf();
+      },
+      disabledEndDate(endValue) {
+        const startValue = this.startValue;
+        if (!endValue || !startValue) {
+          return false;
+        }
+        return startValue.valueOf() >= endValue.valueOf();
+      },
+      handleStartOpenChange(open) {
+        if (!open) {
+          this.endOpen = true;
+        }
+      },
+      handleEndOpenChange(open) {
+        this.endOpen = open;
+      },
       initDictConfig() {
         initDictOptions('monitor_gender').then((res) => {
           if (res.success) {
@@ -295,4 +399,9 @@
 </script>
 <style scoped>
   @import '~@assets/less/common.less'
+</style>
+<style>
+  #bd .ant-card-body{
+    padding:10px;
+  }
 </style>

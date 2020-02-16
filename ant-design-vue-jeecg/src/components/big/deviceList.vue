@@ -32,8 +32,8 @@
               <div style="height:20px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{text}}</div>
             </template>
             <template slot="operation" slot-scope="text, record">
-              <a-button v-if="record.status+'' === '0' || record.type !== '20'" type="link" disabled size="small">查看监控</a-button>
-              <a-button v-if="record.status+'' === '1' && record.type === '20'" type="link" @click="showVideo(record)" size="small">查看监控</a-button>
+              <a-button v-if="record.status+'' === '0'" type="link" disabled size="small">查看监控</a-button>
+              <a-button v-if="record.status+'' === '1'" type="link" @click="showVideo(record)" size="small">查看监控</a-button>
             </template>
           </a-table>
         </div>
@@ -143,11 +143,6 @@
       //   });
       // },
       showVideo(item) {
-        console.log(item)
-        if(item.type !== '20') {
-          this.$message.error('该设备暂不支持播放');
-          return
-        }
         const params = {
           deviceId: item.deviceId
         }

@@ -92,6 +92,9 @@
           <a @click="handleEdit(record)">编辑</a>
 
           <a-divider type="vertical"/>
+          <a @click="handleView(record)">查看监控</a>
+
+          <a-divider type="vertical"/>
           <a-dropdown>
             <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
             <a-menu slot="overlay">
@@ -106,7 +109,14 @@
 
       </a-table>
     </div>
-
+    <a-modal
+      v-if="selectRecord"
+      title="监控记录"
+      :width="1200"
+      v-model="jkVisible"
+      :footer="null">
+      <SelectMonitorPersonRecordList v-if="jkVisible" :selectId="selectRecord.searchContent"></SelectMonitorPersonRecordList>
+    </a-modal>
     <monitorSearchTask-modal ref="modalForm" @ok="modalFormOk"></monitorSearchTask-modal>
   </a-card>
 </template>
@@ -114,17 +124,22 @@
 <script>
 
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
+  import SelectMonitorPersonRecordList from './modules/SelectMonitorPersonRecordList'
   import MonitorSearchTaskModal from './modules/MonitorSearchTaskModal'
+  import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: "MonitorSearchTaskList",
     mixins: [JeecgListMixin],
     components: {
+      SelectMonitorPersonRecordList,
       MonitorSearchTaskModal
     },
     data() {
       return {
+        selectRecord: undefined,
         description: '搜索任务管理页面',
+        jkVisible:false,
         // 表头
         columns: [
           {
@@ -159,6 +174,18 @@
             dataIndex: 'endTime'
           },
           {
+            title: '状态',
+            align: "center",
+            dataIndex: 'searchStatus',
+            customRender:(text)=>{
+              if(!text){
+                return ''
+              }else{
+                return filterMultiDictText(this.dictOptions['monitor_search_status'], text+"")
+              }
+            }
+          },
+          {
             title: '操作',
             dataIndex: 'action',
             align: "center",
@@ -172,7 +199,9 @@
           exportXlsUrl: "/monitor/monitorSearchTask/exportXls",
           importExcelUrl: "monitor/monitorSearchTask/importExcel",
         },
-        dictOptions: {},
+        dictOptions: {
+          monitor_search_status: []
+        },
       }
     },
     computed: {
@@ -181,7 +210,17 @@
       }
     },
     methods: {
+      handleView(record) {
+        this.selectRecord = record
+        this.jkVisible = true
+      },
       initDictConfig() {
+
+        initDictOptions('monitor_search_status').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'monitor_search_status', res.result)
+          }
+        })
       }
 
     }
