@@ -74,6 +74,14 @@
         </template>
 
         <span slot="action" slot-scope="text, record">
+          <a @click="handleEdit(record)">编辑</a>
+
+          <a-divider type="vertical"/>
+          <a-dropdown>
+            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
           <a @click="handleEdit(record)" v-if="record.status === 'N'">编辑</a>
           <a-divider type="vertical" v-if="record.status === 'N'"/>
           <a @click="handleUse(record)" :aria-disabled="true" v-if="record.status === 'N'">生效</a>
@@ -81,12 +89,16 @@
           <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)"  v-if="record.status === 'N'">
             <a>删除</a>
           </a-popconfirm>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
 
           <a @click="handleUnUse(record)" :aria-disabled="true" v-if="record.status === 'Y'">取消生效</a>
         </span>
 
       </a-table>
     </div>
+
     <monitorAlarmConfig-modal ref="modalForm" @ok="modalFormOk"></monitorAlarmConfig-modal>
   </a-card>
 </template>
