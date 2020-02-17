@@ -123,15 +123,13 @@
           {
             title:'进出时间',
             align:"center",
-            dataIndex: 'outInTime',
-            customRender:function (text) {
-              return !text?"":(text.length>10?text.substr(0,10):text)
-            }
+            dataIndex: 'outInTime'
           },
           {
             title:'图片地址',
             align:"center",
-            dataIndex: 'photoUrl'
+            dataIndex: 'photoUrl',
+            scopedSlots: {customRender: 'imgSlot'}
           },
           {
             title:'进出地址',
