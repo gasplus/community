@@ -151,6 +151,7 @@
     },
     data () {
       return {
+        imgBasePath: window._CONFIG['imgDomainRecordURL'],
         description: '人员监控信息管理页面',
         // 表头
         columns: [
