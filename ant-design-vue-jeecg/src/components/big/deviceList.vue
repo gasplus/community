@@ -29,7 +29,7 @@
               <a-tag v-if="text + '' === '0'" color="red">异常</a-tag>
             </template>
             <template slot="address" slot-scope="text">
-              <div style="height:20px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;">{{text}}</div>
+              <div style="height:20px;overflow: hidden;text-overflow:ellipsis;white-space: nowrap;width:150px;" :title="text">{{text}}</div>
             </template>
             <template slot="operation" slot-scope="text, record">
               <a-button v-if="record.status+'' === '0'" type="link" disabled size="small">查看监控</a-button>
@@ -108,14 +108,14 @@
         columns: [{
           title: '设备地址',
           dataIndex: 'address',
-          width: '50%',
+          width: '150px',
           scopedSlots: { customRender: 'address' },
         }, {
             title: '状态',
             dataIndex: 'status',
             scopedSlots: { customRender: 'status' },
         },{
-          width: '25%',
+          width: '120px',
           title: '操作',
           dataIndex: 'operation',
           scopedSlots: { customRender: 'operation' },
