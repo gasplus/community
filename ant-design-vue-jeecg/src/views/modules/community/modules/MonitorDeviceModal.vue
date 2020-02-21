@@ -25,28 +25,24 @@
         <a-form-item label="名称" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'name', validatorRules.name]" placeholder="请输入名称"></a-input>
         </a-form-item>
-        <a-form-item label="设备id" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'deviceId', validatorRules.deviceId]" placeholder="请输入设备id"></a-input>
+        <a-form-item label="设备序号" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'deviceId', validatorRules.deviceId]" placeholder="请输入设备序号"></a-input>
         </a-form-item>
-        <a-form-item label="类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'type', validatorRules.type]" placeholder="请输入类型"></a-input>
-        </a-form-item>
+
         <a-form-item label="地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'address', validatorRules.address]" placeholder="请输入地址"></a-input>
         </a-form-item>
         <a-form-item label="状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input-number v-decorator="[ 'status', validatorRules.status]" placeholder="请输入状态" style="width: 100%"/>
         </a-form-item>
-        <a-form-item label="设备ip" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item label="设备地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'deviceIp', validatorRules.deviceIp]" placeholder="请输入设备ip"></a-input>
         </a-form-item>
-        <a-form-item label="功能" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'funcType', validatorRules.funcType]" placeholder="请输入功能"></a-input>
-        </a-form-item>
-        <a-form-item label="播放url" :labelCol="labelCol" :wrapperCol="wrapperCol">
+
+        <a-form-item label="播放地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'liveUrl', validatorRules.liveUrl]" placeholder="请输入播放url"></a-input>
         </a-form-item>
-        
+
       </a-form>
     </a-spin>
   </a-modal>
@@ -57,10 +53,10 @@
   import { httpAction } from '@/api/manage'
   import pick from 'lodash.pick'
   import JTreeSelect from '@/components/jeecg/JTreeSelect'
-  
+
   export default {
     name: "MonitorDeviceModal",
-    components: { 
+    components: {
       JTreeSelect
     },
     data () {
@@ -97,7 +93,7 @@
         },
         expandedRowKeys:[],
         pidField:"pid"
-     
+
       }
     },
     created () {
@@ -149,7 +145,7 @@
               that.close();
             })
           }
-         
+
         })
       },
       handleCancel () {
@@ -180,8 +176,8 @@
           }
         }
       }
-      
-      
+
+
     }
   }
 </script>

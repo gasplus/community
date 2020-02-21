@@ -1,18 +1,51 @@
 <template>
   <a-card :bordered="false">
-    
+    <!-- 查询开始   -->
+
+    <div class="table-page-search-wrapper">
+      <a-form layout="inline">
+        <a-row :gutter="24">
+          <a-col :span="6">
+            <a-form-item label="设备序号">
+              <a-input placeholder="请输入设备序号查询" v-model="queryParam.deviceId"></a-input>
+            </a-form-item>
+          </a-col>
+
+          <a-col :span="6">
+            <a-form-item label="地址">
+              <a-input placeholder="请输入地址查询" v-model="queryParam.address"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :span="6">
+            <a-form-item label="设备地址">
+              <a-input placeholder="请输入设备地址查询" v-model="queryParam.deviceIp"></a-input>
+            </a-form-item>
+          </a-col>
+
+          <a-col :span="6">
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchByquery" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+            </span>
+          </a-col>
+
+        </a-row>
+      </a-form>
+    </div>
+    <!-- 查询结束   -->
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('监控设备管理')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
-        <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
+          <a-menu-item key="1" @click="batchDel">
+            <a-icon type="delete"/>
+            删除
+          </a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
+        <a-button style="margin-left: 8px"> 批量操作
+          <a-icon type="down"/>
+        </a-button>
       </a-dropdown>
     </div>
 
@@ -35,7 +68,7 @@
         @change="handleTableChange"
         @expand="handleExpand"
         v-bind="tableProps">
-        
+
         <template slot="imgSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <img v-else :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
@@ -82,7 +115,7 @@
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
   import MonitorDeviceModal from './modules/MonitorDeviceModal'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
-  
+
   export default {
     name: "MonitorDeviceList",
     mixins:[JeecgListMixin],
@@ -100,15 +133,11 @@
             dataIndex: 'name'
           },
           {
-            title:'设备id',
-            align:"left",
+            title: '设备序号',
+            align: "left",
             dataIndex: 'deviceId'
           },
-          {
-            title:'类型',
-            align:"left",
-            dataIndex: 'type'
-          },
+
           {
             title:'地址',
             align:"left",
@@ -120,23 +149,15 @@
             dataIndex: 'status'
           },
           {
-            title:'设备ip',
-            align:"left",
+            title: '设备地址',
+            align: "left",
             dataIndex: 'deviceIp'
           },
+
+
           {
-            title:'备注',
-            align:"left",
-            dataIndex: 'memo'
-          },
-          {
-            title:'功能',
-            align:"left",
-            dataIndex: 'funcType'
-          },
-          {
-            title:'播放url',
-            align:"left",
+            title: '播放地址',
+            align: "left",
             dataIndex: 'liveUrl'
           },
           {
@@ -157,8 +178,7 @@
         expandedRowKeys:[],
         hasChildrenField:"hasChild",
         pidField:"pid",
-        dictOptions:{
-        } 
+        dictOptions:{}
       }
     },
     computed: {
@@ -310,8 +330,8 @@
           }
         }
       },
-      
-       
+
+
     }
   }
 </script>

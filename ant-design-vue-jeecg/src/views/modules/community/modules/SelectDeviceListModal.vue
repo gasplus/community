@@ -6,23 +6,29 @@
     @ok="handleOk"
     @cancel="handleCancel"
     cancelText="关闭">
-<!--
+    <!-- 查询开始   -->
+
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
         <a-row :gutter="24">
-
-          <a-col :span="6" v-if="msgType==='USER'">
-            <a-form-item label="账号">
-              <a-input placeholder="请输入账号查询" v-model="queryParam.username"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :span="6" v-if="msgType==='GROUP'">
-            <a-form-item label="分组名称">
-              <a-input placeholder="请输入分组名称查询" v-model="queryParam.title"></a-input>
+          <a-col :span="6">
+            <a-form-item label="设备序号">
+              <a-input placeholder="请输入设备序号查询" v-model="queryParam.deviceId"></a-input>
             </a-form-item>
           </a-col>
 
-          <a-col :span="6" >
+          <a-col :span="6">
+            <a-form-item label="地址">
+              <a-input placeholder="请输入地址查询" v-model="queryParam.address"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :span="6">
+            <a-form-item label="设备地址">
+              <a-input placeholder="请输入设备地址查询" v-model="queryParam.deviceIp"></a-input>
+            </a-form-item>
+          </a-col>
+
+          <a-col :span="6">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchByquery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
@@ -32,8 +38,8 @@
         </a-row>
       </a-form>
     </div>
-    -->
- <!--    update-begin author:kangxiaolin   date:20190921   for:系统发送通知 用户多选失败 #513  -->
+    <!-- 查询结束   -->
+    <!--    update-begin author:kangxiaolin   date:20190921   for:系统发送通知 用户多选失败 #513  -->
     <a-table
       ref="table"
       rowKey="deviceId"
@@ -68,8 +74,8 @@
             dataIndex: 'name'
           },
           {
-            title:'设备id',
-            align:"left",
+            title: '设备序号',
+            align: "left",
             dataIndex: 'deviceId'
           },
 
@@ -80,8 +86,8 @@
           },
 
           {
-            title:'设备ip',
-            align:"left",
+            title: '设备地址',
+            align: "left",
             dataIndex: 'deviceIp'
           }
         ],
@@ -152,12 +158,21 @@
           }
         })
       },
-      getQueryParams(){
-        let param = Object.assign({}, this.queryParam,this.isorter);
+      getQueryParams() {
+        let param = Object.assign({}, this.queryParam, this.isorter);
         param.field = this.getQueryField();
         //--update-begin----author:scott---date:20190818------for:新建公告时指定特定用户翻页错误SelectUserListModal #379----
         // param.current = this.ipagination.current;
         // param.pageSize = this.ipagination.pageSize;
+        if (param.deviceId != null) {
+          param.deviceId = "*" + param.deviceId + "*"
+        }
+        if (param.address != null) {
+          param.address = "*" + param.address + "*"
+        }
+        if (param.deviceIp != null) {
+          param.deviceIp = "*" + param.deviceIp + "*"
+        }
         param.pageNo = this.ipagination.current;
         param.pageSize = this.ipagination.pageSize;
         //--update-end----author:scott---date:20190818------for:新建公告时指定特定用户翻页错误SelectUserListModal #379---

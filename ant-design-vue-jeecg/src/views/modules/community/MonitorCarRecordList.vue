@@ -87,7 +87,8 @@
 
 <script>
 
-  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import {filterObj} from '@/utils/util';
+  import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import MonitorCarRecordModal from './modules/MonitorCarRecordModal'
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDate from '@/components/jeecg/JDate.vue'
@@ -156,14 +157,30 @@
       }
     },
     methods: {
+      getQueryParams() {
+        //获取查询条件
+        let sqp = {}
+        if (this.superQueryParams) {
+          sqp['superQueryParams'] = encodeURI(this.superQueryParams)
+        }
+        var param = Object.assign(sqp, this.queryParam, this.isorter, this.filters);
+        if (param.carNumber != null) {
+          param.carNumber = "*" + param.carNumber + "*"
+        }
+
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        return filterObj(param);
+      },
       showDeviceSelect() {
-        this.$refs.DeviceListModal.add(this.selectedDevices,this.deviceIds);
+        this.$refs.DeviceListModal.add(this.selectedDevices, this.deviceIds);
       },
       removeSelected(value) {
         let deleteInd = -1
         const deviceIds = this.deviceIds.split(',')
-        this.selectedDevices.forEach((item,index) => {
-          if(item === value) {
+        this.selectedDevices.forEach((item, index) => {
+          if (item === value) {
             deleteInd = index
           }
         })
