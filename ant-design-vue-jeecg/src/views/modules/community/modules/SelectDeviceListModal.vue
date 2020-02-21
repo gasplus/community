@@ -72,40 +72,17 @@
             align:"left",
             dataIndex: 'deviceId'
           },
-          {
-            title:'类型',
-            align:"left",
-            dataIndex: 'type'
-          },
+
           {
             title:'地址',
             align:"left",
             dataIndex: 'address'
           },
-          {
-            title:'状态',
-            align:"left",
-            dataIndex: 'status'
-          },
+
           {
             title:'设备ip',
             align:"left",
             dataIndex: 'deviceIp'
-          },
-          {
-            title:'备注',
-            align:"left",
-            dataIndex: 'memo'
-          },
-          {
-            title:'功能',
-            align:"left",
-            dataIndex: 'funcType'
-          },
-          {
-            title:'播放url',
-            align:"left",
-            dataIndex: 'liveUrl'
           }
         ],
         dataSource:[],
