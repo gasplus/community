@@ -101,10 +101,12 @@
             </a-menu>
           </a-dropdown>
         </span>
-
+        <span slot="device" slot-scope="text, record">
+          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
+        </span>
       </a-table>
     </div>
-
+    <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <monitorDevice-modal ref="modalForm" @ok="modalFormOk"></monitorDevice-modal>
   </a-card>
 </template>
@@ -113,14 +115,17 @@
 
   import { getAction } from '@/api/manage'
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import {deviceMixin} from '@/mixins/deviceMixin'
+  import deviceDetail from '@/components/big/deviceDetail'
   import MonitorDeviceModal from './modules/MonitorDeviceModal'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: "MonitorDeviceList",
-    mixins:[JeecgListMixin],
+    mixins:[JeecgListMixin,deviceMixin],
     components: {
-      MonitorDeviceModal
+      MonitorDeviceModal,
+      deviceDetail
     },
     data () {
       return {
@@ -165,6 +170,12 @@
             dataIndex: 'action',
             align:"center",
             scopedSlots: { customRender: 'action' },
+          },
+          {
+            title: '查看监控',
+            align: "center",
+            dataIndex: 'deviceId',
+            scopedSlots: {customRender: 'device'}
           }
         ],
         url: {

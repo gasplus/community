@@ -236,7 +236,7 @@
         </div>
       </div>
       <div class="home_tongji_list">
-        <div class="home_tongji_item" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
+        <div :class="'home_tongji_item '+(key==='count'?'can_select':'')" @click="showTJList(key)" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
           <div class="home_tongji_item_box">
             <div class="home_tongji_item_title">{{tongjiKeyMap[key]}}</div>
             <div class="home_tongji_item_info">
@@ -253,6 +253,7 @@
           </div>
         </div>
       </div>
+      <personRealList v-if="personRealListShow" @leave="closePersonRealList" @showLD="showLD"></personRealList>
       <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
       <PersonList v-show="personListShow" :personListData="personListData" :roomData="roomData" @close="closePersonList"></PersonList>
       <deviceList v-if="deviceListShow" @leave="closeDeviceList"></deviceList>
@@ -294,6 +295,7 @@
   import carDetail from '@/components/big/carDetail'
   import deviceList from '@/components/big/deviceList'
   import deviceDetail from '@/components/big/deviceDetail'
+  import personRealList from '@/components/big/personRealList'
 
     export default {
       name: "home",
@@ -304,6 +306,7 @@
           carDetailShow: false,
           personData: {},
           personDetailShow: false,
+          personRealListShow: false,
           deviceListShow: false,
           searchResultShow:false,
           searchResultData: [],
@@ -343,8 +346,8 @@
           // accordionHeight:400,
           centerHeight: 0,
           // mapUrl: '',
-          //mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
-           mapUrl: 'http://20.36.24.100:9000',
+          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
+          // mapUrl: 'http://20.36.24.100:9000',
           imagePath: window._CONFIG['imgDomainURL'],
           jkImagePath: window._CONFIG['imgDomainRecordURL'],
           dialogShow: false,
@@ -388,7 +391,8 @@
         Collapse,
         MessageBox,
         deviceList,
-        deviceDetail
+        deviceDetail,
+        personRealList
       },
       mounted() {
         getMonitorPersonTypeStat().then(rel => {
@@ -509,6 +513,17 @@
         closePersonDetail() {
           this.personDetailShow = false
         },
+        closePersonRealList() {
+          this.personRealListShow = false
+        },
+        showTJList(key) {
+          if(key === 'count'){
+            this.showPersonRealList()
+          }
+        },
+        showPersonRealList() {
+          this.personRealListShow = true
+        },
         showPersonDetail(item) {
           this.personData = item
           this.personDetailShow = true
@@ -595,6 +610,10 @@
               }
             })
           })
+        },
+        showLD(ld) {
+          this.personRealListShow = false
+          this.$refs.mapIframe.contentWindow.postMessage({funcName:'changeHouseColor',data:{id:ld}},'*');
         },
         closeSearchBox() {
           this.searchResultShow = false
@@ -1599,5 +1618,8 @@
   }
   .collapse .collapse-header::before{
     display: none;
+  }
+  .can_select{
+    cursor: pointer;
   }
 </style>

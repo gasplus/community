@@ -55,7 +55,9 @@
         :loading="loading"
 
         @change="handleTableChange">
-
+        <span slot="device" slot-scope="text, record">
+          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
+        </span>
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
         </template>
@@ -80,6 +82,7 @@
       </a-table>
     </div>
 
+    <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorCarRecord-modal ref="modalForm" @ok="modalFormOk"></monitorCarRecord-modal>
   </a-card>
@@ -89,17 +92,20 @@
 
   import {filterObj} from '@/utils/util';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
+  import {deviceMixin} from '@/mixins/deviceMixin'
+  import deviceDetail from '@/components/big/deviceDetail'
   import MonitorCarRecordModal from './modules/MonitorCarRecordModal'
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDate from '@/components/jeecg/JDate.vue'
 
   export default {
     name: "MonitorCarRecordList",
-    mixins:[JeecgListMixin],
+    mixins:[JeecgListMixin,deviceMixin],
     components: {
       JDate,
       SelectDeviceListModal,
-      MonitorCarRecordModal
+      MonitorCarRecordModal,
+      deviceDetail
     },
     data () {
       return {
@@ -136,6 +142,12 @@
             title:'进出地址',
             align:"center",
             dataIndex: 'address'
+          },
+          {
+            title: '查看监控',
+            align: "center",
+            dataIndex: 'deviceId',
+            scopedSlots: {customRender: 'device'}
           }
         ],
         url: {

@@ -1,7 +1,7 @@
 <template>
   <!--  <div class="card1" :style="'left:'+position.left+';top:'+position.top" @mouseleave="leave">-->
-  <div class="card1">
-    <div class="mask"></div>
+  <div class="card1" :style="'margin-left:-'+(center?342.5:233)+'px;'" @mouseleave="leaveDiv">
+    <div class="mask" v-if="!center"></div>
     <div class="card1_bg">
       <div class="card1_bg_l_t"></div>
       <div class="card1_bg_l_c"></div>
@@ -46,6 +46,14 @@
 
   export default {
     name: "deviceDetail",
+    props: {
+      center: {
+        type: Boolean,
+        default() {
+          return false
+        }
+      }
+    },
     data() {
       return {
         videoPlayUrl: '',
@@ -76,6 +84,11 @@
             }
           }
         })
+      },
+      leaveDiv() {
+        if(!this.center){
+          this.$emit('leave')
+        }
       },
       leave() {
         this.$emit('leave')
@@ -271,15 +284,6 @@
   }
 
   .card1_body {
-  }
-  .device_list_box{
-    position:absolute;
-    left:0;
-    top:0;
-    width:340px;
-    bottom:0;
-    overflow: auto;
-    background:rgba(255,255,255,1);
   }
   .device_video{
     position:absolute;

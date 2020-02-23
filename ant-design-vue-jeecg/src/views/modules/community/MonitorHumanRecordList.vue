@@ -104,11 +104,6 @@
 -->
     <!-- table区域-begin -->
     <div id="bd">
-      <div class="ant-alert ant-alert-info" style="margin-bottom: 16px;">
-        <i class="anticon anticon-info-circle ant-alert-icon"></i> 已选择 <a style="font-weight: 600">{{ selectedRowKeys.length }}</a>项
-        <a style="margin-left: 24px" @click="onClearSelected">清空</a>
-      </div>
-
       <a-table
         ref="table"
         size="middle"
@@ -118,7 +113,6 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
 
         @change="handleTableChange">
 
@@ -190,15 +184,15 @@
             <a-button type="primary">查看</a-button>
           </a-popover>
         </span>
-        <span slot="action" slot-scope="text, record">
 
-          <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-            <a>删除</a>
-          </a-popconfirm>
+
+        <span slot="device" slot-scope="text, record">
+          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
         </span>
 
       </a-table>
     </div>
+    <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorHumanRecord-modal ref="modalForm" @ok="modalFormOk"></monitorHumanRecord-modal>
   </a-card>
@@ -222,6 +216,8 @@
   }
   import moment from 'moment';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
+  import {deviceMixin} from '@/mixins/deviceMixin'
+  import deviceDetail from '@/components/big/deviceDetail'
   import MonitorHumanRecordModal from './modules/MonitorHumanRecordModal'
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
@@ -230,12 +226,13 @@
 
   export default {
     name: "MonitorHumanRecordList",
-    mixins: [JeecgListMixin],
+    mixins: [JeecgListMixin,deviceMixin],
     components: {
       JDictSelectTag,
       JDate,
       SelectDeviceListModal,
-      MonitorHumanRecordModal
+      MonitorHumanRecordModal,
+      deviceDetail
     },
     data() {
       return {
@@ -270,10 +267,10 @@
             scopedSlots: {customRender: 'action1'}
           },
           {
-            title: '操作',
-            dataIndex: 'action',
+            title: '查看监控',
             align: "center",
-            scopedSlots: {customRender: 'action'}
+            dataIndex: 'deviceId',
+            scopedSlots: {customRender: 'device'}
           }
         ],
 

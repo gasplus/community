@@ -75,20 +75,25 @@
           <span v-if="record.personId==='anonymous'">{{record.personName}}</span>
         </span>
 
-
+        <span slot="device" slot-scope="text, record">
+          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
+        </span>
       </a-table>
     </div>
+    <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
   </a-card>
 </template>
 
 <script>
 
   import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import {deviceMixin} from '@/mixins/deviceMixin'
+  import deviceDetail from '@/components/big/deviceDetail'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
     name: "SelectMonitorPersonRecordList",
-    mixins:[JeecgListMixin],
+    mixins:[JeecgListMixin,deviceMixin],
     props: {
       selectId:{
         type: String,
@@ -98,6 +103,7 @@
       }
     },
     components: {
+      deviceDetail
     },
     data () {
       return {
@@ -148,6 +154,12 @@
             title:'进出地址',
             align:"center",
             dataIndex: 'address'
+          },
+          {
+            title: '查看监控',
+            align: "center",
+            dataIndex: 'deviceId',
+            scopedSlots: {customRender: 'device'}
           }
         ],
         /* 排序参数 */

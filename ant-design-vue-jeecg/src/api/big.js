@@ -16,11 +16,19 @@ const api = {
   deviceList: 'monitor/monitorDevice/getAll',
   personById: 'monitor/monitorPerson/queryById',
   videoUrlConfig: 'monitor/monitorDevice/getVideoUrlConfig',
-  flvUrl: 'monitor/monitorDevice/getLiveFlvUrl'
+  flvUrl: 'monitor/monitorDevice/getLiveFlvUrl',
+  monitorPersonList: 'monitor/monitorPerson/list'
 }
 
 export default api
 
+export function getMonitorPersonList(parameter) {
+  return axios({
+    url: api.monitorPersonList,
+    method: 'get',
+    params: parameter
+  })
+}
 export function getFLVUrl(parameter) {
   parameter = parameter || {}
   parameter.xiaoQuId = xiaoQuId

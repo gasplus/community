@@ -31,7 +31,7 @@
 <style scoped>
   .message_list {
     margin-top: -15px;
-    width: 300px;
+    width: 800px;
     min-height: 40px;
     max-height: 300px;
     background: rgba(44, 92, 235, 1);

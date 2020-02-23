@@ -82,51 +82,23 @@
             下载
           </a-button>
         </template>
+        <span slot="device" slot-scope="text, record">
+          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
+        </span>
         <span slot="show" slot-scope="text,record">
-          <a-popover title="监控结果" trigger="hover" v-if="record.personId!=='anonymous'">
-            <template slot="content">
-              <a-row>
-                <a-col span="24">
-                  <a-card hoverable style="width: 540px;margin:0 10px;" title="" size="small">
-                    <img
-                      alt="example"
-                      :src="imgBasePath+record.photoUrl"
-                      slot="cover"
-                    />
-                    <a-card-meta>
-                      <template slot="description">
-                        <a-row>
-                          <a-col span="6">姓名</a-col>
-                          <a-col span="18">{{record.personName}}</a-col>
-                        </a-row>
-                        <a-row>
-                          <a-col span="6">身份证号</a-col>
-                          <a-col span="18">{{record.personIdCard}}</a-col>
-                        </a-row>
-                        <a-row>
-                          <a-col span="6">户籍地址</a-col>
-                          <a-col span="18">{{record.hjdz}}</a-col>
-                        </a-row>
-                        <a-row>
-                          <a-col span="6">出入时间</a-col>
-                          <a-col span="18">{{record.outInTime}}</a-col>
-                        </a-row>
-                      </template>
-                    </a-card-meta>
-                  </a-card>
-                </a-col>
-              </a-row>
-            </template>
-            <a>{{record.personName}}</a>
-          </a-popover>
+          <a v-if="record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
+            {{record.personName}}
+          </a>
           <span v-if="record.personId==='anonymous'">{{record.personName}}</span>
         </span>
 
 
       </a-table>
     </div>
+    <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorPersonRecord-modal ref="modalForm" @ok="modalFormOk"></monitorPersonRecord-modal>
+    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
   </a-card>
 </template>
 
@@ -134,7 +106,10 @@
 
   import {filterObj} from '@/utils/util';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
+  import {deviceMixin} from '@/mixins/deviceMixin'
   import MonitorPersonRecordModal from './modules/MonitorPersonRecordModal'
+  import PersonRelation from './modules/PersonRelation'
+  import deviceDetail from '@/components/big/deviceDetail'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDate from '@/components/jeecg/JDate.vue'
@@ -142,12 +117,14 @@
 
   export default {
     name: "MonitorPersonRecordList",
-    mixins:[JeecgListMixin],
+    mixins:[JeecgListMixin,deviceMixin],
     components: {
       JDictSelectTag,
       JDate,
       SelectDeviceListModal,
-      MonitorPersonRecordModal
+      MonitorPersonRecordModal,
+      deviceDetail,
+      PersonRelation
     },
     data () {
       return {
@@ -176,6 +153,7 @@
             align:"center",
             dataIndex: 'outInTime'
           },
+          /*
           {
             title:'人员类型',
             align:"center",
@@ -187,7 +165,7 @@
                 return filterMultiDictText(this.dictOptions['personType'], text+"")
               }
             }
-          },
+          },*/
           {
             title:'图片地址',
             align:"center",
@@ -198,6 +176,12 @@
             title:'进出地址',
             align:"center",
             dataIndex: 'address'
+          },
+          {
+            title: '查看监控',
+            align: "center",
+            dataIndex: 'deviceId',
+            scopedSlots: {customRender: 'device'}
           }
         ],
         /* 排序参数 */
@@ -217,6 +201,8 @@
         dictOptions:{
           personType:[],
         },
+        selectPersonId: '',
+        personRelationShow: false
       }
     },
     computed: {
@@ -225,7 +211,6 @@
       }
     },
     methods: {
-
       getQueryParams() {
         //获取查询条件
         let sqp = {}
@@ -284,6 +269,15 @@
           text = text.substring(0,text.indexOf(","))
         }
         return window._CONFIG['imgDomainRecordURL']+text
+      },
+      closePersonRelation() {
+        this.personRelationShow = false
+        this.selectPersonId = ''
+      },
+      showPersonRelation(recordId) {
+        // recordId = '1213466081813917697'
+        this.selectPersonId = recordId
+        this.personRelationShow = true
       }
 
     }
