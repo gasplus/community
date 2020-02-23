@@ -146,6 +146,15 @@
                 :pagination="ipagination"
                 :loading="loading"
                 @change="handleTableChange">
+                <template slot="imgSlot" slot-scope="text">
+                  <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
+                  <a-popover v-else placement="topLeft" arrowPointAtCenter>
+                    <template slot="content">
+                      <img :src="getImgView(text)" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+                    </template>
+                    <img :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+                  </a-popover>
+                </template>
               </a-table>
             </a-card>
           </a-col>
@@ -205,6 +214,12 @@
             align: "center"
           },
           {
+            title:'图片地址',
+            align:"center",
+            dataIndex: 'photoUrl',
+            scopedSlots: {customRender: 'imgSlot'}
+          },
+          {
             title:'进出时间',
             dataIndex: 'outInTime',
             align: "center"
@@ -259,6 +274,13 @@
             this.tjData = res.result
           }
         })
+      },
+      /* 图片预览 */
+      getImgView(text){
+        if(text && text.indexOf(",")>0){
+          text = text.substring(0,text.indexOf(","))
+        }
+        return window._CONFIG['imgDomainURL']+"/"+text
       },
       changeTab(tabId) {
         this.tabId = tabId
