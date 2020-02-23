@@ -200,8 +200,8 @@
             }
           },
           {
-            title:'人员姓名',
-            dataIndex: 'xingMing',
+            title: '人员姓名',
+            dataIndex: 'personName',
             align: "center"
           },
           {
@@ -210,8 +210,8 @@
             align: "center"
           },
           {
-            title:'进出地点',
-            dataIndex: 'outInTime',
+            title: '进出地点',
+            dataIndex: 'address',
             align: "center"
           },
         ],
