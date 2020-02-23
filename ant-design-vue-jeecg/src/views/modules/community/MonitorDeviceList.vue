@@ -181,7 +181,7 @@
           {
             title: '查看监控',
             align: "center",
-            dataIndex: 'deviceId',
+            dataIndex: 'deviceId1',
             scopedSlots: {customRender: 'device'}
           }
         ],

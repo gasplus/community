@@ -65,9 +65,9 @@
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
-              <img :src="getImgView(text)" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+              <img :src="getImgViewRecord(text)" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
             </template>
-            <img :src="getImgView(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+            <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </a-popover>
         </template>
         <template slot="fileSlot" slot-scope="text">
@@ -216,6 +216,13 @@
         }
         this.deviceIds += deviceList.map(item => item.deviceId).join(",")
         this.queryParam.deviceId = this.deviceIds
+      },
+      /* 图片预览 */
+      getImgViewRecord(text){
+        if(text && text.indexOf(",")>0){
+          text = text.substring(0,text.indexOf(","))
+        }
+        return window._CONFIG['imgDomainRecordURL']+text
       },
       initDictConfig(){
       }
