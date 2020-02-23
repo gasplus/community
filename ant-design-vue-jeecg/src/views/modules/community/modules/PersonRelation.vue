@@ -127,13 +127,13 @@
             <a-card title="进出记录" size="small" style="margin-bottom:10px;" :headStyle="headStyle1">
               <a-row style="line-height:30px;padding-bottom:10px;">
                 <a-col :span="8">
-                  总天数：12天
+                  总天数：{{tjData.totalCount||0}}天
                 </a-col>
                 <a-col :span="8">
-                  总次数：12次
+                  总次数：{{tjData.totalDays||0}}次
                 </a-col>
                 <a-col :span="8">
-                  出现频率：1次/天
+                  出现频率：{{tjData.rate||0}}次/天
                 </a-col>
               </a-row>
               <a-table
@@ -233,6 +233,7 @@
           roomPersonList: 'monitor/monitorPerson/getFangJianPersonByPersonId',
           list: "/monitor/monitorPersonRecord/list",
         },
+        tjData: {},
         tabId: '',
         title:"人员信息",
         tabList: [],
@@ -249,9 +250,13 @@
     },
     methods: {
       tongji() {
-        getAction(this.url.tongji, {personId:this.tabId}).then(res => {
+        getAction(this.url.tongji, {
+          personId: this.tabId,
+          xiaoQuId: 1
+        }).then(res => {
           if(res.success){
             console.log(res)
+            this.tjData = res.result
           }
         })
       },
