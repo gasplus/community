@@ -149,9 +149,16 @@
             dataIndex: 'address'
           },
           {
-            title:'状态',
-            align:"left",
-            dataIndex: 'status'
+            title: '状态',
+            align: "left",
+            dataIndex: 'status',
+            customRender: (text) => {
+              if (!text) {
+                return ''
+              } else {
+                return filterMultiDictText(this.dictOptions['status'], text + "")
+              }
+            }
           },
           {
             title: '设备地址',
@@ -186,10 +193,12 @@
           exportXlsUrl: "/monitor/monitorDevice/exportXls",
           importExcelUrl: "monitor/monitorDevice/importExcel",
         },
-        expandedRowKeys:[],
-        hasChildrenField:"hasChild",
-        pidField:"pid",
-        dictOptions:{}
+        expandedRowKeys: [],
+        hasChildrenField: "hasChild",
+        pidField: "pid",
+        dictOptions: {
+          status: [],
+        }
       }
     },
     computed: {
@@ -272,7 +281,12 @@
           }
         }
       },
-      initDictConfig(){
+      initDictConfig() {
+        initDictOptions('device_status').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'status', res.result)
+          }
+        })
       },
       modalFormOk(formData,arr){
         if(!formData.id){

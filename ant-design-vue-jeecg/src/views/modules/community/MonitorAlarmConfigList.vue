@@ -4,6 +4,34 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
+          <a-col :md="6" :sm="8">
+            <a-form-item label="监控标题">
+              <a-input placeholder="请输入监控标题" v-model="queryParam.title"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="监控类型">
+              <j-dict-select-tag placeholder="请选择监控类型" v-model="queryParam.alarmType" dictCode="monitor_alarm_type"/>
+            </a-form-item>
+          </a-col>
+          <template v-if="toggleSearchStatus">
+            <a-col :md="6" :sm="8">
+              <a-form-item label="报警规则">
+                <j-dict-select-tag placeholder="请选择报警规则" v-model="queryParam.alarmRuleType"
+                                   dictCode="alarm__rule_type"/>
+              </a-form-item>
+            </a-col>
+          </template>
+          <a-col :md="6" :sm="8">
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
+              <a @click="handleToggleSearch" style="margin-left: 8px">
+                {{ toggleSearchStatus ? '收起' : '展开' }}
+                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
+              </a>
+            </span>
+          </a-col>
 
         </a-row>
       </a-form>
@@ -13,11 +41,7 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('警告配置')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
-                @change="handleImportExcel">
-        <a-button type="primary" icon="import">导入</a-button>
-      </a-upload>
+
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1" @click="batchDel">
@@ -103,7 +127,7 @@
 </template>
 
 <script>
-
+  import {filterObj} from '@/utils/util';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import MonitorAlarmConfigModal from './modules/MonitorAlarmConfigModal'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
@@ -200,12 +224,28 @@
       }
     },
     methods: {
-      handleUnUse(record){
-        postAction(this.url.unUse,{id:record.id}).then(res => {
-          if(res.success){
+      getQueryParams() {
+        //获取查询条件
+        let sqp = {}
+        if (this.superQueryParams) {
+          sqp['superQueryParams'] = encodeURI(this.superQueryParams)
+        }
+        var param = Object.assign(sqp, this.queryParam, this.isorter, this.filters);
+        if (param.title != null) {
+          param.title = "*" + param.title + "*"
+        }
+
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        return filterObj(param);
+      },
+      handleUnUse(record) {
+        postAction(this.url.unUse, {id: record.id}).then(res => {
+          if (res.success) {
             this.$message.success('取消生效成功')
             this.loadData()
-          }else{
+          } else {
             this.$message.error(res.message)
           }
         })
