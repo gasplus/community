@@ -202,6 +202,7 @@
       },
       onPageChange(pageNumber) {
         this.pagination.page = pageNumber
+        this.getMonitorPersonList()
       },
       getMonitorPersonList() {
         const params = {
@@ -459,12 +460,12 @@
   }
   .person_item_p_l{
     position:absolute;
-    width:70px;
+    width:90px;
     left:0;
     top:4px;
   }
   .person_item_p_r{
-    padding-left:70px;
+    padding-left:90px;
     word-break: break-all;
   }
   .person_item_btn{
