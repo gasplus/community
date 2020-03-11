@@ -1,269 +1,369 @@
 <template>
-  <div class="page-header-index-wide">
-<!--    <a-row :gutter="24">-->
-<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
-<!--        <chart-card :loading="loading" title="总销售额" total="￥126,560">-->
-<!--          <a-tooltip title="指标说明" slot="action">-->
-<!--            <a-icon type="info-circle-o" />-->
-<!--          </a-tooltip>-->
-<!--          <div>-->
-<!--            <trend flag="up" style="margin-right: 16px;">-->
-<!--              <span slot="term">周同比</span>-->
-<!--              12%-->
-<!--            </trend>-->
-<!--            <trend flag="down">-->
-<!--              <span slot="term">日同比</span>-->
-<!--              11%-->
-<!--            </trend>-->
-<!--          </div>-->
-<!--          <template slot="footer">日均销售额<span>￥ 234.56</span></template>-->
-<!--        </chart-card>-->
-<!--      </a-col>-->
-<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
-<!--        <chart-card :loading="loading" title="访问量" :total="8846 | NumberFormat">-->
-<!--          <a-tooltip title="指标说明" slot="action">-->
-<!--            <a-icon type="info-circle-o" />-->
-<!--          </a-tooltip>-->
-<!--          <div>-->
-<!--            <mini-area />-->
-<!--          </div>-->
-<!--          <template slot="footer">日访问量<span> {{ '1234' | NumberFormat }}</span></template>-->
-<!--        </chart-card>-->
-<!--      </a-col>-->
-<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
-<!--        <chart-card :loading="loading" title="支付笔数" :total="6560 | NumberFormat">-->
-<!--          <a-tooltip title="指标说明" slot="action">-->
-<!--            <a-icon type="info-circle-o" />-->
-<!--          </a-tooltip>-->
-<!--          <div>-->
-<!--            <mini-bar :height="40" />-->
-<!--          </div>-->
-<!--          <template slot="footer">转化率 <span>60%</span></template>-->
-<!--        </chart-card>-->
-<!--      </a-col>-->
-<!--      <a-col :sm="24" :md="12" :xl="6" :style="{ marginBottom: '24px' }">-->
-<!--        <chart-card :loading="loading" title="运营活动效果" total="78%">-->
-<!--          <a-tooltip title="指标说明" slot="action">-->
-<!--            <a-icon type="info-circle-o" />-->
-<!--          </a-tooltip>-->
-<!--          <div>-->
-<!--            <mini-progress color="rgb(19, 194, 194)" :target="80" :percentage="78" :height="8" />-->
-<!--          </div>-->
-<!--          <template slot="footer">-->
-<!--            <trend flag="down" style="margin-right: 16px;">-->
-<!--              <span slot="term">同周比</span>-->
-<!--              12%-->
-<!--            </trend>-->
-<!--            <trend flag="up">-->
-<!--              <span slot="term">日环比</span>-->
-<!--              80%-->
-<!--            </trend>-->
-<!--          </template>-->
-<!--        </chart-card>-->
-<!--      </a-col>-->
-<!--    </a-row>-->
+  <page-layout :avatar="avatar">
+    <div slot="headerContent">
+      <div class="title">{{ timeFix }}，{{ nickname() }}<span class="welcome-text">，{{ welcome() }}</span></div>
+      <div>前端工程师 | 蚂蚁金服 - 某某某事业群 - VUE平台</div>
+    </div>
+    <div slot="extra">
+      <a-row class="more-info">
+        <a-col :span="8">
+          <head-info title="项目数" content="56" :center="false" :bordered="false"/>
+        </a-col>
+        <a-col :span="8">
+          <head-info title="团队排名" content="8/24" :center="false" :bordered="false"/>
+        </a-col>
+        <a-col :span="8">
+          <head-info title="项目访问" content="2,223" :center="false"/>
+        </a-col>
+      </a-row>
+    </div>
 
-<!--    <a-card :loading="loading" :bordered="false" :body-style="{padding: '0'}">-->
-<!--      <div class="salesCard">-->
-<!--        <a-tabs default-active-key="1" size="large" :tab-bar-style="{marginBottom: '24px', paddingLeft: '16px'}">-->
-<!--          <div class="extra-wrapper" slot="tabBarExtraContent">-->
-<!--            <div class="extra-item">-->
-<!--              <a>今日</a>-->
-<!--              <a>本周</a>-->
-<!--              <a>本月</a>-->
-<!--              <a>本年</a>-->
-<!--            </div>-->
-<!--            <a-range-picker :style="{width: '256px'}" />-->
-<!--          </div>-->
-<!--          <a-tab-pane loading="true" tab="销售额" key="1">-->
-<!--            <a-row>-->
-<!--              <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <bar title="销售额排行" :dataSource="barData"/>-->
-<!--              </a-col>-->
-<!--              <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <rank-list title="门店销售排行榜" :list="rankList"/>-->
-<!--              </a-col>-->
-<!--            </a-row>-->
-<!--          </a-tab-pane>-->
-<!--          <a-tab-pane tab="访问量" key="2">-->
-<!--            <a-row>-->
-<!--              <a-col :xl="16" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <bar title="销售额趋势" :dataSource="barData"/>-->
-<!--              </a-col>-->
-<!--              <a-col :xl="8" :lg="12" :md="12" :sm="24" :xs="24">-->
-<!--                <rank-list title="门店销售排行榜" :list="rankList"/>-->
-<!--              </a-col>-->
-<!--            </a-row>-->
-<!--          </a-tab-pane>-->
-<!--        </a-tabs>-->
-<!--      </div>-->
-<!--    </a-card>-->
+    <div>
+      <a-row :gutter="24">
+        <a-col :xl="16" :lg="24" :md="24" :sm="24" :xs="24">
+          <a-card
+            class="project-list"
+            :loading="loading"
+            style="margin-bottom: 24px;"
+            :bordered="false"
+            title="进行中的项目"
+            :body-style="{ padding: 0 }">
+            <a slot="extra">全部项目</a>
+            <div>
+              <a-card-grid class="project-card-grid" :key="i" v-for="(item, i) in projects">
+                <a-card :bordered="false" :body-style="{ padding: 0 }">
+                  <a-card-meta>
+                    <div slot="title" class="card-title">
+                      <a-avatar size="small" :src="item.cover"/>
+                      <a>{{ item.title }}</a>
+                    </div>
+                    <div slot="description" class="card-description">
+                      {{ item.description }}
+                    </div>
+                  </a-card-meta>
+                  <div class="project-item">
+                    <a href="/#/">科学搬砖组</a>
+                    <span class="datetime">9小时前</span>
+                  </div>
+                </a-card>
+              </a-card-grid>
+            </div>
+          </a-card>
 
-    <a-row>
-      <a-col :span="24">
-        <a-card :loading="loading" :bordered="false" title="最近一周访问次数统计" :style="{ marginTop: '0px' }">
-          <a-row>
-            <a-col :span="6">
-              <head-info title="今日访问IP数" :content="loginfo.todayIp"></head-info>
-            </a-col>
-            <a-col :span="2">
-              <a-spin class='circle-cust'>
-                <a-icon slot="indicator" type="environment" style="font-size: 24px"  />
-              </a-spin>
-            </a-col>
-            <a-col :span="6">
-              <head-info title="今日访问次数" :content="loginfo.todayVisitCount"></head-info>
-            </a-col>
-            <a-col :span="2">
-              <a-spin class='circle-cust'>
-                <a-icon slot="indicator" type="team" style="font-size: 24px"  />
-              </a-spin>
-            </a-col>
-            <a-col :span="6">
-              <head-info title="访问总次数" :content="loginfo.totalVisitCount"></head-info>
-            </a-col>
-            <a-col :span="2">
-              <a-spin class='circle-cust'>
-                <a-icon slot="indicator" type="rise" style="font-size: 24px"  />
-              </a-spin>
-            </a-col>
-          </a-row>
-          <line-chart-multid :fields="visitFields" :dataSource="visitInfo"></line-chart-multid>
-        </a-card>
-      </a-col>
-    </a-row>
-  </div>
+          <a-card :loading="loading" title="动态" :bordered="false">
+            <a-list>
+              <a-list-item :key="index" v-for="(item, index) in activities">
+                <a-list-item-meta>
+                  <a-avatar slot="avatar" :src="item.user.avatar"/>
+                  <div slot="title">
+                    <span>{{ item.user.nickname }}</span>&nbsp;
+                    在&nbsp;<a href="#">{{ item.project.name }}</a>&nbsp;
+                    <span>{{ item.project.action }}</span>&nbsp;
+                    <a href="#">{{ item.project.event }}</a>
+                  </div>
+                  <div slot="description">{{ item.time }}</div>
+                </a-list-item-meta>
+              </a-list-item>
+            </a-list>
+          </a-card>
+        </a-col>
+        <a-col
+          style="padding: 0 12px"
+          :xl="8"
+          :lg="24"
+          :md="24"
+          :sm="24"
+          :xs="24">
+          <a-card title="快速开始 / 便捷导航" style="margin-bottom: 24px" :bordered="false" :body-style="{padding: 0}">
+            <div class="item-group">
+              <a>操作一</a>
+              <a>操作二</a>
+              <a>操作三</a>
+              <a>操作四</a>
+              <a>操作五</a>
+              <a>操作六</a>
+              <a-button size="small" type="primary" ghost icon="plus">添加</a-button>
+            </div>
+          </a-card>
+          <a-card title="XX 指数" style="margin-bottom: 24px" :loading="radarLoading" :bordered="false"
+                  :body-style="{ padding: 0 }">
+            <div style="min-height: 400px;">
+              <!-- :scale="scale" :axis1Opts="axis1Opts" :axis2Opts="axis2Opts"  -->
+              <radar :data="radarData"/>
+            </div>
+          </a-card>
+          <a-card :loading="loading" title="团队" :bordered="false">
+            <div class="members">
+              <a-row>
+                <a-col :span="12" v-for="(item, index) in teams" :key="index">
+                  <a>
+                    <a-avatar size="small" :src="item.avatar"/>
+                    <span class="member">{{ item.name }}</span>
+                  </a>
+                </a-col>
+              </a-row>
+            </div>
+          </a-card>
+        </a-col>
+      </a-row>
+    </div>
+  </page-layout>
 </template>
 
 <script>
-  import ChartCard from '@/components/ChartCard'
-  import ACol from "ant-design-vue/es/grid/Col"
-  import ATooltip from "ant-design-vue/es/tooltip/Tooltip"
-  import MiniArea from '@/components/chart/MiniArea'
-  import MiniBar from '@/components/chart/MiniBar'
-  import MiniProgress from '@/components/chart/MiniProgress'
-  import RankList from '@/components/chart/RankList'
-  import Bar from '@/components/chart/Bar'
-  import LineChartMultid from '@/components/chart/LineChartMultid'
-  import HeadInfo from '@/components/tools/HeadInfo.vue'
+  import {timeFix} from "@/utils/util"
+  import {mapGetters} from "vuex"
 
-  import Trend from '@/components/Trend'
-  import { getLoginfo,getVisitInfo } from '@/api/api'
+  import PageLayout from '@/components/page/PageLayout'
+  import HeadInfo from '@/components/tools/HeadInfo'
+  import Radar from '@/components/chart/Radar'
+  import {getRoleList, getServiceList} from "@/api/manage"
 
-  const rankList = []
-  for (let i = 0; i < 7; i++) {
-    rankList.push({
-      name: '白鹭岛 ' + (i+1) + ' 号店',
-      total: 1234.56 - i * 100
-    })
-  }
-  const barData = []
-  for (let i = 0; i < 12; i += 1) {
-    barData.push({
-      x: `${i + 1}月`,
-      y: Math.floor(Math.random() * 1000) + 200
-    })
-  }
+  const DataSet = require('@antv/data-set')
+
   export default {
-    name: "Analysis",
+    name: "Workplace",
     components: {
-      ATooltip,
-      ACol,
-      ChartCard,
-      MiniArea,
-      MiniBar,
-      MiniProgress,
-      RankList,
-      Bar,
-      Trend,
-      LineChartMultid,
-      HeadInfo
+      PageLayout,
+      HeadInfo,
+      Radar
     },
     data() {
       return {
+        timeFix: timeFix(),
+        avatar: '',
+        user: {},
+
+        projects: [],
         loading: true,
-        center: null,
-        rankList,
-        barData,
-        loginfo:{},
-        visitFields:['ip','visit'],
-        visitInfo:[],
-        indicator: <a-icon type="loading" style="font-size: 24px" spin />
+        radarLoading: true,
+        activities: [],
+        teams: [],
+
+        // data
+        axis1Opts: {
+          dataKey: 'item',
+          line: null,
+          tickLine: null,
+          grid: {
+            lineStyle: {
+              lineDash: null
+            },
+            hideFirstLine: false
+          }
+        },
+        axis2Opts: {
+          dataKey: 'score',
+          line: null,
+          tickLine: null,
+          grid: {
+            type: 'polygon',
+            lineStyle: {
+              lineDash: null
+            }
+          }
+        },
+        scale: [{
+          dataKey: 'score',
+          min: 0,
+          max: 80
+        }],
+        axisData: [
+          {item: '引用', a: 70, b: 30, c: 40},
+          {item: '口碑', a: 60, b: 70, c: 40},
+          {item: '产量', a: 50, b: 60, c: 40},
+          {item: '贡献', a: 40, b: 50, c: 40},
+          {item: '热度', a: 60, b: 70, c: 40},
+          {item: '引用', a: 70, b: 50, c: 40}
+        ],
+        radarData: []
+      }
+    },
+    computed: {
+      userInfo() {
+        return this.$store.getters.userInfo
       }
     },
     created() {
-      setTimeout(() => {
-        this.loading = !this.loading
-      }, 1000)
-      this.initLogInfo();
+      this.user = this.userInfo
+      this.avatar = window._CONFIG['imgDomainURL'] + "/" + this.userInfo.avatar
+      console.log('this.avatar :' + this.avatar)
+
+      getRoleList().then(res => {
+        console.log('workplace -> call getRoleList()', res)
+      })
+
+      getServiceList().then(res => {
+        console.log('workplace -> call getServiceList()', res)
+      })
+    },
+    mounted() {
+      this.getProjects()
+      this.getActivity()
+      this.getTeams()
+      this.initRadar()
     },
     methods: {
-      initLogInfo () {
-        getLoginfo(null).then((res)=>{
-          if(res.success){
-            Object.keys(res.result).forEach(key=>{
-              res.result[key] =res.result[key]+""
-            })
-            this.loginfo = res.result;
-          }
-        })
-        getVisitInfo().then(res=>{
-          if(res.success){
-             console.log("aaaaaa",res.result)
-             this.visitInfo = res.result;
-           }
-         })
+      ...mapGetters(["nickname", "welcome"]),
+      getProjects() {
+        this.$http.get('/api/list/search/projects')
+          .then(res => {
+            this.projects = res.result && res.result.data
+            this.loading = false
+          })
       },
+      getActivity() {
+        this.$http.get('/api/workplace/activity')
+          .then(res => {
+            this.activities = res.result
+          })
+      },
+      getTeams() {
+        this.$http.get('/api/workplace/teams')
+          .then(res => {
+            this.teams = res.result
+          })
+      },
+      initRadar() {
+        this.radarLoading = true
+
+        this.$http.get('/api/workplace/radar')
+          .then(res => {
+
+            const dv = new DataSet.View().source(res.result)
+            dv.transform({
+              type: 'fold',
+              fields: ['个人', '团队', '部门'],
+              key: 'user',
+              value: 'score'
+            })
+
+            this.radarData = dv.rows
+            this.radarLoading = false
+          })
+      }
     }
   }
 </script>
 
 <style lang="scss" scoped>
-  .circle-cust{
-    position: relative;
-    top: 28px;
-    left: -100%;
-  }
-  .extra-wrapper {
-    line-height: 55px;
-    padding-right: 24px;
+  .project-list {
 
-    .extra-item {
-      display: inline-block;
-      margin-right: 24px;
+    .card-title {
+      font-size: 0;
 
       a {
-        margin-left: 24px;
+        color: rgba(0, 0, 0, 0.85);
+        margin-left: 12px;
+        line-height: 24px;
+        height: 24px;
+        display: inline-block;
+        vertical-align: top;
+        font-size: 14px;
+
+        &:hover {
+          color: #1890ff;
+        }
+      }
+    }
+
+    .card-description {
+      color: rgba(0, 0, 0, 0.45);
+      height: 44px;
+      line-height: 22px;
+      overflow: hidden;
+    }
+
+    .project-item {
+      display: flex;
+      margin-top: 8px;
+      overflow: hidden;
+      font-size: 12px;
+      height: 20px;
+      line-height: 20px;
+
+      a {
+        color: rgba(0, 0, 0, 0.45);
+        display: inline-block;
+        flex: 1 1 0;
+
+        &:hover {
+          color: #1890ff;
+        }
+      }
+
+      .datetime {
+        color: rgba(0, 0, 0, 0.25);
+        flex: 0 0 auto;
+        float: right;
+      }
+    }
+
+    .ant-card-meta-description {
+      color: rgba(0, 0, 0, 0.45);
+      height: 44px;
+      line-height: 22px;
+      overflow: hidden;
+    }
+  }
+
+  .item-group {
+    padding: 20px 0 8px 24px;
+    font-size: 0;
+
+    a {
+      color: rgba(0, 0, 0, 0.65);
+      display: inline-block;
+      font-size: 14px;
+      margin-bottom: 13px;
+      width: 25%;
+    }
+  }
+
+  .members {
+    a {
+      display: block;
+      margin: 12px 0;
+      line-height: 24px;
+      height: 24px;
+
+      .member {
+        font-size: 14px;
+        color: rgba(0, 0, 0, .65);
+        line-height: 24px;
+        max-width: 100px;
+        vertical-align: top;
+        margin-left: 12px;
+        transition: all 0.3s;
+        display: inline-block;
+      }
+
+      &:hover {
+        span {
+          color: #1890ff;
+        }
       }
     }
   }
 
-  /* 首页访问量统计 */
-  .head-info {
-    position: relative;
-    text-align: left;
-    padding: 0 32px 0 0;
-    min-width: 125px;
+  .mobile {
 
-    &.center {
-      text-align: center;
-      padding: 0 32px;
-    }
+    .project-list {
 
-    span {
-      color: rgba(0, 0, 0, .45);
-      display: inline-block;
-      font-size: .95rem;
-      line-height: 42px;
-      margin-bottom: 4px;
-    }
-    p {
-      line-height: 42px;
-      margin: 0;
-      a {
-        font-weight: 600;
-        font-size: 1rem;
+      .project-card-grid {
+        width: 100%;
       }
     }
+
+    .more-info {
+      border: 0;
+      padding-top: 16px;
+      margin: 16px 0 16px;
+    }
+
+    .headerContent .title .welcome-text {
+      display: none;
+    }
   }
+
 </style>
