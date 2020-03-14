@@ -20,7 +20,7 @@
             </div>
           </div>
           <div class="row">
-            <div v-if="avatar" class="avatar">
+            <div class="avatar">
               <a-avatar :src="avatar"/>
             </div>
             <div v-if="this.$slots.content" class="headerContent">
@@ -68,6 +68,11 @@
         type: String,
         default: '',
         required: false
+      },
+      hideBreadcrumb: {
+        type: Boolean,
+        default: false,
+        required: false
       }
     },
     data() {
@@ -77,7 +82,9 @@
       }
     },
     created() {
-      this.getBreadcrumb()
+      if(this.hideBreadcrumb){
+        this.getBreadcrumb()
+      }
     },
     methods: {
       getBreadcrumb() {

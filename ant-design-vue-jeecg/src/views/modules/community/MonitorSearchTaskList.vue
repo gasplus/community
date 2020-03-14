@@ -92,7 +92,9 @@
           <a @click="handleEdit(record)">编辑</a>
 
           <a-divider type="vertical"/>
-          <a @click="handleView(record)">查看监控</a>
+
+          <!--<a @click="handleView(record)">查看监控</a>-->
+          <a @click="handleResult(record)">查看结果</a>
 
           <a-divider type="vertical"/>
           <a-dropdown>
@@ -213,6 +215,10 @@
       handleView(record) {
         this.selectRecord = record
         this.jkVisible = true
+      },
+      handleResult(record) {
+
+        //MonitorSearchResultList
       },
       initDictConfig() {
 

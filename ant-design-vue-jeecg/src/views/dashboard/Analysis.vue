@@ -2,18 +2,26 @@
   <page-layout :avatar="avatar">
     <div slot="headerContent">
       <div class="title">{{ timeFix }}，{{ nickname() }}<span class="welcome-text">，{{ welcome() }}</span></div>
-      <div>前端工程师 | 蚂蚁金服 - 某某某事业群 - VUE平台</div>
+      <div></div>
     </div>
     <div slot="extra">
       <a-row class="more-info">
-        <a-col :span="8">
-          <head-info title="项目数" content="56" :center="false" :bordered="false"/>
+        <a-col :span="4">
         </a-col>
-        <a-col :span="8">
-          <head-info title="团队排名" content="8/24" :center="false" :bordered="false"/>
+        <a-col :span="4">
+          <head-info title="实有人口" :content="tongji.count+''" :center="false" :bordered="false"/>
         </a-col>
-        <a-col :span="8">
-          <head-info title="项目访问" content="2,223" :center="false"/>
+        <a-col :span="4">
+          <head-info title="常住人口" :content="tongji.A01A01+''" :center="false" :bordered="false"/>
+        </a-col>
+        <a-col :span="4">
+          <head-info title="流动人口" :content="tongji.A01A02+''" :center="false"/>
+        </a-col>
+        <a-col :span="4">
+          <head-info title="重点人口" :content="tongji.A01A03+''" :center="false"/>
+        </a-col>
+        <a-col :span="4">
+          <head-info title="重点关注人口" :content="tongji.A01A04+''" :center="false"/>
         </a-col>
       </a-row>
     </div>
@@ -26,42 +34,32 @@
             :loading="loading"
             style="margin-bottom: 24px;"
             :bordered="false"
-            title="进行中的项目"
+            title="进行中的任务"
             :body-style="{ padding: 0 }">
-            <a slot="extra">全部项目</a>
+            <a slot="extra" @click="go2Project">更多</a>
             <div>
               <a-card-grid class="project-card-grid" :key="i" v-for="(item, i) in projects">
                 <a-card :bordered="false" :body-style="{ padding: 0 }">
                   <a-card-meta>
                     <div slot="title" class="card-title">
-                      <a-avatar size="small" :src="item.cover"/>
-                      <a>{{ item.title }}</a>
-                    </div>
-                    <div slot="description" class="card-description">
-                      {{ item.description }}
+                      <a-avatar size="default" :src="item.alarmType==='10'?'/car.png':'/person.png'"/>
+                      <a>{{ item.title }} <a-tag>{{ !item.alarmRuleType?'':filterMultiDictText(dictOptions['alarmRuleType'], item.alarmRuleType + "") }}</a-tag></a>
                     </div>
                   </a-card-meta>
-                  <div class="project-item">
-                    <a href="/#/">科学搬砖组</a>
-                    <span class="datetime">9小时前</span>
-                  </div>
                 </a-card>
               </a-card-grid>
             </div>
           </a-card>
 
-          <a-card :loading="loading" title="动态" :bordered="false">
+          <a-card :loading="loading" title="社区动态" :bordered="false">
             <a-list>
               <a-list-item :key="index" v-for="(item, index) in activities">
                 <a-list-item-meta>
-                  <a-avatar slot="avatar" :src="item.user.avatar"/>
+                  <a-avatar slot="avatar" :src="'/active.png'"/>
                   <div slot="title">
-                    <span>{{ item.user.nickname }}</span>&nbsp;
-                    在&nbsp;<a href="#">{{ item.project.name }}</a>&nbsp;
-                    <span>{{ item.project.action }}</span>&nbsp;
-                    <a href="#">{{ item.project.event }}</a>
+                    <span>{{ item.content }}</span>&nbsp;
                   </div>
-                  <div slot="description">{{ item.time }}</div>
+                  <div slot="description">{{ item.createTime }}</div>
                 </a-list-item-meta>
               </a-list-item>
             </a-list>
@@ -74,34 +72,19 @@
           :md="24"
           :sm="24"
           :xs="24">
-          <a-card title="快速开始 / 便捷导航" style="margin-bottom: 24px" :bordered="false" :body-style="{padding: 0}">
-            <div class="item-group">
-              <a>操作一</a>
-              <a>操作二</a>
-              <a>操作三</a>
-              <a>操作四</a>
-              <a>操作五</a>
-              <a>操作六</a>
-              <a-button size="small" type="primary" ghost icon="plus">添加</a-button>
-            </div>
-          </a-card>
-          <a-card title="XX 指数" style="margin-bottom: 24px" :loading="radarLoading" :bordered="false"
+          <a-card title="平安指数" style="margin-bottom: 24px" :loading="radarLoading" :bordered="false"
                   :body-style="{ padding: 0 }">
             <div style="min-height: 400px;">
               <!-- :scale="scale" :axis1Opts="axis1Opts" :axis2Opts="axis2Opts"  -->
-              <radar :data="radarData"/>
-            </div>
-          </a-card>
-          <a-card :loading="loading" title="团队" :bordered="false">
-            <div class="members">
-              <a-row>
-                <a-col :span="12" v-for="(item, index) in teams" :key="index">
-                  <a>
-                    <a-avatar size="small" :src="item.avatar"/>
-                    <span class="member">{{ item.name }}</span>
-                  </a>
-                </a-col>
-              </a-row>
+              <v-chart :forceFit="true" :height="400" :data="radarData" :padding="[20, 20, 95, 20]" :scale="scale">
+                <v-tooltip></v-tooltip>
+                <v-axis :dataKey="axis1Opts.dataKey" :line="axis1Opts.line" :tickLine="axis1Opts.tickLine" :grid="axis1Opts.grid"/>
+                <v-axis :dataKey="axis2Opts.dataKey" :line="axis2Opts.line" :tickLine="axis2Opts.tickLine" :grid="axis2Opts.grid"/>
+                <v-legend dataKey="user" marker="circle" :offset="30"/>
+                <v-coord type="polar" radius="0.8"/>
+                <v-line position="item*score" color="user" :size="2"/>
+                <v-point position="item*score" color="user" :size="4" shape="circle"/>
+              </v-chart>
             </div>
           </a-card>
         </a-col>
@@ -117,7 +100,21 @@
   import PageLayout from '@/components/page/PageLayout'
   import HeadInfo from '@/components/tools/HeadInfo'
   import Radar from '@/components/chart/Radar'
-  import {getRoleList, getServiceList} from "@/api/manage"
+  import {getRoleList, getServiceList,getAction} from "@/api/manage"
+  import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import {
+    getPersonMonitorList,
+    getCarMonitorList,
+    getTodayStat,
+    getTodayCarStat,
+    getMonitorPersonTypeStat,
+    getMonitorMessage,
+    getFangJianPerson,
+    getMonitorCarStat,
+    getPersonList,
+    getCarList,
+    getDeviceList
+  } from "@/api/big"
 
   const DataSet = require('@antv/data-set')
 
@@ -129,54 +126,68 @@
       Radar
     },
     data() {
+      const axis1Opts = {
+        dataKey: 'item',
+        line: null,
+        tickLine: null,
+        grid: {
+          lineStyle: {
+            lineDash: null
+          },
+          hideFirstLine: false
+        }
+      }
+      const axis2Opts = {
+        dataKey: 'score',
+        line: null,
+        tickLine: null,
+        grid: {
+          type: 'polygon',
+          lineStyle: {
+            lineDash: null
+          }
+        }
+      }
+
+      const scale = [
+        {
+          dataKey: 'score',
+          min: 0,
+          max: 100
+        }, {
+          dataKey: 'user',
+          alias: '类型'
+        }
+      ]
+
+      const sourceData = []
       return {
         timeFix: timeFix(),
+        axis1Opts,
+        axis2Opts,
+        scale,
         avatar: '',
         user: {},
-
+        tongji: {
+          count: 0,
+          A01A01: 0,
+          A01A02: 0,
+          A01A03: 0,
+          A01A04: 0
+        },
         projects: [],
         loading: true,
         radarLoading: true,
         activities: [],
         teams: [],
-
-        // data
-        axis1Opts: {
-          dataKey: 'item',
-          line: null,
-          tickLine: null,
-          grid: {
-            lineStyle: {
-              lineDash: null
-            },
-            hideFirstLine: false
-          }
+        radarData: sourceData,
+        url: {
+          projectList: "/monitor/monitorAlarmConfig/list",
         },
-        axis2Opts: {
-          dataKey: 'score',
-          line: null,
-          tickLine: null,
-          grid: {
-            type: 'polygon',
-            lineStyle: {
-              lineDash: null
-            }
-          }
+        dictOptions: {
+          alarmType: [],
+          alarmRuleType: []
         },
-        scale: [{
-          dataKey: 'score',
-          min: 0,
-          max: 80
-        }],
-        axisData: [
-          {item: '引用', a: 70, b: 30, c: 40},
-          {item: '口碑', a: 60, b: 70, c: 40},
-          {item: '产量', a: 50, b: 60, c: 40},
-          {item: '贡献', a: 40, b: 50, c: 40},
-          {item: '热度', a: 60, b: 70, c: 40},
-          {item: '引用', a: 70, b: 50, c: 40}
-        ],
-        radarData: []
       }
     },
     computed: {
@@ -186,7 +197,7 @@
     },
     created() {
       this.user = this.userInfo
-      this.avatar = window._CONFIG['imgDomainURL'] + "/" + this.userInfo.avatar
+      this.avatar = "/manager.png"
       console.log('this.avatar :' + this.avatar)
 
       getRoleList().then(res => {
@@ -196,27 +207,72 @@
       getServiceList().then(res => {
         console.log('workplace -> call getServiceList()', res)
       })
+
+      this.initDictConfig()
+
+      this.initRadar()
     },
     mounted() {
+      this.getTongjiData()
       this.getProjects()
       this.getActivity()
       this.getTeams()
-      this.initRadar()
     },
     methods: {
       ...mapGetters(["nickname", "welcome"]),
+      filterMultiDictText:filterMultiDictText,
+      go2Project() {
+        this.$router.push({
+          path: '/modules/community/MonitorAlarmConfigList'
+        })
+      },
+      initDictConfig() {
+        initDictOptions('monitor_alarm_type').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'alarmType', res.result)
+          }
+        })
+        initDictOptions('alarm__rule_type').then((res) => {
+          if (res.success) {
+            this.$set(this.dictOptions, 'alarmRuleType', res.result)
+          }
+        })
+      },
       getProjects() {
+        getAction(this.url.projectList, {pageNo:1,pageSize:6,status: 'Y'}).then(res => {
+          this.projects = res.result.records
+          this.loading = false
+        })
+        /*
         this.$http.get('/api/list/search/projects')
           .then(res => {
             this.projects = res.result && res.result.data
             this.loading = false
-          })
+          })*/
+      },
+      getTongjiData() {
+        getMonitorPersonTypeStat().then(rel => {
+          if(rel.code === 200) {
+            const {count, A01A01,A01A02,A01A03,A01A04} = rel.result
+            this.tongji.count = count || 0
+            this.tongji.A01A01 = A01A01 || 0
+            this.tongji.A01A02 = A01A02 || 0
+            this.tongji.A01A03 = A01A03 || 0
+            this.tongji.A01A04 = A01A04 || 0
+          }
+        })
       },
       getActivity() {
-        this.$http.get('/api/workplace/activity')
-          .then(res => {
-            this.activities = res.result
-          })
+        getMonitorMessage({
+          page: 1,
+          column: 'createTime',
+          order: 'desc',
+          pageSize:10
+        }).then(rel => {
+          if(rel.code === 200) {
+            this.activities = rel.result.records
+          }
+        })
       },
       getTeams() {
         this.$http.get('/api/workplace/teams')
@@ -226,21 +282,35 @@
       },
       initRadar() {
         this.radarLoading = true
-
-        this.$http.get('/api/workplace/radar')
-          .then(res => {
-
-            const dv = new DataSet.View().source(res.result)
-            dv.transform({
-              type: 'fold',
-              fields: ['个人', '团队', '部门'],
-              key: 'user',
-              value: 'score'
-            })
-
-            this.radarData = dv.rows
-            this.radarLoading = false
+        this.radarData = []
+        getAction('/monitor/monitorPersonRecord/getTodayStat',{xiaoQuId:'1'}).then(res => {
+          this.radarData.push({
+            item: '陌生人数量',
+            score: res.result.anonymousCount || 0
           })
+          this.radarData.push({
+            item: '社区成员数量',
+            score: res.result.normalCount || 0
+          })
+        })
+        getAction('/monitor/monitorCarRecord/getTodayStat',{xiaoQuId:'1'}).then(res => {
+          this.radarData.push({
+            item: '陌生车辆数量',
+            score: res.result.anonymousCount || 0
+          })
+          this.radarData.push({
+            item: '社区车辆数量',
+            score: res.result.normalCount || 0
+          })
+        })
+
+        getAction('/monitor/monitorDevice/getMonitorCarStat',{xiaoQuId:'1'}).then(res => {
+          this.radarData.push({
+            item: '正常设备',
+            score: res.result.zcCount || 0
+          })
+        })
+        this.radarLoading = false
       }
     }
   }
@@ -364,6 +434,9 @@
     .headerContent .title .welcome-text {
       display: none;
     }
+  }
+  .head-info{
+    text-align: center;
   }
 
 </style>

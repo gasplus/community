@@ -46,11 +46,16 @@
   ]
 
   const sourceData = [
-    { item: '示例一', score: 40 },
-    { item: '示例二', score: 20 },
-    { item: '示例三', score: 67 },
-    { item: '示例四', score: 43 },
-    { item: '示例五', score: 90 }
+    { item: '示例一', score: 40 ,user: '1'},
+    { item: '示例二', score: 20 ,user: '1'},
+    { item: '示例三', score: 67 ,user: '1'},
+    { item: '示例四', score: 43 ,user: '1'},
+    { item: '示例五', score: 90 ,user: '1'},
+    { item: '示例一', score: 40 ,user: '2'},
+    { item: '示例二', score: 20 ,user: '2'},
+    { item: '示例三', score: 67 ,user: '2'},
+    { item: '示例四', score: 43 ,user: '2'},
+    { item: '示例五', score: 90 ,user: '2'}
   ]
 
   export default {
