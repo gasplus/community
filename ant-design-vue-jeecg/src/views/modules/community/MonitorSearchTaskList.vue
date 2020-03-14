@@ -119,6 +119,13 @@
       :footer="null">
       <SelectMonitorPersonRecordList v-if="jkVisible" :selectId="selectRecord.searchContent"></SelectMonitorPersonRecordList>
     </a-modal>
+    <a-modal
+      title="结果记录"
+      :width="1200"
+      v-model="resultShow"
+      :footer="null">
+      <MonitorSearchResultList v-if="resultShow" :searchId="selectRecord.id"></MonitorSearchResultList>
+    </a-modal>
     <monitorSearchTask-modal ref="modalForm" @ok="modalFormOk"></monitorSearchTask-modal>
   </a-card>
 </template>
@@ -128,6 +135,7 @@
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import SelectMonitorPersonRecordList from './modules/SelectMonitorPersonRecordList'
   import MonitorSearchTaskModal from './modules/MonitorSearchTaskModal'
+  import MonitorSearchResultList from './MonitorSearchResultList'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
 
   export default {
@@ -135,10 +143,12 @@
     mixins: [JeecgListMixin],
     components: {
       SelectMonitorPersonRecordList,
-      MonitorSearchTaskModal
+      MonitorSearchTaskModal,
+      MonitorSearchResultList
     },
     data() {
       return {
+        resultShow: false,
         selectRecord: undefined,
         description: '搜索任务管理页面',
         jkVisible:false,
@@ -217,6 +227,11 @@
         this.jkVisible = true
       },
       handleResult(record) {
+        this.selectRecord = record
+        console.log(this.selectRecord)
+        this.$nextTick(() => {
+          this.resultShow = true
+        })
 
         //MonitorSearchResultList
       },

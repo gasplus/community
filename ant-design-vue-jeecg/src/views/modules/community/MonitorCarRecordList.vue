@@ -271,8 +271,8 @@
         this.selectCarNumber = ''
       },
       showCarRelation(carNumber,carId) {
-        carId = '1205450244422303747'
-        carNumber = '鲁R737HH'
+        // carId = '1205450244422303747'
+        // carNumber = '鲁R737HH'
         this.selectCarId = carId || ''
         this.selectCarNumber = carNumber || ''
         this.carRelationShow = true
