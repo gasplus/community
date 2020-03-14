@@ -200,7 +200,7 @@
           opacity: 0.65
         },
         url: {
-          tongji: 'monitor/monitorPersonRecord/getPersonStat',
+          tongji: 'monitor/monitorCarRecord/getCarStat',
           getCarById: 'monitor/monitorCar/queryById',
           list: "/monitor/monitorCarRecord/list",
         },
@@ -215,7 +215,7 @@
       this.visible = true
       this.loadData(1)
       this.getCarData()
-      // this.tongji()
+      this.tongji()
     },
     methods: {
       tongji() {
