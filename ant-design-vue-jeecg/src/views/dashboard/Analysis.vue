@@ -1,7 +1,7 @@
 <template>
   <page-layout :avatar="avatar">
     <div slot="headerContent">
-      <div class="title">{{ timeFix }}，{{ nickname() }}<span class="welcome-text">，{{ welcome() }}</span></div>
+      <div class="title">{{ timeFix }}，{{ nickname() }}</div>
       <div></div>
     </div>
     <div slot="extra">
