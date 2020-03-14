@@ -82,6 +82,18 @@
             下载
           </a-button>
         </template>
+        <span slot="show" slot-scope="text,record">
+          <a v-if="record.personId&&record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
+            {{record.personName}}
+          </a>
+          <span v-if="record.personId&&record.personId==='anonymous'">{{record.personName}}</span>
+        </span>
+
+        <span slot="show1" slot-scope="text,record">
+          <a @click="showCarRelation(record.carNumber,record.carId)">
+            {{record.carNumber}}
+          </a>
+        </span>
 
 
       </a-table>
@@ -90,6 +102,8 @@
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorCarRecord-modal ref="modalForm" @ok="modalFormOk"></monitorCarRecord-modal>
+    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
+    <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarNumber="selectCarNumber" @close="closeCarRelation"></CarRelation>
   </a-card>
 </template>
 
@@ -100,6 +114,8 @@
   import {deviceMixin} from '@/mixins/deviceMixin'
   import deviceDetail from '@/components/big/deviceDetail'
   import MonitorCarRecordModal from './modules/MonitorCarRecordModal'
+  import PersonRelation from './modules/PersonRelation'
+  import CarRelation from './modules/CarRelation'
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDate from '@/components/jeecg/JDate.vue'
 
@@ -110,7 +126,9 @@
       JDate,
       SelectDeviceListModal,
       MonitorCarRecordModal,
-      deviceDetail
+      deviceDetail,
+      PersonRelation,
+      CarRelation
     },
     data () {
       return {
@@ -130,7 +148,14 @@
           {
             title:'车牌号',
             align:"center",
-            dataIndex: 'carNumber'
+            dataIndex: 'carNumber',
+            scopedSlots: {customRender: 'show1'}
+          },
+          {
+            title:'车主',
+            align:"center",
+            dataIndex: 'personName',
+            scopedSlots: {customRender: 'show'}
           },
           {
             title:'进出时间',
@@ -166,6 +191,11 @@
         },
         deviceIds: [],
         selectedDevices:[],
+        selectPersonId: '',
+        personRelationShow: false,
+        selectCarId: '',
+        selectCarNumber: '',
+        carRelationShow: false
       }
     },
     computed: {
@@ -225,6 +255,27 @@
         return window._CONFIG['imgDomainRecordURL']+text
       },
       initDictConfig(){
+      },
+      closePersonRelation() {
+        this.personRelationShow = false
+        this.selectPersonId = ''
+      },
+      showPersonRelation(recordId) {
+        // recordId = '1213423090747346946'
+        this.selectPersonId = recordId
+        this.personRelationShow = true
+      },
+      closeCarRelation() {
+        this.carRelationShow = false
+        this.selectCarId = ''
+        this.selectCarNumber = ''
+      },
+      showCarRelation(carNumber,carId) {
+        carId = '1205450244422303747'
+        carNumber = '鲁R737HH'
+        this.selectCarId = carId || ''
+        this.selectCarNumber = carNumber || ''
+        this.carRelationShow = true
       }
 
     }
