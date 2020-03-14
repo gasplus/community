@@ -5,7 +5,7 @@
       <div class="home_head_info">
         <a-popover  placement="bottom" trigger="hover">
           <template slot="content">
-            <message-box :list="messageList"></message-box>
+            <message-box :list="messageList" @clickRow="readMessage"></message-box>
           </template>
           <div class="home_head_info_item message_icon ani" style="height:30px;width:30px;margin:0;"></div>
         </a-popover>
@@ -289,6 +289,7 @@
     getPersonById,
     getDeviceList
   } from "@/api/big"
+  import { putAction } from "@/api/manage";
   import DialogCard from '@/components/big/dialogCard'
   import PersonList from '@/components/big/personList'
   import PersonDetail from '@/components/big/personDetail'
@@ -380,6 +381,9 @@
           position:{
             left: '-100px',
             top: '100px'
+          },
+          url:{
+            readMessage: '/monitor/monitorMessage/read',
           }
         }
       },
@@ -494,6 +498,11 @@
         }, this.timeStep * 1000)
       },
       methods: {
+        readMessage(item) {
+          putAction(this.url.readMessage, {id:item.id,status:1}).then(res => {
+            this.getMonitorMessage()
+          })
+        },
         tuomin(str,startLength,endLength) {
           if(str.length>startLength+endLength){
             const arr = str.split('')
@@ -766,6 +775,7 @@
         getMonitorMessage() {
           getMonitorMessage({
             page: 1,
+            status: '0',
             column: 'createTime',
             order: 'desc',
             pageSize:10

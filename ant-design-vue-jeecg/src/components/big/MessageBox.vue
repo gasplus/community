@@ -1,6 +1,6 @@
 <template>
   <div class="message_list scroll_body">
-    <div class="message_list_item" v-for="(item, index) in list" :key="index">
+    <div class="message_list_item" v-for="(item, index) in list" :key="index" @click="clickRow(item)">
       <div :class="'message_list_item_content '+messageTypeMap[item.messageType]">{{item.content}}</div>
       <div class="message_list_item_btn">
         <!--<a-tag color="#87d068">查看</a-tag>-->
@@ -24,6 +24,9 @@
       }
     },
     methods: {
+      clickRow(item) {
+        this.$emit('clickRow', item)
+      }
     }
   }
 </script>

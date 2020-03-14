@@ -1,7 +1,7 @@
 <template>
   <page-layout :avatar="avatar">
     <div slot="headerContent">
-      <div class="title">{{ timeFix }}，{{ nickname() }}<span class="welcome-text">，{{ welcome() }}</span></div>
+      <div class="title">{{ timeFix }}，{{ nickname() }}</div>
       <div></div>
     </div>
     <div slot="extra">
@@ -52,8 +52,9 @@
           </a-card>
 
           <a-card :loading="loading" title="社区动态" :bordered="false">
+            <a slot="extra" @click="go2Active">更多</a>
             <a-list>
-              <a-list-item :key="index" v-for="(item, index) in activities">
+              <a-list-item :key="index" v-for="(item, index) in activities" style="cursor: pointer" @click="readMessage(item.id)">
                 <a-list-item-meta>
                   <a-avatar slot="avatar" :src="'/active.png'"/>
                   <div slot="title">
@@ -100,7 +101,7 @@
   import PageLayout from '@/components/page/PageLayout'
   import HeadInfo from '@/components/tools/HeadInfo'
   import Radar from '@/components/chart/Radar'
-  import {getRoleList, getServiceList,getAction} from "@/api/manage"
+  import {getRoleList, getServiceList,getAction,putAction} from "@/api/manage"
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
   import {
     getPersonMonitorList,
@@ -181,7 +182,9 @@
         activities: [],
         teams: [],
         radarData: sourceData,
+        radarSourceData: [],
         url: {
+          readMessage: '/monitor/monitorMessage/read',
           projectList: "/monitor/monitorAlarmConfig/list",
         },
         dictOptions: {
@@ -218,12 +221,39 @@
       this.getActivity()
       this.getTeams()
     },
+    watch: {
+      radarSourceData(list) {
+        const arr = []
+        let sum = 0
+        list.forEach(item => {
+          sum += item.score
+        })
+        list.forEach(item => {
+          const o = {
+            item: item.item,
+            score: Math.floor(item.score*100/sum)
+          }
+          arr.push(o)
+        })
+        this.radarData = arr
+      }
+    },
     methods: {
       ...mapGetters(["nickname", "welcome"]),
       filterMultiDictText:filterMultiDictText,
       go2Project() {
         this.$router.push({
           path: '/modules/community/MonitorAlarmConfigList'
+        })
+      },
+      go2Active() {
+        this.$router.push({
+          path: '/modules/community/MonitorMessageList'
+        })
+      },
+      readMessage(id) {
+        putAction(this.url.readMessage, {id:id,status:1}).then(res => {
+          this.getActivity()
         })
       },
       initDictConfig() {
@@ -266,6 +296,7 @@
         getMonitorMessage({
           page: 1,
           column: 'createTime',
+          status: 0,
           order: 'desc',
           pageSize:10
         }).then(rel => {
@@ -282,30 +313,30 @@
       },
       initRadar() {
         this.radarLoading = true
-        this.radarData = []
+        this.radarSourceData = []
         getAction('/monitor/monitorPersonRecord/getTodayStat',{xiaoQuId:'1'}).then(res => {
-          this.radarData.push({
+          this.radarSourceData.push({
             item: '陌生人数量',
             score: res.result.anonymousCount || 0
           })
-          this.radarData.push({
+          this.radarSourceData.push({
             item: '社区成员数量',
             score: res.result.normalCount || 0
           })
         })
         getAction('/monitor/monitorCarRecord/getTodayStat',{xiaoQuId:'1'}).then(res => {
-          this.radarData.push({
+          this.radarSourceData.push({
             item: '陌生车辆数量',
             score: res.result.anonymousCount || 0
           })
-          this.radarData.push({
+          this.radarSourceData.push({
             item: '社区车辆数量',
             score: res.result.normalCount || 0
           })
         })
 
         getAction('/monitor/monitorDevice/getMonitorCarStat',{xiaoQuId:'1'}).then(res => {
-          this.radarData.push({
+          this.radarSourceData.push({
             item: '正常设备',
             score: res.result.zcCount || 0
           })
