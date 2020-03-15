@@ -21,11 +21,11 @@
             <div class="person_item_info">
               <div class="person_item_p">
                 <div class="person_item_p_l">姓名：</div>
-                <div class="person_item_p_r">{{person.personName}}</div>
+                <div class="person_item_p_r">{{person.personName==='anonymous'?'':person.personName}}</div>
               </div>
               <div class="person_item_p">
                 <div class="person_item_p_l">身份证号：</div>
-                <div class="person_item_p_r">{{person.personIdCard}}</div>
+                <div class="person_item_p_r">{{person.personIdCard==='anonymous'?'':person.personIdCard}}</div>
               </div>
               <div class="person_item_p">
                 <div class="person_item_p_l">户籍地址：</div>
@@ -37,7 +37,7 @@
               </div>
               <div class="person_item_p">
                 <div class="person_item_p_l">进出地址：</div>
-                <div class="person_item_p_r">{{person.address}}安联大厦会计法拉可接受的弗拉基数了大富科技阿里上看到街坊邻居</div>
+                <div class="person_item_p_r">{{person.address}}</div>
               </div>
             </div>
           </div>
@@ -133,7 +133,7 @@
       searchId: {
         type: String,
         default() {
-          return '123'
+          return ''
         }
       }
     },
@@ -215,7 +215,9 @@
         this.loadData(1)
       },
       changePage(current, size) {
-        this.loadData(current)
+        this.ipagination.current = current
+        this.ipagination.size = size
+        this.loadData()
       },
       initDictConfig() {
       }

@@ -6,31 +6,38 @@
         <a-row :gutter="24">
           <a-col :md="12" :sm="16">
             <a-form-item label="创建日期">
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间" class="query-group-cust" v-model="queryParam.createTime_begin"></j-date>
+              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间" class="query-group-cust"
+                      v-model="queryParam.createTime_begin"></j-date>
               <span class="query-group-split-cust"></span>
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间" class="query-group-cust" v-model="queryParam.createTime_end"></j-date>
+              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间" class="query-group-cust"
+                      v-model="queryParam.createTime_end"></j-date>
             </a-form-item>
           </a-col>
+
+          <a-col :md="6" :sm="8">
+            <a-form-item label="日志内容">
+
+              <a-input placeholder="请输入日志内容" v-model="queryParam.content"></a-input>
+            </a-form-item>
+          </a-col>
+
           <a-col :md="6" :sm="8">
             <a-form-item label="类型">
               <j-dict-select-tag placeholder="请选择类型" v-model="queryParam.messageType" dictCode="message_type"/>
             </a-form-item>
           </a-col>
-          <template v-if="toggleSearchStatus">
-            <a-col :md="6" :sm="8">
-              <a-form-item label="状态">
-                <j-dict-select-tag placeholder="请选择状态" v-model="queryParam.status" dictCode="message_status"/>
+
+          <a-col :md="6" :sm="8">
+            <a-form-item label="状态">
+              <j-dict-select-tag placeholder="请选择状态" v-model="queryParam.status" dictCode="message_status"/>
               </a-form-item>
             </a-col>
-          </template>
+
           <a-col :md="6" :sm="8" >
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
+
             </span>
           </a-col>
 
@@ -103,8 +110,8 @@
 </template>
 
 <script>
-
-  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import {filterObj} from '@/utils/util';
+  import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import MonitorMessageModal from './modules/MonitorMessageModal'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import JDate from '@/components/jeecg/JDate.vue'
@@ -194,7 +201,23 @@
       }
     },
     methods: {
-      initDictConfig(){
+      getQueryParams() {
+        //获取查询条件
+        let sqp = {}
+        if (this.superQueryParams) {
+          sqp['superQueryParams'] = encodeURI(this.superQueryParams)
+        }
+        var param = Object.assign(sqp, this.queryParam, this.isorter, this.filters);
+        if (param.content != null) {
+          param.content = "*" + param.content + "*"
+        }
+
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        return filterObj(param);
+      },
+      initDictConfig() {
         initDictOptions('message_type').then((res) => {
           if (res.success) {
             this.$set(this.dictOptions, 'messageType', res.result)

@@ -41,12 +41,12 @@
         <a-form-item label="时间区间定义" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'alarmTimeConfig', validatorRules.alarmTimeConfig]" placeholder="请输入时间区间定义"></a-input>
         </a-form-item>
-        -->
+
         <a-form-item label="是否有效" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag type="list" v-decorator="['status']" :trigger-change="true" dictCode="isYN"
                              placeholder="请选择是否有效"/>
         </a-form-item>
-
+        -->
       </a-form>
     </a-spin>
     <SelectUCListModal ref="UserListModal" v-if="selectAlarmType" :type="selectAlarmType" @choseUserList="choseUserList"></SelectUCListModal>
