@@ -372,7 +372,7 @@
           userToday: {},
           carToday: {},
           dateData: new Date(),
-          timeStep: 3000,
+          timeStep: 3,
           weekMap: {
             1: '一',
             2: '二',
@@ -417,10 +417,6 @@
         DigitRoll
       },
       mounted() {
-        setInterval(() => {
-          this.faceCount = 100
-          this.carCount = Math.floor(100000000*Math.random())
-        }, 3000)
         getMonitorPersonTypeStat().then(rel => {
           if(rel.code === 200) {
             this.xiaoquData = rel.result
