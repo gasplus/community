@@ -205,36 +205,46 @@
       <div class="home_c_line_b"></div>
       <div class="home_c_line_r_b"></div>
       <div class="home_clear_btn" @click="clearTag"></div>
-      <div class="home_search_box">
-        <div class="home_search_ope">
-          <a-select :defaultValue="searchType" style="width: 120px;" @change="changeSearchType">
-            <a-select-option value="person">人员</a-select-option>
-            <a-select-option value="car">车辆</a-select-option>
-          </a-select>
-          <a-input-search :placeholder="searchPlaceholderMap[searchType]" v-model="searchValue" style="width: 300px;" @search="onSearchList" />
-          <div class="home_search_list scroll_body" v-if="searchResultShow">
-            <div class="home_search_item" v-for="(item,index) in searchResultData" :key="index" @click="go2Detail(item)">
-              <div class="home_search_info" v-if="searchType==='person'">
-                <div class="home_search_info_left" style="width:70%;">{{item.hjdz}}</div>
-                <div class="home_search_info_right" style="width:30%;"></div>
-              </div>
-              <div class="home_search_info" v-if="searchType==='person'">
-                <div class="home_search_info_left" style="width:30%;font-size:16px;">{{item.xingMing}}</div>
-                <div class="home_search_info_right" style="width:70%;font-size:16px;">{{item.sfzh}}</div>
-              </div>
-
-              <div class="home_search_info" v-if="searchType==='car'">
-                <div class="home_search_info_left" style="width:50%;font-size:16px;">{{item.carNumber}}</div>
-                <div class="home_search_info_right" style="width:50%;font-size:16px;">{{item.personName}}</div>
-              </div>
-              <div class="home_search_info" v-if="searchType==='car'">
-                <div class="home_search_info_left" style="width:70%;font-size:14px;">{{item.personCardId}}</div>
-                <div class="home_search_info_right" style="width:30%;">{{item.personId==='anonymous'?'陌生人':''}}</div>
-              </div>
-            </div>
-          </div>
+      <div class="home_center_tongji_box">
+        <div class="home_center_tongji_item">
+          <div class="home_center_tongji_item_label">人脸图像总数</div>
+          <DigitRoll :rollDigits="faceCount"/>
+        </div>
+        <div class="home_center_tongji_item">
+          <div class="home_center_tongji_item_label">感知车辆总数</div>
+          <DigitRoll :rollDigits="carCount" />
         </div>
       </div>
+<!--      <div class="home_search_box">-->
+<!--        <div class="home_search_ope">-->
+<!--          <a-select :defaultValue="searchType" style="width: 120px;" @change="changeSearchType">-->
+<!--            <a-select-option value="person">人员</a-select-option>-->
+<!--            <a-select-option value="car">车辆</a-select-option>-->
+<!--          </a-select>-->
+<!--          <a-input-search :placeholder="searchPlaceholderMap[searchType]" v-model="searchValue" style="width: 300px;" @search="onSearchList" />-->
+<!--          <div class="home_search_list scroll_body" v-if="searchResultShow">-->
+<!--            <div class="home_search_item" v-for="(item,index) in searchResultData" :key="index" @click="go2Detail(item)">-->
+<!--              <div class="home_search_info" v-if="searchType==='person'">-->
+<!--                <div class="home_search_info_left" style="width:70%;">{{item.hjdz}}</div>-->
+<!--                <div class="home_search_info_right" style="width:30%;"></div>-->
+<!--              </div>-->
+<!--              <div class="home_search_info" v-if="searchType==='person'">-->
+<!--                <div class="home_search_info_left" style="width:30%;font-size:16px;">{{item.xingMing}}</div>-->
+<!--                <div class="home_search_info_right" style="width:70%;font-size:16px;">{{item.sfzh}}</div>-->
+<!--              </div>-->
+
+<!--              <div class="home_search_info" v-if="searchType==='car'">-->
+<!--                <div class="home_search_info_left" style="width:50%;font-size:16px;">{{item.carNumber}}</div>-->
+<!--                <div class="home_search_info_right" style="width:50%;font-size:16px;">{{item.personName}}</div>-->
+<!--              </div>-->
+<!--              <div class="home_search_info" v-if="searchType==='car'">-->
+<!--                <div class="home_search_info_left" style="width:70%;font-size:14px;">{{item.personCardId}}</div>-->
+<!--                <div class="home_search_info_right" style="width:30%;">{{item.personId==='anonymous'?'陌生人':''}}</div>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
       <div class="home_tongji_list">
         <div :class="'home_tongji_item '+(key==='count'?'can_select':'')" @click="showTJList(key)" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
           <div class="home_tongji_item_box">
@@ -272,6 +282,7 @@
 
 <script>
   // password: Siwo@#$2019
+  import DigitRoll from '@huoyu/vue-digitroll'
   import Collapse from 'vue-collapse'
   import MessageBox from '@/components/big/MessageBox'
   import {
@@ -302,6 +313,8 @@
       name: "home",
       data () {
         return {
+          faceCount: 12,
+          carCount: 32132,
           deviceDetailShow: false,
           carData: {},
           carDetailShow: false,
@@ -357,7 +370,7 @@
           userToday: {},
           carToday: {},
           dateData: new Date(),
-          timeStep: 3,
+          timeStep: 3000,
           weekMap: {
             1: '一',
             2: '二',
@@ -396,7 +409,8 @@
         MessageBox,
         deviceList,
         deviceDetail,
-        personRealList
+        personRealList,
+        DigitRoll
       },
       mounted() {
         getMonitorPersonTypeStat().then(rel => {
@@ -620,9 +634,30 @@
             })
           })
         },
-        showLD(ld) {
+        showLD(person) {
           this.personRealListShow = false
-          this.$refs.mapIframe.contentWindow.postMessage({funcName:'changeHouseColor',data:{id:ld}},'*');
+          const roomData = {
+            danYuanHao: person.danYuanHao,
+            fangJianHao: person.fangJianHao
+          }
+          this.getLouDongInfo({
+            louDongHao: person.louDongHao
+          }, (data1) => {
+            data1.ld = person.louDongHao
+            this.dialogShow = true
+            this.$nextTick(() => {
+              try{
+                if(this.$refs.dialogDom.setLouDongData) {
+                  this.$refs.dialogDom.setLouDongData(data1,roomData)
+                } else if(this.$refs.dialogDom[0].setLouDongData) {
+                  this.$refs.dialogDom[0].setLouDongData(data1,roomData)
+                }
+              } catch {
+              }
+
+            })
+          })
+          this.$refs.mapIframe.contentWindow.postMessage({funcName:'changeHouseColor',data:{id:person.louDongHao}},'*');
         },
         closeSearchBox() {
           this.searchResultShow = false
@@ -1631,5 +1666,118 @@
   }
   .can_select{
     cursor: pointer;
+  }
+  .home_center_tongji_box{
+    position: absolute;
+    left:20px;
+    top:10px;
+    z-index: 100;
+    font-size:32px;
+    color:#fff;
+  }
+  .d-roll-item{
+    height:40px!important;
+    overflow: hidden;
+    border-radius: 4px;
+    margin-right:2px;
+    background:linear-gradient(270deg,rgba(15,37,92,0.9) 0%,rgba(12,22,56,0.9) 100%);
+  }
+  .d-roll-list .d-roll-item .d-roll-bar{
+    width: 26px;
+    color:rgba(0,0,0,0);
+    min-height: 47px;
+    display: inline-block;
+    /*background: url("~@/assets/images/number1.png") no-repeat;*/
+    /*background-position: 0 0;*/
+  }
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(1),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(11){
+    background-image: url("~@/assets/images/0.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(2),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(12){
+    background-image: url("~@/assets/images/1.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(3),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(13){
+    background-image: url("~@/assets/images/2.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(4),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(14){
+    background-image: url("~@/assets/images/3.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(5),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(15){
+    background-image: url("~@/assets/images/4.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(6),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(16){
+    background-image: url("~@/assets/images/5.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(7),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(17){
+    background-image: url("~@/assets/images/6.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(8),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(18){
+    background-image: url("~@/assets/images/7.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(9),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(19){
+    background-image: url("~@/assets/images/8.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(10),
+  .d-roll-list .d-roll-item .d-roll-bar>div:nth-child(20){
+    background-image: url("~@/assets/images/9.png");
+    background-position:center 5px;
+    background-size:18px 30px;
+    background-repeat: no-repeat;
+  }
+  .home_center_tongji_item_label{
+    padding:0 10px;
+    text-align: center;
+    color: #fff;
+    font-size: 16px;
+    position: relative;
+    line-height: 32px;
+    margin-top: 10px;
+    margin-bottom: -15px;
+    background:linear-gradient(270deg,rgba(15,37,92,0.9) 0%,rgba(12,22,56,0.9) 100%);
+    border-radius: 5px;
+    letter-spacing: 1px;
   }
 </style>

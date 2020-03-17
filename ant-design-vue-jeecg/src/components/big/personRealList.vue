@@ -42,7 +42,7 @@
                          slot="cover" alt="">
                   </div>
                   <div class="person_item_btn">
-                    <a-button type="primary" size="small" @click="showLD(person.louDongHao)">查看</a-button>
+                    <a-button type="primary" size="small" @click="showLD(person)">查看</a-button>
                   </div>
                   <div class="person_item_info">
                     <div class="person_item_p">
@@ -73,7 +73,7 @@
                          slot="cover" alt="">
                   </div>
                   <div class="person_item_btn">
-                    <a-button type="primary" size="small" @click="showLD(person.louDongHao)">查看</a-button>
+                    <a-button type="primary" size="small" @click="showLD(person)">查看</a-button>
                   </div>
                   <div class="person_item_info">
                     <div class="person_item_p">
@@ -104,7 +104,7 @@
                          slot="cover" alt="">
                   </div>
                   <div class="person_item_btn">
-                    <a-button type="primary" size="small" @click="showLD(person.louDongHao)">查看</a-button>
+                    <a-button type="primary" size="small" @click="showLD(person)">查看</a-button>
                   </div>
                   <div class="person_item_info">
                     <div class="person_item_p">
@@ -135,7 +135,7 @@
                          slot="cover" alt="">
                   </div>
                   <div class="person_item_btn">
-                    <a-button type="primary" size="small" @click="showLD(person.louDongHao)">查看</a-button>
+                    <a-button type="primary" size="small" @click="showLD(person)">查看</a-button>
                   </div>
                   <div class="person_item_info">
                     <div class="person_item_p">
@@ -227,8 +227,8 @@
       leave() {
         this.$emit('leave')
       },
-      showLD(ld) {
-        this.$emit('showLD',ld)
+      showLD(person) {
+        this.$emit('showLD',person)
       }
     }
   }

@@ -308,10 +308,10 @@
       },
     },
     created() {
-      const endDate = new Date()
-      const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
-      this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd hh:mm:ss')
-      this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+      // const endDate = new Date()
+      // const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+      // this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd hh:mm:ss')
+      // this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
 
       this.loadData();
       //初始化字典配置 在自己页面定义
