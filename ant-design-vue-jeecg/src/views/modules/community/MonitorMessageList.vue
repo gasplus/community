@@ -95,8 +95,39 @@
             下载
           </a-button>
         </template>
+        <span slot="monitor" slot-scope="text,record">
+          <a-popover placement="top" trigger="hover" v-if="record.dataContent&&record.dataContent.indexOf('{')>=0">
+            <template slot="content">
+              <a-row style="min-width:260px;">
+                <a-col span="24">
+                  <div class="monitor_img">
+                    <img
+                      alt="example"
+                      :src="imgBasePath+JSON.parse(record.dataContent).photoUrl"
+                      slot="cover"
+                    />
+                  </div>
+                </a-col>
+              </a-row>
+              <a-row>
+                <a-col span="6">进出地点</a-col>
+                <a-col span="18">{{JSON.parse(record.dataContent).address}}</a-col>
+              </a-row>
+              <a-row>
+                <a-col span="6">进出时间</a-col>
+                <a-col span="18">{{getDateStr(JSON.parse(record.dataContent).outInTime)}}</a-col>
+              </a-row>
+            </template>
+            <a>
+              查看
+            </a>
+          </a-popover>
+        </span>
 
         <span slot="action" slot-scope="text, record">
+
+          <a @click="handleRead(record)" v-if="record.status === '0'">处理</a>
+          <a-divider type="vertical" v-if="record.status === '0'"/>
           <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
             <a>删除</a>
           </a-popconfirm>
@@ -110,8 +141,24 @@
 </template>
 
 <script>
+  Date.prototype.Format = function (fmt) { //author: meizz
+    const o = {
+      "M+": this.getMonth() + 1, //月份
+      "d+": this.getDate(), //日
+      "h+": this.getHours(), //小时
+      "m+": this.getMinutes(), //分
+      "s+": this.getSeconds(), //秒
+      "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+      "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (let k in o)
+      if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+  }
   import {filterObj} from '@/utils/util';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
+  import {putAction} from "@/api/manage";
   import MonitorMessageModal from './modules/MonitorMessageModal'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import JDate from '@/components/jeecg/JDate.vue'
@@ -127,16 +174,17 @@
     },
     data () {
       return {
+        imgBasePath: window._CONFIG['imgDomainRecordURL'] + '/',
         description: '监控信息管理页面',
         // 表头
         columns: [
           {
             title: '#',
             dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
+            key: 'rowIndex',
+            width: 60,
+            align: "center",
+            customRender: function (t, r, index) {
               return parseInt(index)+1;
             }
           },
@@ -153,24 +201,30 @@
               if(!text){
                 return ''
               }else{
-                return filterMultiDictText(this.dictOptions['messageType'], text+"")
+                return filterMultiDictText(this.dictOptions['messageType'], text + "")
               }
             }
           },
           {
-            title:'日志内容',
-            align:"center",
+            title: '日志内容',
+            align: "center",
             dataIndex: 'content'
           },
           {
-            title:'状态',
-            align:"center",
+            title: '监控信息',
+            align: 'center',
+            dataIndex: 'monitor',
+            scopedSlots: {customRender: 'monitor'}
+          },
+          {
+            title: '状态',
+            align: "center",
             dataIndex: 'status',
-            customRender:(text)=>{
-              if(!text){
+            customRender: (text) => {
+              if (!text) {
                 return ''
-              }else{
-                return filterMultiDictText(this.dictOptions['status'], text+"")
+              } else {
+                return filterMultiDictText(this.dictOptions['status'], text + "")
               }
             }
           },
@@ -183,6 +237,7 @@
           }
         ],
         url: {
+          readMessage: '/monitor/monitorMessage/read',
           list: "/monitor/monitorMessage/list",
           delete: "/monitor/monitorMessage/delete",
           deleteBatch: "/monitor/monitorMessage/deleteBatch",
@@ -217,6 +272,17 @@
         param.pageSize = this.ipagination.pageSize;
         return filterObj(param);
       },
+      handleRead(record) {
+        putAction(this.url.readMessage, {id: record.id, status: 1}).then(res => {
+          this.loadData()
+        })
+      },
+      getDateStr(time) {
+        if (time) {
+          return new Date(time).Format("yyyy-MM-dd hh:mm:ss")
+        }
+        return ''
+      },
       initDictConfig() {
         initDictOptions('message_type').then((res) => {
           if (res.success) {
@@ -235,4 +301,18 @@
 </script>
 <style scoped>
   @import '~@assets/less/common.less'
+
+</style>
+<style>
+  .monitor_img {
+    width: 100px;
+    margin: 0 auto;
+  }
+
+  .monitor_img img {
+    display: block;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+  }
 </style>

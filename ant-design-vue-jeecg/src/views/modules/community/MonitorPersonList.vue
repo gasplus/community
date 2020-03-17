@@ -17,7 +17,14 @@
           <template v-if="toggleSearchStatus">
             <a-col :md="6" :sm="8">
               <a-form-item label="人员类型">
-                <j-dict-select-tag placeholder="请选择人员类型" v-model="queryParam.type" dictCode="hu_person_type"/>
+                <a-select placeholder="请选择人员类型" v-model="queryParam.type">
+                  <a-select-option value="">请选择</a-select-option>
+                  <a-select-option v-for="(item, key) in dictOptions.type" :key="key" :value="item.value">
+                  <span style="display: inline-block;width: 100%" :title=" item.text || item.label ">
+                    {{ item.text || item.label }}
+                  </span>
+                  </a-select-option>
+                </a-select>
               </a-form-item>
             </a-col>
           </template>
@@ -36,19 +43,27 @@
       </a-form>
     </div>
     <!-- 查询区域-END -->
-    
+
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
+      <a-button @click="handleAdd" type="primary" icon="plus" style="margin-right:8px;">新增</a-button>
+      <!--
       <a-button type="primary" icon="download" @click="handleExportXls('人员信息')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
+      -->
+      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
+                @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
       <a-dropdown v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
-          <a-menu-item key="1" @click="batchDel"><a-icon type="delete"/>删除</a-menu-item>
+          <a-menu-item key="1" @click="batchDel">
+            <a-icon type="delete"/>
+            删除
+          </a-menu-item>
         </a-menu>
-        <a-button style="margin-left: 8px"> 批量操作 <a-icon type="down" /></a-button>
+        <a-button style="margin-left: 8px"> 批量操作
+          <a-icon type="down"/>
+        </a-button>
       </a-dropdown>
     </div>
 
@@ -69,7 +84,7 @@
         :pagination="ipagination"
         :loading="loading"
         :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        
+
         @change="handleTableChange">
 
         <template slot="htmlSlot" slot-scope="text">
@@ -91,13 +106,15 @@
             下载
           </a-button>
         </template>
-
+        <span slot="personType" slot-scope="text, record">
+          {{personTypeMap[text]}}
+        </span>
         <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical" />
+          <a-divider type="vertical"/>
           <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down" /></a>
+            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
             <a-menu slot="overlay">
               <a-menu-item>
                 <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
@@ -170,36 +187,29 @@
             dataIndex: 'lxdh'
           },
           {
-            title:'民族',
-            align:"center",
-            dataIndex: 'minZu',
-            customRender:(text)=>{
-              if(!text){
-                return ''
-              }else{
-                return filterMultiDictText(this.dictOptions['minZu'], text+"")
-              }
-            }
-          },
-          {
             title:'人员类型',
             align:"center",
             dataIndex: 'type',
-            customRender:(text)=>{
-              if(!text){
-                return ''
-              }else{
-                return filterMultiDictText(this.dictOptions['type'], text+"")
-              }
-            }
+            scopedSlots: {customRender: 'personType'}
           },
           {
             title: '操作',
             dataIndex: 'action',
-            align:"center",
-            scopedSlots: { customRender: 'action' }
+            align: "center",
+            scopedSlots: {customRender: 'action'}
           }
         ],
+        personTypeMap: {
+          A01A01: '常住人口',
+          A01A02: '流动人口',
+          A01A03: '重点人口',
+          A01A04: '重点关注人口',
+          A01A05: '布控人员',
+          A01A04A01: '留守儿童',
+          A01A04A02: '孤寡老人',
+          A01A04A03: '精神病人',
+          A01A04A04: '吸毒人员',
+        },
         url: {
           list: "/monitor/monitorPerson/list",
           delete: "/monitor/monitorPerson/delete",
@@ -207,9 +217,9 @@
           exportXlsUrl: "/monitor/monitorPerson/exportXls",
           importExcelUrl: "monitor/monitorPerson/importExcel",
         },
-        dictOptions:{
-         minZu:[],
-         type:[],
+        dictOptions: {
+          minZu: [],
+          type: [],
         },
       }
     },
@@ -219,19 +229,24 @@
       }
     },
     methods: {
-      initDictConfig(){
+      initDictConfig() {
         initDictOptions('').then((res) => {
           if (res.success) {
             this.$set(this.dictOptions, 'minZu', res.result)
           }
         })
-        initDictOptions('hu_person_type').then((res) => {
-          if (res.success) {
-            this.$set(this.dictOptions, 'type', res.result)
-          }
-        })
+        const types = []
+        for (let key in this.personTypeMap) {
+          types.push({
+            value: key,
+            text: this.personTypeMap[key],
+            title: this.personTypeMap[key]
+          })
+        }
+        this.$set(this.dictOptions, 'type', types)
+        console.log(this.dictOptions.type)
       }
-       
+
     }
   }
 </script>
