@@ -208,11 +208,11 @@
       <div class="home_center_tongji_box">
         <div class="home_center_tongji_item">
           <div class="home_center_tongji_item_label">人脸图像总数</div>
-          <DigitRoll :rollDigits="faceCount"/>
+          <DigitRoll :rollDigits="faceCount" v-if="faceCountShow"/>
         </div>
         <div class="home_center_tongji_item">
           <div class="home_center_tongji_item_label">感知车辆总数</div>
-          <DigitRoll :rollDigits="carCount" />
+          <DigitRoll :rollDigits="carCount" v-if="carCountShow"/>
         </div>
       </div>
 <!--      <div class="home_search_box">-->
@@ -300,7 +300,7 @@
     getPersonById,
     getDeviceList
   } from "@/api/big"
-  import { putAction } from "@/api/manage";
+  import { putAction, getAction } from "@/api/manage";
   import DialogCard from '@/components/big/dialogCard'
   import PersonList from '@/components/big/personList'
   import PersonDetail from '@/components/big/personDetail'
@@ -313,8 +313,10 @@
       name: "home",
       data () {
         return {
-          faceCount: 12,
-          carCount: 32132,
+          faceCount: 0,
+          carCount: 0,
+          faceCountShow: true,
+          carCountShow: true,
           deviceDetailShow: false,
           carData: {},
           carDetailShow: false,
@@ -396,6 +398,8 @@
             top: '100px'
           },
           url:{
+            getLeftPerson: 'monitor/monitorPersonRecord/getTotalPersonStat',
+            getLeftCar: 'monitor/monitorCarRecord/getTotalCarStat',
             readMessage: '/monitor/monitorMessage/read',
           }
         }
@@ -413,6 +417,10 @@
         DigitRoll
       },
       mounted() {
+        setInterval(() => {
+          this.faceCount = 100
+          this.carCount = Math.floor(100000000*Math.random())
+        }, 3000)
         getMonitorPersonTypeStat().then(rel => {
           if(rel.code === 200) {
             this.xiaoquData = rel.result
@@ -425,6 +433,7 @@
         this.getMonitorMessage()
         this.getMonitorCarStat()
         this.getDeviceList()
+        this.getLeftTongjiData()
         this.$nextTick(() => {
           this.centerHeight = this.$refs.center.offsetHeight
         })
@@ -449,6 +458,16 @@
         //     this.$refs.dialogDom.setLouDongData(data1)
         //   }
         // })
+      },
+      watch: {
+        faceCount() {
+          this.faceCountShow = false
+          this.faceCountShow = true
+        },
+        carCount() {
+          this.carCountShow = false
+          this.carCountShow = true
+        }
       },
       created() {
         this.timeAni()
@@ -509,9 +528,18 @@
           this.getMonitorMessage()
           this.getMonitorCarStat()
           this.getDeviceList()
+          this.getLeftTongjiData()
         }, this.timeStep * 1000)
       },
       methods: {
+        getLeftTongjiData() {
+          getAction(this.url.getLeftPerson, {xiaoQuId:1}).then(res => {
+            this.faceCount = res.result
+          })
+          getAction(this.url.getLeftCar, {xiaoQuId:1}).then(res => {
+            this.carCount = res.result
+          })
+        },
         readMessage(item) {
           putAction(this.url.readMessage, {id:item.id,status:1}).then(res => {
             this.getMonitorMessage()
