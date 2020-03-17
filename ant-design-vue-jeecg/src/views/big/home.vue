@@ -29,7 +29,7 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" style="padding:0;">
                   <div class="tongji_item">
-                    <div class="tongji_item_t">
+                    <div class="tongji_item_t" @click.stop="go2Page('/modules/community/MonitorHumanRecordList')">
                       <div class="tongji_item_t_label">总次数</div>
                       <div class="tongji_item_t_number">{{userToday.totalCount}}</div>
                     </div>
@@ -116,7 +116,7 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" style="padding:0;">
                   <div class="tongji_item">
-                    <div class="tongji_item_t">
+                    <div class="tongji_item_t" @click.stop="go2Page('/modules/community/MonitorCarRecordList')">
                       <div class="tongji_item_t_label">总次数</div>
                       <div class="tongji_item_t_number">{{carToday.totalCount}}</div>
                     </div>
@@ -246,7 +246,7 @@
 <!--        </div>-->
 <!--      </div>-->
       <div class="home_tongji_list">
-        <div :class="'home_tongji_item '+(key==='count'?'can_select':'')" @click="showTJList(key)" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
+        <div class="home_tongji_item can_select" @click="showTJList(key)" v-for="(key,index) in tongjiList" :key="key" v-if="xiaoquData[key]||xiaoquData[key]===0">
           <div class="home_tongji_item_box">
             <div class="home_tongji_item_title">{{tongjiKeyMap[key]}}</div>
             <div class="home_tongji_item_info">
@@ -263,7 +263,7 @@
           </div>
         </div>
       </div>
-      <personRealList v-if="personRealListShow" @leave="closePersonRealList" @showLD="showLD"></personRealList>
+      <personRealList v-if="personRealListShow" @leave="closePersonRealList" @showLD="showLD" :personType="personType"></personRealList>
       <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
       <PersonList v-show="personListShow" :personListData="personListData" :roomData="roomData" @close="closePersonList"></PersonList>
       <deviceList v-if="deviceListShow" @leave="closeDeviceList"></deviceList>
@@ -313,6 +313,7 @@
       name: "home",
       data () {
         return {
+          personType: '',
           faceCount: 0,
           carCount: 0,
           faceCountShow: true,
@@ -372,7 +373,7 @@
           userToday: {},
           carToday: {},
           dateData: new Date(),
-          timeStep: 3,
+          timeStep: 3000,
           weekMap: {
             1: '一',
             2: '二',
@@ -528,6 +529,11 @@
         }, this.timeStep * 1000)
       },
       methods: {
+        go2Page(url) {
+          this.$router.push({
+            path: url
+          })
+        },
         getLeftTongjiData() {
           getAction(this.url.getLeftPerson, {xiaoQuId:1}).then(res => {
             this.faceCount = res.result
@@ -537,9 +543,11 @@
           })
         },
         readMessage(item) {
+          this.go2Page('/modules/community/MonitorMessageList')
+          /*
           putAction(this.url.readMessage, {id:item.id,status:1}).then(res => {
             this.getMonitorMessage()
-          })
+          })*/
         },
         tuomin(str,startLength,endLength) {
           if(str.length>startLength+endLength){
@@ -564,11 +572,10 @@
           this.personRealListShow = false
         },
         showTJList(key) {
-          if(key === 'count'){
-            this.showPersonRealList()
-          }
+          this.showPersonRealList(key)
         },
-        showPersonRealList() {
+        showPersonRealList(key) {
+          this.personType = key
           this.personRealListShow = true
         },
         showPersonDetail(item) {
@@ -1646,6 +1653,7 @@
   .tongji_item_t{
     height:40px;
     background:rgba(255,255,255,0.1);
+    cursor:pointer;
   }
   .tongji_item_t_label{
     height:40px;

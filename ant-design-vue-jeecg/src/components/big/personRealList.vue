@@ -178,7 +178,7 @@
 
   export default {
     name: "personRealList",
-    props: ['position'],
+    props: ['position','personType'],
     data() {
       return {
         baseImgUrl: window._CONFIG['imgDomainURL'],
@@ -210,6 +210,9 @@
           pageSize: this.pagination.pageSize,
           column: 'createTime',
           order: 'desc'
+        }
+        if(this.personType){
+          params.type = this.personType==='count'?'':this.personType
         }
         if(this.xingming){
           const xingming = this.xingming

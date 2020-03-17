@@ -4,26 +4,33 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
-          <a-col :md="12" :sm="16">
+          <a-col :md="timeType==='3'?24:8" :sm="timeType==='3'?24:8">
             <a-form-item label="进出时间">
+              <a-radio-group v-model="timeType" buttonStyle="solid">
+                <a-radio-button value="3">自定义</a-radio-button>
+                <a-radio-button value="0">当天</a-radio-button>
+                <a-radio-button value="1">近7天</a-radio-button>
+                <a-radio-button value="2">近30天</a-radio-button>
+              </a-radio-group>
               <a-date-picker
+                style="margin-left:20px;"
+                v-if="timeType==='3'"
                 :disabledDate="disabledStartDate"
                 :allowClear="false"
                 showTime
                 format="YYYY-MM-DD HH:mm:ss"
-                :defaultValue="moment(queryParam.outInTime_begin, 'YYYY-MM-DD HH:mm:ss')"
                 v-model="startValue"
                 placeholder="请选择开始时间"
                 @openChange="handleStartOpenChange"
               />
-              <span class="query-group-split-cust"></span>
+              <span class="query-group-split-cust" v-if="timeType==='3'"></span>
               <a-date-picker
+                v-if="timeType==='3'"
                 :allowClear="false"
                 :disabledDate="disabledEndDate"
                 showTime
                 format="YYYY-MM-DD HH:mm:ss"
                 placeholder="请选择结束时间"
-                :defaultValue="moment(queryParam.outInTime_end, 'YYYY-MM-DD HH:mm:ss')"
                 v-model="endValue"
                 :open="endOpen"
                 @openChange="handleEndOpenChange"
@@ -236,6 +243,7 @@
     },
     data() {
       return {
+        timeType: '',
         imgBasePath: window._CONFIG['imgDomainRecordURL'],
         description: '人体检测结果管理页面',
         // 表头
@@ -300,11 +308,34 @@
       }
     },
     watch: {
+      timeType(value) {
+        if(value === '0'){
+          const endDate = new Date()
+          this.queryParam.outInTime_begin = endDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '1'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-7*24*60*60*1000)
+          this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '2'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+          this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '3'){
+          this.queryParam.outInTime_begin = ''
+          this.queryParam.outInTime_end = ''
+        }
+      },
       startValue(val) {
-        console.log('startValue', val);
+        console.log('startValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam.outInTime_begin = val._d.Format('yyyy-MM-dd hh:mm:ss')
       },
       endValue(val) {
-        console.log('endValue', val);
+        console.log('endValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam.outInTime_end = val._d.Format('yyyy-MM-dd hh:mm:ss')
+
       },
     },
     created() {
@@ -312,7 +343,7 @@
       // const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
       // this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd hh:mm:ss')
       // this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
-
+      this.timeType = '3'
       this.loadData();
       //初始化字典配置 在自己页面定义
       this.initDictConfig();
