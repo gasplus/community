@@ -373,7 +373,7 @@
           userToday: {},
           carToday: {},
           dateData: new Date(),
-          timeStep: 3000,
+          timeStep: 3,
           weekMap: {
             1: '一',
             2: '二',
