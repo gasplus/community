@@ -4,6 +4,40 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
+          <a-col :md="timeType==='3'?24:8" :sm="timeType==='3'?24:8">
+            <a-form-item label="创建时间">
+              <a-radio-group v-model="timeType" buttonStyle="solid">
+                <a-radio-button value="3">自定义</a-radio-button>
+                <a-radio-button value="0">当天</a-radio-button>
+                <a-radio-button value="1">近7天</a-radio-button>
+                <a-radio-button value="2">近30天</a-radio-button>
+              </a-radio-group>
+              <a-date-picker
+                style="margin-left:20px;"
+                v-if="timeType==='3'"
+                :disabledDate="disabledStartDate"
+                :allowClear="false"
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                v-model="startValue"
+                placeholder="请选择开始时间"
+                @openChange="handleStartOpenChange"
+              />
+              <span class="query-group-split-cust" v-if="timeType==='3'"></span>
+              <a-date-picker
+                v-if="timeType==='3'"
+                :allowClear="false"
+                :disabledDate="disabledEndDate"
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="请选择结束时间"
+                v-model="endValue"
+                :open="endOpen"
+                @openChange="handleEndOpenChange"
+              />
+            </a-form-item>
+          </a-col>
+          <!--
           <a-col :md="12" :sm="16">
             <a-form-item label="创建日期">
               <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间" class="query-group-cust"
@@ -13,6 +47,7 @@
                       v-model="queryParam.createTime_end"></j-date>
             </a-form-item>
           </a-col>
+          -->
 
           <a-col :md="6" :sm="8">
             <a-form-item label="日志内容">
@@ -141,6 +176,7 @@
 </template>
 
 <script>
+  import moment from "moment";
   Date.prototype.Format = function (fmt) { //author: meizz
     const o = {
       "M+": this.getMonth() + 1, //月份
@@ -174,6 +210,10 @@
     },
     data () {
       return {
+        timeType: '',
+        startValue: null,
+        endValue: null,
+        endOpen: false,
         imgBasePath: window._CONFIG['imgDomainRecordURL'] + '/',
         description: '监控信息管理页面',
         // 表头
@@ -255,7 +295,64 @@
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
       }
     },
+    watch: {
+      timeType(value) {
+        if(value === '0'){
+          const endDate = new Date()
+          this.queryParam.createTime_begin = endDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.createTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '1'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-7*24*60*60*1000)
+          this.queryParam.createTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.createTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '2'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+          this.queryParam.createTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.createTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '3'){
+          this.queryParam.createTime_begin = ''
+          this.queryParam.createTime_end = ''
+        }
+      },
+      startValue(val) {
+        console.log('startValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam.createTime_begin = val._d.Format('yyyy-MM-dd hh:mm:ss')
+      },
+      endValue(val) {
+        console.log('endValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam.createTime_end = val._d.Format('yyyy-MM-dd hh:mm:ss')
+
+      },
+    },
+    created() {
+      this.timeType = '3'
+    },
     methods: {
+      moment,
+      disabledStartDate(startValue) {
+        const endValue = this.endValue;
+        if (!startValue || !endValue) {
+          return false;
+        }
+        return startValue.valueOf() > endValue.valueOf();
+      },
+      disabledEndDate(endValue) {
+        const startValue = this.startValue;
+        if (!endValue || !startValue) {
+          return false;
+        }
+        return startValue.valueOf() >= endValue.valueOf();
+      },
+      handleStartOpenChange(open) {
+        if (!open) {
+          this.endOpen = true;
+        }
+      },
+      handleEndOpenChange(open) {
+        this.endOpen = open;
+      },
       getQueryParams() {
         //获取查询条件
         let sqp = {}

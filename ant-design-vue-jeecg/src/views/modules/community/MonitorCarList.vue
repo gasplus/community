@@ -36,7 +36,7 @@
       </a-form>
     </div>
     <!-- 查询区域-END -->
-    
+
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
@@ -69,7 +69,7 @@
         :pagination="ipagination"
         :loading="loading"
         :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
-        
+
         @change="handleTableChange">
 
         <template slot="htmlSlot" slot-scope="text">
@@ -107,10 +107,22 @@
             </a-menu>
           </a-dropdown>
         </span>
+        <span slot="show" slot-scope="text,record">
+          <a v-if="record.personId&&record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
+            {{record.personName}}
+          </a>
+          <span v-if="record.personId&&record.personId==='anonymous'">{{record.personName}}</span>
+        </span>
 
+        <span slot="show1" slot-scope="text,record">
+          <a @click="showCarRelation(record.carNumber,record.id)">
+            {{record.carNumber}}
+          </a>
+        </span>
       </a-table>
     </div>
-
+    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
+    <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarNumber="selectCarNumber" @close="closeCarRelation"></CarRelation>
     <monitorCar-modal ref="modalForm" @ok="modalFormOk"></monitorCar-modal>
   </a-card>
 </template>
@@ -121,13 +133,17 @@
   import MonitorCarModal from './modules/MonitorCarModal'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import PersonRelation from './modules/PersonRelation'
+  import CarRelation from './modules/CarRelation'
 
   export default {
     name: "MonitorCarList",
     mixins: [JeecgListMixin],
     components: {
       JDictSelectTag,
-      MonitorCarModal
+      MonitorCarModal,
+      PersonRelation,
+      CarRelation
     },
     data() {
       return {
@@ -147,12 +163,14 @@
           {
             title:'车牌号',
             align:"center",
-            dataIndex: 'carNumber'
+            dataIndex: 'carNumber',
+            scopedSlots: {customRender: 'show1'}
           },
           {
             title: '姓名',
             align: "center",
-            dataIndex: 'personName'
+            dataIndex: 'personName',
+            scopedSlots: {customRender: 'show'}
           },
           {
             title: '身份证',
@@ -178,6 +196,11 @@
             scopedSlots: {customRender: 'action'}
           }
         ],
+        selectPersonId: '',
+        personRelationShow: false,
+        selectCarId: '',
+        selectCarNumber: '',
+        carRelationShow: false,
         url: {
           list: "/monitor/monitorCar/list",
           delete: "/monitor/monitorCar/delete",
@@ -197,6 +220,27 @@
       }
     },
     methods: {
+      closePersonRelation() {
+        this.personRelationShow = false
+        this.selectPersonId = ''
+      },
+      showPersonRelation(recordId) {
+        // recordId = '1213423090747346946'
+        this.selectPersonId = recordId
+        this.personRelationShow = true
+      },
+      closeCarRelation() {
+        this.carRelationShow = false
+        this.selectCarId = ''
+        this.selectCarNumber = ''
+      },
+      showCarRelation(carNumber,carId) {
+        // carId = '1205450244422303747'
+        // carNumber = '鲁R737HH'
+        this.selectCarId = carId || ''
+        this.selectCarNumber = carNumber || ''
+        this.carRelationShow = true
+      },
       initDictConfig() {
         initDictOptions('carType').then((res) => {
           if (res.success) {
@@ -209,7 +253,7 @@
           }
         })
       }
-       
+
     }
   }
 </script>

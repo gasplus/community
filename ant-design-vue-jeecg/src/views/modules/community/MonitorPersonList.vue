@@ -106,6 +106,11 @@
             下载
           </a-button>
         </template>
+        <span slot="show" slot-scope="text,record">
+          <a @click="showPersonRelation(record.id)">
+            {{text}}
+          </a>
+        </span>
         <span slot="personType" slot-scope="text, record">
           {{personTypeMap[text]}}
         </span>
@@ -127,7 +132,7 @@
 
       </a-table>
     </div>
-
+    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
     <monitorPerson-modal ref="modalForm" @ok="modalFormOk"></monitorPerson-modal>
   </a-card>
 </template>
@@ -138,13 +143,15 @@
   import MonitorPersonModal from './modules/MonitorPersonModal'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import PersonRelation from './modules/PersonRelation'
 
   export default {
     name: "MonitorPersonList",
     mixins:[JeecgListMixin],
     components: {
       JDictSelectTag,
-      MonitorPersonModal
+      MonitorPersonModal,
+      PersonRelation
     },
     data () {
       return {
@@ -164,7 +171,8 @@
           {
             title:'姓名',
             align:"center",
-            dataIndex: 'xingMing'
+            dataIndex: 'xingMing',
+            scopedSlots: {customRender: 'show'}
           },
           {
             title:'公民身份证号',
@@ -217,6 +225,8 @@
           exportXlsUrl: "/monitor/monitorPerson/exportXls",
           importExcelUrl: "monitor/monitorPerson/importExcel",
         },
+        selectPersonId: '',
+        personRelationShow: false,
         dictOptions: {
           minZu: [],
           type: [],
@@ -229,6 +239,15 @@
       }
     },
     methods: {
+      closePersonRelation() {
+        this.personRelationShow = false
+        this.selectPersonId = ''
+      },
+      showPersonRelation(recordId) {
+        // recordId = '1213466081813917697'
+        this.selectPersonId = recordId
+        this.personRelationShow = true
+      },
       initDictConfig() {
         initDictOptions('').then((res) => {
           if (res.success) {

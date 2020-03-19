@@ -4,6 +4,39 @@
     <div class="table-page-search-wrapper">
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
+          <a-col :md="timeType==='3'?24:8" :sm="timeType==='3'?24:8">
+            <a-form-item label="进出时间">
+              <a-radio-group v-model="timeType" buttonStyle="solid">
+                <a-radio-button value="3">自定义</a-radio-button>
+                <a-radio-button value="0">当天</a-radio-button>
+                <a-radio-button value="1">近7天</a-radio-button>
+                <a-radio-button value="2">近30天</a-radio-button>
+              </a-radio-group>
+              <a-date-picker
+                style="margin-left:20px;"
+                v-if="timeType==='3'"
+                :disabledDate="disabledStartDate"
+                :allowClear="false"
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                v-model="startValue"
+                placeholder="请选择开始时间"
+                @openChange="handleStartOpenChange"
+              />
+              <span class="query-group-split-cust" v-if="timeType==='3'"></span>
+              <a-date-picker
+                v-if="timeType==='3'"
+                :allowClear="false"
+                :disabledDate="disabledEndDate"
+                showTime
+                format="YYYY-MM-DD HH:mm:ss"
+                placeholder="请选择结束时间"
+                v-model="endValue"
+                :open="endOpen"
+                @openChange="handleEndOpenChange"
+              />
+            </a-form-item>
+          </a-col>
           <a-col :md="6" :sm="8">
             <a-form-item label="人员姓名">
               <a-input placeholder="请输入人员姓名" v-model="queryParam.personName"></a-input>
@@ -12,15 +45,6 @@
           <a-col :md="6" :sm="8">
             <a-form-item label="身份证">
               <a-input placeholder="请输入身份证" v-model="queryParam.personIdCard"></a-input>
-            </a-form-item>
-          </a-col>
-          <a-col :md="12" :sm="8">
-            <a-form-item label="进出时间">
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择开始时间"
-                      class="query-group-cust" v-model="queryParam.outInTime_begin"></j-date>
-              <span class="query-group-split-cust"></span>
-              <j-date :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" placeholder="请选择结束时间"
-                      class="query-group-cust" v-model="queryParam.outInTime_end"></j-date>
             </a-form-item>
           </a-col>
           <a-col :md="18" :sm="18">
@@ -62,7 +86,11 @@
         :loading="loading"
 
         @change="handleTableChange">
-
+        <span slot="showRemarks" slot-scope="text,record">
+          <a @click="showRemarksDialog(record)">
+            查看备注
+          </a>
+        </span>
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
         </template>
@@ -104,10 +132,36 @@
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorPersonRecord-modal ref="modalForm" @ok="modalFormOk"></monitorPersonRecord-modal>
     <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
+    <MonitorRecordRemarkListModal
+      v-if="selectRecord"
+      :recordId="selectRecord.id"
+      :dataId="selectRecord.personId"
+      :personId="selectRecord.personId"
+      remarks-type="10"
+      :recordShow="remarksShow"
+      @handleCancel="closeRemarks"
+    ></MonitorRecordRemarkListModal>
   </a-card>
 </template>
 
 <script>
+  import moment from "moment";
+
+  Date.prototype.Format = function (fmt) { //author: meizz
+    const o = {
+      "M+": this.getMonth() + 1, //月份
+      "d+": this.getDate(), //日
+      "h+": this.getHours(), //小时
+      "m+": this.getMinutes(), //分
+      "s+": this.getSeconds(), //秒
+      "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+      "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (let k in o)
+      if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+  }
 
   import {filterObj} from '@/utils/util';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
@@ -119,6 +173,7 @@
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDate from '@/components/jeecg/JDate.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import MonitorRecordRemarkListModal from "./modules/MonitorRecordRemarkListModal";
 
   export default {
     name: "MonitorPersonRecordList",
@@ -127,12 +182,17 @@
       JDictSelectTag,
       JDate,
       SelectDeviceListModal,
+      MonitorRecordRemarkListModal,
       MonitorPersonRecordModal,
       deviceDetail,
       PersonRelation
     },
     data () {
       return {
+        timeType: '',
+        startValue: null,
+        endValue: null,
+        endOpen: false,
         imgBasePath: window._CONFIG['imgDomainRecordURL'],
         description: '人员监控信息管理页面',
         // 表头
@@ -183,6 +243,12 @@
             dataIndex: 'address'
           },
           {
+            title: '备注信息',
+            align: "center",
+            dataIndex: 'remark',
+            scopedSlots: {customRender: 'showRemarks'}
+          },
+          {
             title: '查看监控',
             align: "center",
             dataIndex: 'deviceId',
@@ -207,7 +273,9 @@
           personType:[],
         },
         selectPersonId: '',
-        personRelationShow: false
+        personRelationShow: false,
+        selectRecord: undefined,
+        remarksShow: false
       }
     },
     computed: {
@@ -215,7 +283,74 @@
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
       }
     },
+    watch: {
+      timeType(value) {
+        if(value === '0'){
+          const endDate = new Date()
+          this.queryParam.outInTime_begin = endDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '1'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-7*24*60*60*1000)
+          this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '2'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+          this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '3'){
+          this.queryParam.outInTime_begin = ''
+          this.queryParam.outInTime_end = ''
+        }
+      },
+      startValue(val) {
+        console.log('startValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam.outInTime_begin = val._d.Format('yyyy-MM-dd hh:mm:ss')
+      },
+      endValue(val) {
+        console.log('endValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam.outInTime_end = val._d.Format('yyyy-MM-dd hh:mm:ss')
+
+      },
+    },
+    created() {
+      this.timeType = '3'
+    },
     methods: {
+      moment,
+      disabledStartDate(startValue) {
+        const endValue = this.endValue;
+        if (!startValue || !endValue) {
+          return false;
+        }
+        return startValue.valueOf() > endValue.valueOf();
+      },
+      disabledEndDate(endValue) {
+        const startValue = this.startValue;
+        if (!endValue || !startValue) {
+          return false;
+        }
+        return startValue.valueOf() >= endValue.valueOf();
+      },
+      handleStartOpenChange(open) {
+        if (!open) {
+          this.endOpen = true;
+        }
+      },
+      handleEndOpenChange(open) {
+        this.endOpen = open;
+      },
+      closeRemarks() {
+        this.selectRecord = undefined
+        this.remarksShow = false
+      },
+      showRemarksDialog(record) {
+        this.selectRecord = record
+        this.$nextTick(() => {
+          this.remarksShow = true
+        })
+      },
       getQueryParams() {
         //获取查询条件
         let sqp = {}

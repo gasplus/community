@@ -16,9 +16,6 @@
         <a-form-item label="备注内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'remarksContent', validatorRules.remarksContent]" placeholder="请输入备注内容"></a-input>
         </a-form-item>
-        <a-form-item label="备注类别" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'remarksType', validatorRules.remarksType]" placeholder="请输入备注类别"></a-input>
-        </a-form-item>
 
       </a-form>
     </a-spin>
@@ -51,9 +48,8 @@
 
         confirmLoading: false,
         validatorRules: {
-          remarksName: {},
-          remarksContent: {},
-          remarksType: {},
+          remarksName: {rules: [{ required: true, message: '请输入备注人!' }]},
+          remarksContent: {rules: [{ required: true, message: '请输入备注内容!' }]},
         },
         url: {
           add: "/monitor/monitorRecordRemarks/add",
@@ -65,15 +61,15 @@
     created() {
     },
     methods: {
-      add() {
-        this.edit({});
+      add(addData) {
+        this.edit(addData || {});
       },
       edit(record) {
         this.form.resetFields();
         this.model = Object.assign({}, record);
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'createTime', 'remarksName', 'remarksContent', 'remarksType', 'personId'))
+          this.form.setFieldsValue(pick(this.model, 'remarksName', 'remarksContent', 'remarksType', 'personId','recordId','dataId'))
         })
       },
       close() {
@@ -116,7 +112,7 @@
         this.close()
       },
       popupCallback(row) {
-        this.form.setFieldsValue(pick(row, 'createTime', 'remarksName', 'remarksContent', 'remarksType', 'personId'))
+        this.form.setFieldsValue(pick(row, 'remarksName', 'remarksContent', 'remarksType', 'personId','recordId','dataId'))
       },
 
 

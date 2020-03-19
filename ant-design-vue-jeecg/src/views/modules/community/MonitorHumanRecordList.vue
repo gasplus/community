@@ -143,6 +143,12 @@
             下载
           </a-button>
         </template>
+
+        <span slot="showRemarks" slot-scope="text,record">
+          <a @click="showRemarksDialog(record)">
+            查看备注
+          </a>
+        </span>
         <span slot="action1" slot-scope="text, record">
           <a-popover title="监控结果" trigger="hover">
             <template slot="content">
@@ -202,6 +208,15 @@
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorHumanRecord-modal ref="modalForm" @ok="modalFormOk"></monitorHumanRecord-modal>
+    <MonitorRecordRemarkListModal
+      v-if="selectRecord"
+      :recordId="selectRecord.id"
+      :dataId="selectRecord.personId"
+      :personId="selectRecord.personId"
+      remarks-type="20"
+      :recordShow="remarksShow"
+      @handleCancel="closeRemarks"
+    ></MonitorRecordRemarkListModal>
   </a-card>
 </template>
 
@@ -226,6 +241,7 @@
   import {deviceMixin} from '@/mixins/deviceMixin'
   import deviceDetail from '@/components/big/deviceDetail'
   import MonitorHumanRecordModal from './modules/MonitorHumanRecordModal'
+  import MonitorRecordRemarkListModal from './modules/MonitorRecordRemarkListModal'
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import JDate from '@/components/jeecg/JDate.vue'
@@ -239,7 +255,8 @@
       JDate,
       SelectDeviceListModal,
       MonitorHumanRecordModal,
-      deviceDetail
+      deviceDetail,
+      MonitorRecordRemarkListModal
     },
     data() {
       return {
@@ -275,6 +292,12 @@
             scopedSlots: {customRender: 'action1'}
           },
           {
+            title: '备注信息',
+            align: "center",
+            dataIndex: 'remark',
+            scopedSlots: {customRender: 'showRemarks'}
+          },
+          {
             title: '查看监控',
             align: "center",
             dataIndex: 'deviceId',
@@ -304,7 +327,9 @@
         endOpen: false,
         deviceIds: [],
         selectedDevices:[],
-        disableMixinCreated: true
+        disableMixinCreated: true,
+        selectRecord: undefined,
+        remarksShow: false
       }
     },
     watch: {
@@ -354,6 +379,16 @@
       }
     },
     methods: {
+      closeRemarks() {
+        this.selectRecord = undefined
+        this.remarksShow = false
+      },
+      showRemarksDialog(record) {
+        this.selectRecord = record
+        this.$nextTick(() => {
+          this.remarksShow = true
+        })
+      },
       showDeviceSelect() {
         this.$refs.DeviceListModal.add(this.selectedDevices,this.deviceIds);
       },
