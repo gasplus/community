@@ -122,7 +122,7 @@
           <a v-if="record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
             {{record.personName}}
           </a>
-          <span v-if="record.personId==='anonymous'">{{record.personName}}</span>
+          <a-button size="small" v-if="record.personId==='anonymous'" type="primary" @click="showRegisterPerson(record)">登记</a-button>
         </span>
 
 
@@ -131,6 +131,7 @@
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorPersonRecord-modal ref="modalForm" @ok="modalFormOk"></monitorPersonRecord-modal>
+    <MonitorRegisterPersonModal ref="modalRegisterForm" @ok="modalFormOk"></MonitorRegisterPersonModal>
     <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
     <MonitorRecordRemarkListModal
       v-if="selectRecord"
@@ -167,6 +168,7 @@
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import {deviceMixin} from '@/mixins/deviceMixin'
   import MonitorPersonRecordModal from './modules/MonitorPersonRecordModal'
+  import MonitorRegisterPersonModal from './modules/MonitorRegisterPersonModal'
   import PersonRelation from './modules/PersonRelation'
   import deviceDetail from '@/components/big/deviceDetail'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
@@ -185,7 +187,8 @@
       MonitorRecordRemarkListModal,
       MonitorPersonRecordModal,
       deviceDetail,
-      PersonRelation
+      PersonRelation,
+      MonitorRegisterPersonModal
     },
     data () {
       return {
@@ -318,6 +321,13 @@
       this.timeType = '3'
     },
     methods: {
+      showRegisterPerson(record) {
+        this.$refs.modalRegisterForm.add({
+          zhaoPian: record.photoUrl
+        });
+        this.$refs.modalRegisterForm.title = "访客登记";
+        this.$refs.modalRegisterForm.disableSubmit = false;
+      },
       moment,
       disabledStartDate(startValue) {
         const endValue = this.endValue;

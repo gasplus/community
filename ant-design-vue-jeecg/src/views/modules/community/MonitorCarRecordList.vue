@@ -110,7 +110,7 @@
           <a v-if="record.personId&&record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
             {{record.personName}}
           </a>
-          <span v-if="record.personId&&record.personId==='anonymous'">{{record.personName}}</span>
+          <a-button v-if="record.personId&&record.personId==='anonymous'" type="primary" size="small" @click="showCarRegister(record)">登记</a-button>
         </span>
 
         <span slot="show1" slot-scope="text,record">
@@ -130,6 +130,7 @@
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorCarRecord-modal ref="modalForm" @ok="modalFormOk"></monitorCarRecord-modal>
+    <MonitorRegisterCarModal ref="modalForm1" @ok="modalFormOk"></MonitorRegisterCarModal>
     <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
     <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarNumber="selectCarNumber" @close="closeCarRelation"></CarRelation>
     <MonitorRecordRemarkListModal
@@ -168,6 +169,7 @@
   import {deviceMixin} from '@/mixins/deviceMixin'
   import deviceDetail from '@/components/big/deviceDetail'
   import MonitorCarRecordModal from './modules/MonitorCarRecordModal'
+  import MonitorRegisterCarModal from './modules/MonitorRegisterCarModal'
   import MonitorRecordRemarkListModal from './modules/MonitorRecordRemarkListModal'
   import PersonRelation from './modules/PersonRelation'
   import CarRelation from './modules/CarRelation'
@@ -184,6 +186,7 @@
       MonitorRecordRemarkListModal,
       deviceDetail,
       PersonRelation,
+      MonitorRegisterCarModal,
       CarRelation
     },
     data () {
@@ -306,6 +309,16 @@
       this.timeType = '3'
     },
     methods: {
+      showCarRegister(record) {
+        console.log(record)
+        this.$refs.modalForm1.add({
+          carNumber: record.carNumber,
+          carType: '100',
+          photoUrl:record.photoUrl
+        });
+        this.$refs.modalForm1.title = "登记车辆";
+        this.$refs.modalForm1.disableSubmit = false;
+      },
       moment,
       disabledStartDate(startValue) {
         const endValue = this.endValue;
