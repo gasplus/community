@@ -109,7 +109,7 @@
           </a-button>
         </template>
         <span slot="show" slot-scope="text,record">
-          <a @click="showPersonRelation(record.id)">
+          <a @click="showPersonRelation(record)">
             {{text}}
           </a>
         </span>
@@ -134,8 +134,8 @@
 
       </a-table>
     </div>
-    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId"
-                    @close="closePersonRelation"></PersonRelation>
+    <VisitorPersonRelation v-if="personRelationShow" :selectInfo="selectPerson"
+                           @close="closePersonRelation"></VisitorPersonRelation>
     <monitorPerson-modal ref="modalForm" @ok="modalFormOk"></monitorPerson-modal>
   </a-card>
 </template>
@@ -146,7 +146,7 @@
   import MonitorPersonModal from './modules/MonitorPersonModal'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
-  import PersonRelation from './modules/PersonRelation'
+  import VisitorPersonRelation from './modules/VisitorPersonRelation'
 
   export default {
     name: "MonitorPersonList",
@@ -154,7 +154,7 @@
     components: {
       JDictSelectTag,
       MonitorPersonModal,
-      PersonRelation
+      VisitorPersonRelation
     },
     data() {
       return {
@@ -188,20 +188,15 @@
             dataIndex: 'hjdz'
           },
           {
-            title: '户关系',
-            align: "center",
-            dataIndex: 'guanXi'
-          },
-          {
             title: '联系电话',
             align: "center",
             dataIndex: 'lxdh'
           },
           {
-            title: '人员类型',
+            title: '照片',
             align: "center",
-            dataIndex: 'type',
-            scopedSlots: {customRender: 'personType'}
+            dataIndex: 'zhaoPian',
+            scopedSlots: {customRender: 'imgSlot'}
           },
           {
             title: '操作',
@@ -222,13 +217,13 @@
           A01A04A04: '吸毒人员',
         },
         url: {
-          list: "/monitor/monitorPerson/list",
+          list: "/monitor/monitorPerson/listVisitor",
           delete: "/monitor/monitorPerson/delete",
           deleteBatch: "/monitor/monitorPerson/deleteBatch",
           exportXlsUrl: "/monitor/monitorPerson/exportXls",
           importExcelUrl: "monitor/monitorPerson/importExcel",
         },
-        selectPersonId: '',
+        selectPerson: {},
         personRelationShow: false,
         dictOptions: {
           minZu: [],
@@ -244,11 +239,11 @@
     methods: {
       closePersonRelation() {
         this.personRelationShow = false
-        this.selectPersonId = ''
+        this.selectPerson = {}
       },
-      showPersonRelation(recordId) {
+      showPersonRelation(record) {
         // recordId = '1213466081813917697'
-        this.selectPersonId = recordId
+        this.selectPerson = record
         this.personRelationShow = true
       },
       initDictConfig() {

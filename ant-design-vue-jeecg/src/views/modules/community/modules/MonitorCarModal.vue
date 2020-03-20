@@ -20,34 +20,54 @@
         <a-form-item label="图片地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-upload v-decorator="['photoUrl']" :trigger-change="true"></j-upload>
         </a-form-item>
+
+        <a-form-item label="人员类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-radio-group v-model="personType" buttonStyle="solid">
+            <a-radio-button value="0">未登记</a-radio-button>
+            <a-radio-button value="1">已登记</a-radio-button>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item v-if="personType==='1'" label="人员选择" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-select
+            mode="multiple"
+            placeholder="请选择人员"
+            v-model="selectedUser"
+            @deselect="removeSelected"
+            @dropdownVisibleChange="showUserSelect"
+          >
+          </a-select>
+        </a-form-item>
         <a-form-item label="姓名" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'personName', validatorRules.personName]" placeholder="请输入姓名"></a-input>
+          <a-input v-decorator="[ 'personName', validatorRules.personName]" placeholder="请输入姓名"
+                   :disabled="personType==='1'"></a-input>
         </a-form-item>
         <a-form-item label="身份证" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'personCardId', validatorRules.personCardId]" placeholder="请输入身份证"></a-input>
-        </a-form-item>
-        <a-form-item label="布控类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['alarmType']" :trigger-change="true" dictCode="isYN"
-                             placeholder="请选择布控类型"/>
+          <a-input v-decorator="[ 'personCardId', validatorRules.personCardId]" placeholder="请输入身份证"
+                   :disabled="personType==='1'"></a-input>
         </a-form-item>
 
       </a-form>
     </a-spin>
+    <SelectUCListModal ref="UserListModal" v-if="personType==='1'" :type="'10'"
+                       @choseUserList="choseUserList"></SelectUCListModal>
   </a-modal>
 </template>
 
 <script>
 
-  import { httpAction } from '@/api/manage'
+  import {httpAction} from '@/api/manage'
+  import SelectUCListModal from './SelectUCListModal'
   import pick from 'lodash.pick'
   import JUpload from '@/components/jeecg/JUpload'
   import JDictSelectTag from "@/components/dict/JDictSelectTag"
+  import {getAction} from "../../../../api/manage";
 
   export default {
     name: "MonitorCarModal",
     components: {
       JUpload,
       JDictSelectTag,
+      SelectUCListModal
     },
     data () {
       return {
@@ -72,27 +92,98 @@
           photoUrl: {},
           personName: {rules: [{required: true, message: '请输入姓名!'}]},
           personCardId: {rules: [{required: true, message: '请输入身份证!'}]},
-          alarmType: {rules: [{required: true, message: '请输入布控类型!'}]},
         },
+        personType: '0',
+        userIds: [],
+        selectedUser: [],
         url: {
+          getUserById: '/monitor/monitorPerson/queryById',
           add: "/monitor/monitorCar/add",
-          edit: "/monitor/monitorCar/edit",
+          edit: "/monitor/monitorCar/edit"
         }
 
       }
     },
-    created () {
+    watch: {
+      personType(v) {
+        this.userIds = ''
+        this.selectedUser = []
+        this.model.personName = ''
+        this.model.personCardId = ''
+        this.model.personId = ''
+        this.$nextTick(() => {
+          this.form.setFieldsValue(pick(this.model, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'personId'))
+        })
+      }
+    },
+    created() {
     },
     methods: {
-      add () {
+      showUserSelect() {
+        this.$refs.UserListModal.add(this.selectedUser, this.userIds);
+      },
+      removeSelected(value) {
+        let deleteInd = -1
+        const userIds = this.userIds.split(',')
+        this.selectedUser.forEach((item, index) => {
+          if (item === value) {
+            deleteInd = index
+          }
+        })
+        if (deleteInd !== -1) {
+          this.selectedUser.splice(deleteInd, 1)
+          userIds.splice(deleteInd, 1)
+          this.userIds = userIds.join(',')
+        }
+        this.model.personCardId = ''
+        this.model.personName = ''
+        this.model.personId = ''
+        this.$nextTick(() => {
+          this.form.setFieldsValue(pick(this.model, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'personId'))
+        })
+      },
+      choseUserList(userList) {
+        this.selectedUser = [];
+        this.userIds = '';
+        for (let i = 0; i < userList.length; i++) {
+          this.selectedUser.push(userList[i].xingMing);
+        }
+        if (userList.length > 0) {
+          this.model.personName = userList[0].xingMing
+          this.model.personCardId = userList[0].sfzh
+        }
+        this.model.personId = this.userIds
+        this.userIds += userList.map(item => item.id).join(",")
+
+        this.$nextTick(() => {
+          this.form.setFieldsValue(pick(this.model, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'personId'))
+        })
+      },
+      queryUserById(id) {
+        const url = this.url.getUserById
+        getAction(url, {id}).then(res => {
+          if (res.success) {
+            this.selectedUser = [res.result.xingMing]
+          } else {
+            this.selectedUser = []
+          }
+        })
+      },
+      add() {
         this.edit({});
       },
-      edit (record) {
+      edit(record) {
+        console.log(record, 'edit')
         this.form.resetFields();
         this.model = Object.assign({}, record);
+        if (record.personId && record.personId !== 'anonymous') {
+          this.userIds = record.personId
+          this.personType = '1'
+          this.queryUserById(record.personId)
+        }
         this.visible = true;
         this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'alarmType'))
+          this.form.setFieldsValue(pick(this.model, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'personId'))
         })
       },
       close () {
@@ -107,20 +198,23 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            if(!this.model.id){
-              httpurl+=this.url.add;
+            if (!this.model.id) {
+              httpurl += this.url.add;
               method = 'post';
-            }else{
+            } else {
               httpurl += this.url.edit;
               method = 'put';
             }
             let formData = Object.assign(this.model, values);
-            console.log("表单提交数据",formData)
-            httpAction(httpurl,formData,method).then((res)=>{
-              if(res.success){
+            if (this.userIds) {
+              formData.personId = this.userIds
+            }
+            console.log("表单提交数据", formData)
+            httpAction(httpurl, formData, method).then((res) => {
+              if (res.success) {
                 that.$message.success(res.message);
                 that.$emit('ok');
-              }else{
+              } else {
                 that.$message.warning(res.message);
               }
             }).finally(() => {
@@ -135,7 +229,7 @@
         this.close()
       },
       popupCallback(row){
-        this.form.setFieldsValue(pick(row, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'alarmType'))
+        this.form.setFieldsValue(pick(row, 'carNumber', 'carType', 'photoUrl', 'personName', 'personCardId', 'personId'))
       },
 
 

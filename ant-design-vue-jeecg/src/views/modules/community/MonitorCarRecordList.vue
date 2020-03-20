@@ -110,7 +110,12 @@
           <a v-if="record.personId&&record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
             {{record.personName}}
           </a>
-          <a-button v-if="record.personId&&record.personId==='anonymous'" type="primary" size="small" @click="showCarRegister(record)">登记</a-button>
+
+          <span v-if="record.carId&&record.carId!=='anonymous'&&record.personId==='anonymous'">
+            {{record.personName}}
+          </span>
+          <a-button v-if="record.carId&&record.carId==='anonymous'" type="primary" size="small"
+                    @click="showCarRegister(record)">登记</a-button>
         </span>
 
         <span slot="show1" slot-scope="text,record">
@@ -313,8 +318,8 @@
         console.log(record)
         this.$refs.modalForm1.add({
           carNumber: record.carNumber,
-          carType: '100',
-          photoUrl:record.photoUrl
+          carType: '200',
+          recordId: record.id
         });
         this.$refs.modalForm1.title = "登记车辆";
         this.$refs.modalForm1.disableSubmit = false;

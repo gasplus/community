@@ -322,8 +322,12 @@
     },
     methods: {
       showRegisterPerson(record) {
+        let zhaoPian = this.getImgViewRecord(record.photoUrl)
+        //   zhaoPian = 'http://www.people.com.cn/mediafile/pic/20140624/5/15681153115536736913.jpg'
+        console.log(zhaoPian)
         this.$refs.modalRegisterForm.add({
-          zhaoPian: record.photoUrl
+          zhaoPian,
+          recordId: record.id
         });
         this.$refs.modalRegisterForm.title = "访客登记";
         this.$refs.modalRegisterForm.disableSubmit = false;

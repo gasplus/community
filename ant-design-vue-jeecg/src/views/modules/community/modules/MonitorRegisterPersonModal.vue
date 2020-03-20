@@ -32,7 +32,7 @@
           <j-dict-select-tag type="list" v-decorator="['minZu']" :trigger-change="true" dictCode="hu_mz" placeholder="请选择民族"/>
         </a-form-item>
         <a-form-item label="照片" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <img :src="form.zhaoPian" alt="" style="width:200px;">
+          <img :src="model.zhaoPian" alt="" style="width:200px;">
         </a-form-item>
 
 <!--        <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">-->

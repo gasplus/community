@@ -111,7 +111,7 @@
           <a v-if="record.personId&&record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
             {{record.personName}}
           </a>
-          <span v-if="record.personId&&record.personId==='anonymous'">{{record.personName}}</span>
+          <span v-if="!record.personId||record.personId==='anonymous'">{{record.personName}}</span>
         </span>
 
         <span slot="show1" slot-scope="text,record">
@@ -176,18 +176,6 @@
             title: '身份证',
             align: "center",
             dataIndex: 'personCardId'
-          },
-          {
-            title: '布控类型',
-            align: "center",
-            dataIndex: 'alarmType',
-            customRender: (text) => {
-              if (!text) {
-                return ''
-              } else {
-                return filterMultiDictText(this.dictOptions['alarmType'], text + "")
-              }
-            }
           },
           {
             title: '操作',

@@ -13,19 +13,11 @@
         <a-form-item label="车牌号" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'carNumber', validatorRules.carNumber]" placeholder="请输入车牌号"></a-input>
         </a-form-item>
-        <a-form-item label="车辆类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['carType']" :trigger-change="true" dictCode="carType"
-                             placeholder="请选择车辆类型"/>
-        </a-form-item>
         <a-form-item label="姓名" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'personName', validatorRules.personName]" placeholder="请输入姓名"></a-input>
         </a-form-item>
         <a-form-item label="身份证" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <a-input v-decorator="[ 'personCardId', validatorRules.personCardId]" placeholder="请输入身份证"></a-input>
-        </a-form-item>
-        <a-form-item label="布控类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['alarmType']" :trigger-change="true" dictCode="isYN"
-                             placeholder="请选择布控类型"/>
         </a-form-item>
 
       </a-form>

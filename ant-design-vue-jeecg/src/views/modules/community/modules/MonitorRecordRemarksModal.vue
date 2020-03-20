@@ -10,11 +10,11 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item label="备注人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'remarksName', validatorRules.remarksName]" placeholder="请输入备注人"></a-input>
-        </a-form-item>
+
         <a-form-item label="备注内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'remarksContent', validatorRules.remarksContent]" placeholder="请输入备注内容"></a-input>
+
+          <a-textarea v-decorator="[ 'remarksContent', validatorRules.remarksContent]"
+                      placeholder="请输入备注内容"></a-textarea>
         </a-form-item>
 
       </a-form>
@@ -48,7 +48,7 @@
 
         confirmLoading: false,
         validatorRules: {
-          remarksName: {rules: [{ required: true, message: '请输入备注人!' }]},
+
           remarksContent: {rules: [{ required: true, message: '请输入备注内容!' }]},
         },
         url: {

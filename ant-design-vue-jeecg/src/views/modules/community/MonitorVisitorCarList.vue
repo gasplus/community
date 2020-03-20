@@ -212,7 +212,7 @@
         selectCarNumber: '',
         carRelationShow: false,
         url: {
-          list: "/monitor/monitorCar/list",
+          list: "/monitor/monitorCar/listVisitor",
           delete: "/monitor/monitorCar/delete",
           deleteBatch: "/monitor/monitorCar/deleteBatch",
           exportXlsUrl: "/monitor/monitorCar/exportXls",

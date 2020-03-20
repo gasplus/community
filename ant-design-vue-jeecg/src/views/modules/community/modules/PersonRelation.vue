@@ -127,10 +127,10 @@
             <a-card title="进出记录" size="small" style="margin-bottom:10px;" :headStyle="headStyle1">
               <a-row style="line-height:30px;padding-bottom:10px;">
                 <a-col :span="8">
-                  总天数：{{tjData.totalCount||0}}天
+                  总天数：{{tjData.totalDays||0}}天
                 </a-col>
                 <a-col :span="8">
-                  总次数：{{tjData.totalDays||0}}次
+                  总次数：{{tjData.totalCount||0}}次
                 </a-col>
                 <a-col :span="8">
                   出现频率：{{tjData.rate||0}}次/天
