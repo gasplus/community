@@ -37,14 +37,13 @@
               />
             </a-form-item>
           </a-col>
-          <a-col :md="12" :sm="16">
+          <a-col :md="6" :sm="8">
             <a-form-item label="人体识别年龄">
-              <a-input placeholder="请输入最小值" class="query-group-cust" v-model="queryParam.bodyInfoAge_begin"></a-input>
-              <span class="query-group-split-cust"></span>
-              <a-input placeholder="请输入最大值" class="query-group-cust" v-model="queryParam.bodyInfoAge_end"></a-input>
+              <j-dict-select-tag placeholder="请选择人脸识别性别" v-model="queryParam.bodyInfoAge"
+                                 dictCode="body_age"/>
             </a-form-item>
           </a-col>
-          <a-col :md="24" :sm="24">
+          <a-col :md="12" :sm="24">
             <a-form-item label="设备选择">
               <a-select
                 mode="multiple"
@@ -164,7 +163,7 @@
                       <template slot="description">
                         <a-row>
                           <a-col span="12">年龄</a-col>
-                          <a-col span="12">{{JSON.parse(record.bodyInfo).age}}</a-col>
+                          <a-col span="12">{{record.bodyInfoAge_dictText}}</a-col>
                           <a-col span="12">性别</a-col>
                           <a-col span="12">{{JSON.parse(record.bodyInfo).gender}}</a-col>
                         </a-row>

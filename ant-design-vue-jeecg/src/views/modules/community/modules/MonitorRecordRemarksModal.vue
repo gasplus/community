@@ -14,7 +14,7 @@
         <a-form-item label="备注内容" :labelCol="labelCol" :wrapperCol="wrapperCol">
 
           <a-textarea v-decorator="[ 'remarksContent', validatorRules.remarksContent]"
-                      placeholder="请输入备注内容"></a-textarea>
+                      placeholder="请输入备注内容" rows="6"></a-textarea>
         </a-form-item>
 
       </a-form>

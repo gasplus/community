@@ -6,7 +6,7 @@
     </div>
     <div slot="extra">
       <a-row class="more-info">
-        <a-col :span="4">
+        <a-col :span="2">
         </a-col>
         <a-col :span="4">
           <head-info title="实有人口" :content="tongji.count+''" :center="false" :bordered="false"/>
@@ -20,7 +20,7 @@
         <a-col :span="4">
           <head-info title="重点人口" :content="tongji.A01A03+''" :center="false"/>
         </a-col>
-        <a-col :span="4">
+        <a-col :span="6">
           <head-info title="重点关注人口" :content="tongji.A01A04+''" :center="false"/>
         </a-col>
       </a-row>
@@ -51,10 +51,11 @@
             </div>
           </a-card>
 
-          <a-card :loading="loading" title="社区动态" :bordered="false">
+          <a-card :loading="loading" title="社区警情动态" :bordered="false">
             <a slot="extra" @click="go2Active">更多</a>
             <a-list>
-              <a-list-item :key="index" v-for="(item, index) in activities" style="cursor: pointer" @click="readMessage(item.id)">
+              <a-list-item :key="index" v-for="(item, index) in activities" style="cursor: pointer"
+                           @click="readMessage(item.id)">
                 <a-list-item-meta>
                   <a-avatar slot="avatar" :src="'/active.png'"/>
                   <div slot="title">
@@ -298,7 +299,7 @@
           column: 'createTime',
           status: 0,
           order: 'desc',
-          pageSize:10
+          pageSize: 5
         }).then(rel => {
           if(rel.code === 200) {
             this.activities = rel.result.records
