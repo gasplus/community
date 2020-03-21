@@ -98,7 +98,8 @@
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
-              <img :src="getImgViewRecord(text)" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+              <img :src="getImgViewRecord(text)" alt="图片不存在"
+                   style="max-width:300px;font-size: 12px;font-style: italic;"/>
             </template>
             <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </a-popover>
@@ -116,13 +117,18 @@
           </a-button>
         </template>
         <span slot="device" slot-scope="text, record">
-          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
+          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer"
+                  @click="showDeviceVideo(record.deviceId)"/>
         </span>
         <span slot="show" slot-scope="text,record">
           <a v-if="record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
             {{record.personName}}
           </a>
-          <a-button size="small" v-if="record.personId==='anonymous'" type="primary" @click="showRegisterPerson(record)">登记</a-button>
+          <a-button size="small" v-if="record.personId==='anonymous'" type="primary"
+                    @click="showRegisterPerson(record)">登记</a-button>
+        </span>
+        <span slot="taskAdd" slot-scope="text,record">
+          <a-button size="small" type="primary" @click="showTaskAdd(record)">搜索</a-button>
         </span>
 
 
@@ -138,10 +144,16 @@
       :recordId="selectRecord.id"
       :dataId="selectRecord.personId"
       :personId="selectRecord.personId"
+
       remarks-type="10"
       :recordShow="remarksShow"
       @handleCancel="closeRemarks"
     ></MonitorRecordRemarkListModal>
+    <MonitorSearchTaskModalAdd
+      :showFlag="taskShow"
+      :person-record="selectRecord"
+      @handleCancel="closeTaskAdd"
+    ></MonitorSearchTaskModalAdd>
   </a-card>
 </template>
 
@@ -169,6 +181,7 @@
   import {deviceMixin} from '@/mixins/deviceMixin'
   import MonitorPersonRecordModal from './modules/MonitorPersonRecordModal'
   import MonitorRegisterPersonModal from './modules/MonitorRegisterPersonModal'
+  import MonitorSearchTaskModalAdd from './modules/MonitorSearchTaskModalAdd'
   import PersonRelation from './modules/PersonRelation'
   import deviceDetail from '@/components/big/deviceDetail'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
@@ -185,6 +198,7 @@
       JDate,
       SelectDeviceListModal,
       MonitorRecordRemarkListModal,
+      MonitorSearchTaskModalAdd,
       MonitorPersonRecordModal,
       deviceDetail,
       PersonRelation,
@@ -192,6 +206,7 @@
     },
     data () {
       return {
+        taskShow: false,
         timeType: '',
         startValue: null,
         endValue: null,
@@ -207,18 +222,24 @@
             width:60,
             align:"center",
             customRender:function (t,r,index) {
-              return parseInt(index)+1;
+              return parseInt(index) + 1;
             }
           },
           {
-            title:'人员姓名',
+            title: '人员姓名',
             dataIndex: 'show',
             align: "center",
             scopedSlots: {customRender: 'show'}
           },
           {
-            title:'进出时间',
-            align:"center",
+            title: '以图搜人',
+            dataIndex: 'task',
+            align: "center",
+            scopedSlots: {customRender: 'taskAdd'}
+          },
+          {
+            title: '进出时间',
+            align: "center",
             dataIndex: 'outInTime'
           },
           /*
@@ -321,6 +342,14 @@
       this.timeType = '3'
     },
     methods: {
+      closeTaskAdd() {
+        this.selectRecord = undefined
+        this.taskShow = false
+      },
+      showTaskAdd(record) {
+        this.selectRecord = record
+        this.taskShow = true
+      },
       showRegisterPerson(record) {
         let zhaoPian = this.getImgViewRecord(record.photoUrl)
         //   zhaoPian = 'http://www.people.com.cn/mediafile/pic/20140624/5/15681153115536736913.jpg'

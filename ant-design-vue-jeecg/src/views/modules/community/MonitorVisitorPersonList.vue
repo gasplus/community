@@ -93,8 +93,14 @@
         </template>
         <template slot="imgSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <img v-else :src="getImgView(text)" height="25px" alt="图片不存在"
-               style="max-width:80px;font-size: 12px;font-style: italic;"/>
+          <a-popover v-else placement="topLeft" arrowPointAtCenter>
+            <template slot="content">
+              <img :src="getImgView(text)" alt="图片不存在" style="max-width:300px;font-size: 12px;font-style: italic;"/>
+            </template>
+            <img :src="getImgView(text)" height="25px" alt="图片不存在"
+                 style="max-width:80px;font-size: 12px;font-style: italic;"/>
+          </a-popover>
+
         </template>
         <template slot="fileSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>

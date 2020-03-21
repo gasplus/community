@@ -149,9 +149,9 @@
           </a>
         </span>
         <span slot="action1" slot-scope="text, record">
-          <a-popover title="监控结果" trigger="hover">
+          <a-popover title="" trigger="hover">
             <template slot="content">
-              <a-row>
+              <a-row style="background:#fff;">
                 <a-col span="12" v-if="record.bodyInfo">
                   <a-card hoverable style="width: 240px;margin:0 10px;" title="人体识别结果" size="small">
                     <img

@@ -231,10 +231,24 @@
           minZu: [],
           type: [],
         },
+        disableMixinCreated: true
       }
     },
+    watch: {
+      '$route.params'(v) {
+        if (v.type !== undefined) {
+          this.queryParam.type = v.type
+          this.loadData()
+        }
+      }
+    },
+    created() {
+      this.loadData();
+      //初始化字典配置 在自己页面定义
+      this.initDictConfig();
+    },
     computed: {
-      importExcelUrl: function(){
+      importExcelUrl: function () {
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
       }
     },
@@ -263,7 +277,6 @@
           })
         }
         this.$set(this.dictOptions, 'type', types)
-        console.log(this.dictOptions.type)
       }
 
     }

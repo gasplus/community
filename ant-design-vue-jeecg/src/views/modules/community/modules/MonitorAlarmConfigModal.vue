@@ -10,23 +10,27 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item label="监控标题" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'title', validatorRules.title]" placeholder="请输入监控标题"></a-input>
-        </a-form-item>
+        <!--        <a-form-item label="监控标题" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
+        <!--          <a-input v-decorator="[ 'title', validatorRules.title]" placeholder="请输入监控标题"></a-input>-->
+        <!--        </a-form-item>-->
         <a-form-item label="监控类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag type="list" v-decorator="['alarmType']" :trigger-change="true"
                              @change="handleChangeAlarmType"
                              dictCode="monitor_alarm_type" placeholder="请选择监控类型"/>
         </a-form-item>
-        <a-form-item v-if="selectAlarmType" :label="(selectAlarmType==='10'?'人员':'车辆')+'选择'" :labelCol="labelCol" :wrapperCol="wrapperCol">
+        <a-form-item v-if="selectAlarmType==='10'" :label="(selectAlarmType==='10'?'人员':'车辆')+'选择'" :labelCol="labelCol"
+                     :wrapperCol="wrapperCol">
           <a-select
-            mode="multiple"
+
             :placeholder="'请选择'+(selectAlarmType+''==='10'?'人员':'车辆')"
             v-model="selectedUser"
             @deselect="removeSelected"
             @dropdownVisibleChange="showUserSelect"
           >
           </a-select>
+        </a-form-item>
+        <a-form-item v-if="selectAlarmType === '20'" label="车牌号" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-input v-decorator="[ 'dataId', validatorRules.dataId]" placeholder="请输入车牌号"></a-input>
         </a-form-item>
         <a-form-item label="报警规则" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag type="list" v-decorator="['alarmRuleType']" :trigger-change="true"
@@ -85,9 +89,10 @@
 
         confirmLoading: false,
         validatorRules: {
-          title: {rules: [{required: true, message: '请输入监控标题!'}]},
+          // title: {rules: [{required: true, message: '请输入监控标题!'}]},
           alarmType: {rules: [{required: true, message: '请输入监控类型!'}]},
           alarmRuleType: {rules: [{required: true, message: '请输入报警规则!'}]},
+          dataId: {rules: [{required: true, message: '请输入车牌号!'}]},
           alarmTimeConfig: {},
           status: {},
         },
@@ -98,12 +103,15 @@
           edit: "/monitor/monitorAlarmConfig/edit",
         },
         userIds: [],
-        selectedUser:[],
+        userNames: [],
+        userIdCards: [],
+        userTypes: [],
+        selectedUser: [],
         selectAlarmType: '',
         selectAlarmRuleType: '',
         nameKey: {
           10: 'xingMing',
-          20: 'carNumber'
+          20: 'dataId'
         }
       }
     },
@@ -138,11 +146,17 @@
       choseUserList(userList) {
         this.selectedUser = [];
         this.userIds = '';
-        for(let i=0;i<userList.length;i++){
+        for (let i = 0; i < userList.length; i++) {
           this.selectedUser.push(userList[i][this.nameKey[this.selectAlarmType]]);
         }
         this.userIds += userList.map(item => item.id).join(",")
+        this.userNames += userList.map(item => item.xingMing).join(",")
+        this.userIdCards += userList.map(item => item.sfzh).join(",")
+        this.userTypes += userList.map(item => item.type).join(",")
         this.model.dataId = this.userIds
+        this.model.title = this.userNames
+        this.model.prop1 = this.userIdCards
+        this.model.prop2 = this.userTypes
       },
       queryUserById(id) {
         let url = ''

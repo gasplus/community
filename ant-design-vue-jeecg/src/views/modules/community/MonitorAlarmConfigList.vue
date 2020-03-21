@@ -5,8 +5,8 @@
       <a-form layout="inline" @keyup.enter.native="searchQuery">
         <a-row :gutter="24">
           <a-col :md="6" :sm="8">
-            <a-form-item label="监控标题">
-              <a-input placeholder="请输入监控标题" v-model="queryParam.title"></a-input>
+            <a-form-item label="监控对象">
+              <a-input placeholder="请输入监控对象" v-model="queryParam.title"></a-input>
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
@@ -159,10 +159,11 @@
             }
           },
           {
-            title: '监控标题',
+            title: '监控对象',
             align: "center",
             dataIndex: 'title'
           },
+
           {
             title: '监控类型',
             align: "center",

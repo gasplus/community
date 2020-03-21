@@ -58,8 +58,15 @@
         </template>
         <template slot="imgSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <img v-else :src="getImgView(text)" height="25px" alt="图片不存在"
-               style="max-width:80px;font-size: 12px;font-style: italic;"/>
+
+          <a-popover v-else placement="topLeft" arrowPointAtCenter>
+            <template slot="content">
+              <img :src="getImgView(text)" alt="图片不存在" style="max-width:300px;font-size: 12px;font-style: italic;"/>
+            </template>
+            <img :src="getImgView(text)" height="25px" alt="图片不存在"
+                 style="max-width:80px;font-size: 12px;font-style: italic;"/>
+          </a-popover>
+
         </template>
         <template slot="fileSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
@@ -118,6 +125,7 @@
 
 <script>
 
+  import {filterObj} from '@/utils/util';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import SelectMonitorPersonRecordList from './modules/SelectMonitorPersonRecordList'
   import MonitorSearchTaskModal from './modules/MonitorSearchTaskModal'
@@ -208,6 +216,22 @@
       }
     },
     methods: {
+      getQueryParams() {
+        //获取查询条件
+        let sqp = {}
+        if (this.superQueryParams) {
+          sqp['superQueryParams'] = encodeURI(this.superQueryParams)
+        }
+        var param = Object.assign(sqp, this.queryParam, this.isorter, this.filters);
+        if (param.searchTitle != null) {
+          param.searchTitle = "*" + param.searchTitle + "*"
+        }
+
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        return filterObj(param);
+      },
       handleView(record) {
         this.selectRecord = record
         this.jkVisible = true

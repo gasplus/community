@@ -29,15 +29,15 @@
         </a-form-item>
 
         <a-form-item label="民族" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['minZu']" :trigger-change="true" dictCode="hu_mz" placeholder="请选择民族"/>
+          <a-input v-decorator="[ 'minZu', validatorRules.minZu]" placeholder="请输入民族"></a-input>
         </a-form-item>
         <a-form-item label="照片" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <img :src="model.zhaoPian" alt="" style="width:200px;">
         </a-form-item>
 
-<!--        <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
-<!--          <a-textarea v-decorator="['memo']" rows="4" placeholder="请输入备注"/>-->
-<!--        </a-form-item>-->
+        <a-form-item label="备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-textarea v-decorator="['memo']" rows="4" placeholder="请输入备注"/>
+        </a-form-item>
 
       </a-form>
     </a-spin>
@@ -78,21 +78,21 @@
         },
 
         confirmLoading: false,
-        validatorRules:{
-        xingMing:{rules: [{ required: true, message: '请输入姓名!' }]},
-        xingBie:{},
-        csrq:{},
-        sfzh:{rules: [{ required: true, message: '请输入公民身份证号!' }]},
-        pcs:{},
-        jwh:{},
-        hjdz:{},
-        guanXi:{},
-        lxdh:{},
-        tenantId:{},
-        louDongHao:{},
-        minZu:{},
-        jieLuXiang:{},
-        fenJu:{},
+        validatorRules: {
+          xingMing: {rules: [{required: true, message: '请输入姓名!'}]},
+          xingBie: {},
+          csrq: {},
+          sfzh: {},
+          pcs: {},
+          jwh: {},
+          hjdz: {},
+          guanXi: {},
+          lxdh: {},
+          tenantId: {},
+          louDongHao: {},
+          minZu: {},
+          jieLuXiang: {},
+          fenJu: {},
         danYuanHao:{},
         fangJianHao:{},
         zhaoPian:{},

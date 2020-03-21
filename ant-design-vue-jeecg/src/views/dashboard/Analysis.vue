@@ -8,19 +8,19 @@
       <a-row class="more-info">
         <a-col :span="2">
         </a-col>
-        <a-col :span="4">
+        <a-col :span="4" @click="go2Page('modules-community-MonitorPersonList','')" style="cursor:pointer;">
           <head-info title="实有人口" :content="tongji.count+''" :center="false" :bordered="false"/>
         </a-col>
-        <a-col :span="4">
+        <a-col :span="4" @click="go2Page('modules-community-MonitorPersonList','A01A01')" style="cursor:pointer;">
           <head-info title="常住人口" :content="tongji.A01A01+''" :center="false" :bordered="false"/>
         </a-col>
-        <a-col :span="4">
+        <a-col :span="4" @click="go2Page('modules-community-MonitorPersonList','A01A02')" style="cursor:pointer;">
           <head-info title="流动人口" :content="tongji.A01A02+''" :center="false"/>
         </a-col>
-        <a-col :span="4">
+        <a-col :span="4" @click="go2Page('modules-community-MonitorPersonList','A01A03')" style="cursor:pointer;">
           <head-info title="重点人口" :content="tongji.A01A03+''" :center="false"/>
         </a-col>
-        <a-col :span="6">
+        <a-col :span="6" @click="go2Page('modules-community-MonitorPersonList','A01A04')" style="cursor:pointer;">
           <head-info title="重点关注人口" :content="tongji.A01A04+''" :center="false"/>
         </a-col>
       </a-row>
@@ -57,7 +57,7 @@
               <a-list-item :key="index" v-for="(item, index) in activities" style="cursor: pointer"
                            @click="readMessage(item.id)">
                 <a-list-item-meta>
-                  <a-avatar slot="avatar" :src="'/active.png'"/>
+                  <a-avatar slot="avatar" :src="getMessageImg(item)"/>
                   <div slot="title">
                     <span>{{ item.content }}</span>&nbsp;
                   </div>
@@ -241,7 +241,26 @@
     },
     methods: {
       ...mapGetters(["nickname", "welcome"]),
-      filterMultiDictText:filterMultiDictText,
+      filterMultiDictText: filterMultiDictText,
+      getMessageImg(item) {
+        const messageMap = {
+          1: '/message_yellow.png',
+          2: '/message_yellow.png',
+          20: '/message_green.png',
+          30: '/message_green.png',
+          40: '/message_red.png',
+          50: '/message_red.png'
+        }
+        return messageMap[item.messageType] || ''
+      },
+      go2Page(name, type) {
+        this.$router.push({
+          name: name,
+          params: {
+            type: type
+          }
+        })
+      },
       go2Project() {
         this.$router.push({
           path: '/modules/community/MonitorAlarmConfigList'
@@ -461,6 +480,7 @@
       border: 0;
       padding-top: 16px;
       margin: 16px 0 16px;
+
     }
 
     .headerContent .title .welcome-text {
