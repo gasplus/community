@@ -28,12 +28,13 @@
                 </div>
               </a-col>
               <a-col :span="3">
-                <div class="base_info_label"></div>
+                <div class="base_info_label">车辆类型</div>
               </a-col>
               <a-col :span="6">
+                {{selectCarType}}
               </a-col>
             </a-row>
-            <a-row v-if="selectCarId!=='anonymous'">
+            <a-row v-if="selectCarId!=='anonymous'&&selectInfo.personName">
               <a-col :span="3">
                 <div class="base_info_label">车主：</div>
               </a-col>
@@ -44,14 +45,15 @@
               </a-col>
 
               <a-col :span="3">
-                <div class="base_info_label"></div>
+                <div class="base_info_label">车辆颜色</div>
               </a-col>
               <a-col :span="6">
                 <div class="base_info_content">
+                  {{selectCarColor}}
                 </div>
               </a-col>
             </a-row>
-            <a-row v-if="selectCarId!=='anonymous'">
+            <a-row v-if="selectCarId!=='anonymous'&&selectInfo.personCardId">
               <a-col :span="3">
                 <div class="base_info_label">身份证号：</div>
               </a-col>
@@ -72,7 +74,8 @@
           </div>
         </div>
       </a-card>
-      <a-card title="进出记录" size="small" style="margin-bottom:10px;" :headStyle="headStyle">
+      <a-card title="进出记录" size="small" style="margin-bottom:10px;" :headStyle="headStyle"
+              v-if="selectCarNumber!=='无法识别'">
         <a-row style="line-height:30px;padding-bottom:10px;">
           <a-col :span="8">
             总天数：{{tjData.totalDays||0}}天
@@ -98,7 +101,8 @@
             <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
             <a-popover v-else placement="topLeft" arrowPointAtCenter>
               <template slot="content">
-                <img :src="getImgViewRecord(text)" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+                <img :src="getImgViewRecord(text)" alt="图片不存在"
+                     style="max-width:500px;font-size: 12px;font-style: italic;"/>
               </template>
               <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
             </a-popover>
@@ -117,6 +121,18 @@
   export default {
     name: "PersonRelation",
     props: {
+      selectCarType: {
+        type: String,
+        default() {
+          return ''
+        }
+      },
+      selectCarColor: {
+        type: String,
+        default() {
+          return ''
+        }
+      },
       selectCarId: {
         type: String,
         default() {
@@ -128,7 +144,8 @@
         default() {
           return ''
         }
-      }
+      },
+      selectCarStatus: ''
     },
     components: {
     },
@@ -202,6 +219,7 @@
         url: {
           tongji: 'monitor/monitorCarRecord/getCarStat',
           getCarById: 'monitor/monitorCar/queryById',
+          queryByCarNumber: 'monitor/monitorCar/queryByCarNumber',
           list: "/monitor/monitorCarRecord/list",
         },
         tjData: {},
@@ -230,21 +248,33 @@
         })
       },
       getCarData() {
-        getAction(this.url.getCarById, {
-          id: this.selectCarId
-        }).then(res => {
-          if(res.success){
-            console.log(res)
-            this.selectInfo = res.result
-          }
-        })
+        if (this.selectCarStatus == 'status') {
+          getAction(this.url.queryByCarNumber, {
+            carNumber: this.selectCarId
+          }).then(res => {
+            if (res.success) {
+              console.log(res)
+              this.selectInfo = res.result
+            }
+          })
+        } else {
+          getAction(this.url.getCarById, {
+            id: this.selectCarId
+          }).then(res => {
+            if (res.success) {
+              console.log(res)
+              this.selectInfo = res.result
+            }
+          })
+        }
+
       },
       /* 图片预览 */
-      getImgViewRecord(text){
-        if(text && text.indexOf(",")>0){
-          text = text.substring(0,text.indexOf(","))
-        }
-        return window._CONFIG['imgDomainRecordURL']+text
+      getImgViewRecord(text) {
+        // if(text && text.indexOf(",")>0){
+        //   text = text.substring(0,text.indexOf(","))
+        // }
+        return window._CONFIG['imgDomainRecordURL'] + text
       },
       handleTableChange(pagination, filters, sorter) {
         this.ipagination = pagination;

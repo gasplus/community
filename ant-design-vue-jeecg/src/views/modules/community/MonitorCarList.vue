@@ -10,25 +10,21 @@
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
+            <a-form-item label="姓名">
+              <a-input placeholder="请输入姓名" v-model="queryParam.personName"></a-input>
+            </a-form-item>
+          </a-col>
+          <a-col :md="6" :sm="8">
             <a-form-item label="车辆类型">
               <j-dict-select-tag placeholder="请选择车辆类型" v-model="queryParam.carType" dictCode="carType"/>
             </a-form-item>
           </a-col>
-          <template v-if="toggleSearchStatus">
-            <a-col :md="6" :sm="8">
-              <a-form-item label="布控类型">
-                <j-dict-select-tag placeholder="请选择布控类型" v-model="queryParam.alarmType" dictCode="isYN"/>
-              </a-form-item>
-            </a-col>
-          </template>
+
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
+
             </span>
           </a-col>
 
@@ -128,7 +124,7 @@
 </template>
 
 <script>
-
+  import {filterObj} from '@/utils/util';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import MonitorCarModal from './modules/MonitorCarModal'
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
@@ -222,12 +218,31 @@
         this.selectCarId = ''
         this.selectCarNumber = ''
       },
-      showCarRelation(carNumber,carId) {
+      showCarRelation(carNumber, carId) {
         // carId = '1205450244422303747'
         // carNumber = '鲁R737HH'
         this.selectCarId = carId || ''
         this.selectCarNumber = carNumber || ''
         this.carRelationShow = true
+      },
+      getQueryParams() {
+        //获取查询条件
+        let sqp = {}
+        if (this.superQueryParams) {
+          sqp['superQueryParams'] = encodeURI(this.superQueryParams)
+        }
+        var param = Object.assign(sqp, this.queryParam, this.isorter, this.filters);
+        if (param.carNumber != null) {
+          param.carNumber = "*" + param.carNumber + "*"
+        }
+        if (param.personName != null) {
+          param.personName = "*" + param.personName + "*"
+        }
+
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        return filterObj(param);
       },
       initDictConfig() {
         initDictOptions('carType').then((res) => {

@@ -205,10 +205,10 @@
       },
       /* 图片预览 */
       getImgViewRecord(text){
-        if(text && text.indexOf(",")>0){
-          text = text.substring(0,text.indexOf(","))
-        }
-        return window._CONFIG['imgDomainRecordURL']+text
+        // if(text && text.indexOf(",")>0){
+        //   text = text.substring(0,text.indexOf(","))
+        // }
+        return window._CONFIG['imgDomainRecordURL'] + text
       }
 
     }

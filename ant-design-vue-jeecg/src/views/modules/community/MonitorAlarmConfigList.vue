@@ -96,6 +96,13 @@
             下载
           </a-button>
         </template>
+
+        <span slot="showRelation" slot-scope="text,record">
+          <a @click="showPersonRelation(record)">
+            {{text}}
+          </a>
+        </span>
+
         <span slot="monitor" slot-scope="text, record">
           <a @click="showMonitorMessage(record)">查看记录</a>
         </span>
@@ -114,7 +121,13 @@
       </a-table>
     </div>
 
+    <VisitorPersonRelation v-if="personRelationShowTwo" :selectInfo="selectPerson"
+                           @close="closePersonRelationTwo"></VisitorPersonRelation>
+    <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarStatus="selectCarStatus"
+                 :selectCarNumber="selectCarNumber" @close="closeCarRelation"></CarRelation>
     <monitorAlarmConfig-modal ref="modalForm" @ok="modalFormOk"></monitorAlarmConfig-modal>
+    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId"
+                    @close="closePersonRelation"></PersonRelation>
     <a-modal
       title="告警记录"
       :width="1000"
@@ -124,6 +137,8 @@
       cancelText="关闭">
       <MonitorMessageListModal :alarm-id="alarmId" v-if="monitorMessageVisible"></MonitorMessageListModal>
     </a-modal>
+
+
   </a-card>
 </template>
 
@@ -133,17 +148,30 @@
   import MonitorAlarmConfigModal from './modules/MonitorAlarmConfigModal'
   import MonitorMessageListModal from './modules/MonitorMessageListModal'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
-  import {postAction} from "../../../api/manage";
+  import {postAction, getAction} from "../../../api/manage";
+  import VisitorPersonRelation from './modules/VisitorPersonRelation'
+  import CarRelation from './modules/CarRelation'
+  import PersonRelation from './modules/PersonRelation'
 
   export default {
     name: "MonitorAlarmConfigList",
     mixins: [JeecgListMixin],
     components: {
       MonitorAlarmConfigModal,
-      MonitorMessageListModal
+      MonitorMessageListModal,
+      VisitorPersonRelation,
+      CarRelation,
+      PersonRelation
     },
     data() {
       return {
+        personRelationShowTwo: false,
+        selectPersonId: '',
+        personRelationShow: '',
+        selectCarNumber: '',
+        selectCarId: '',
+        selectCarStatus: 'status',
+        carRelationShow: false,
         monitorMessageVisible: false,
         description: '警告配置管理页面',
         // 表头
@@ -161,7 +189,9 @@
           {
             title: '监控对象',
             align: "center",
-            dataIndex: 'title'
+            dataIndex: 'title',
+            scopedSlots: {customRender: 'showRelation'}
+
           },
 
           {
@@ -221,7 +251,10 @@
           deleteBatch: "/monitor/monitorAlarmConfig/deleteBatch",
           exportXlsUrl: "/monitor/monitorAlarmConfig/exportXls",
           importExcelUrl: "monitor/monitorAlarmConfig/importExcel",
+          queryById: '/monitor/monitorPerson/queryById'
         },
+        selectPerson: {},
+        personRelationShow: false,
         dictOptions: {
           alarmType: [],
           alarmRuleType: [],
@@ -236,6 +269,30 @@
       }
     },
     methods: {
+      closePersonRelationTwo() {
+        this.personRelationShowTwo = false
+        this.selectPerson = ''
+      },
+      closePersonRelation() {
+        this.personRelationShow = false
+        this.selectPersonId = ''
+      },
+      showPersonRelationT(recordId) {
+        this.selectPersonId = recordId
+        this.personRelationShow = true
+      },
+      closeCarRelation() {
+        this.carRelationShow = false
+        this.selectCarId = ''
+        this.selectCarNumber = ''
+      },
+      showCarRelation(carNumber, carId) {
+        // carId = '1205450244422303747'
+        // carNumber = '鲁R737HH'
+        this.selectCarId = carId || ''
+        this.selectCarNumber = carNumber || ''
+        this.carRelationShow = true
+      },
       closeMonitorMessage() {
         this.monitorMessageVisible = false
       },
@@ -270,12 +327,41 @@
         })
       },
       handleUse(record) {
-        postAction(this.url.use,{id:record.id}).then(res => {
-          if(res.success){
+        postAction(this.url.use, {id: record.id}).then(res => {
+          if (res.success) {
             this.$message.success('配置生效成功')
             this.loadData()
-          }else{
+          } else {
             this.$message.error(res.message)
+          }
+        })
+      },
+      closePersonRelation() {
+        this.personRelationShow = false
+        this.selectPerson = {}
+      },
+      showPersonRelation(record) {
+        this.selectPerson = record
+        console.log(record)
+        if (record.alarmType == 20) {
+          console.log('车辆')
+          this.showCarRelation(record.title, record.dataId, this.selectCarStatus)
+        } else if (record.alarmType == 10) {
+          if (record.prop2 == 'A01A05') {
+            console.log('人员1')
+            this.getPrersonData(record.dataId)
+          } else {
+            console.log('人员2')
+            this.showPersonRelationT(record.dataId)
+          }
+        }
+        // this.personRelationShow = true
+      },
+      getPrersonData(data) {
+        getAction(this.url.queryById, {id: data}).then(res => {
+          if (res.success) {
+            this.selectPerson = res.result
+            this.personRelationShowTwo = true
           }
         })
       },

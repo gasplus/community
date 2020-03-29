@@ -1,7 +1,13 @@
 <template>
   <div class="message_list scroll_body">
     <div class="message_list_item" v-for="(item, index) in list" :key="index" @click="clickRow(item)">
-      <div :class="'message_list_item_content '+messageTypeMap[item.messageType]">{{item.content}}</div>
+      <!--<div :class="'message_list_item_content '+messageTypeMap[item.messageType]">-->
+      <div class="message_list_item_content">
+        {{item.content}}
+        <div class="message_type_icon">
+          <img :src="getMessageImg(item)" alt="">
+        </div>
+      </div>
       <div class="message_list_item_btn">
         <!--<a-tag color="#87d068">查看</a-tag>-->
         {{item.createTime}}
@@ -24,6 +30,17 @@
       }
     },
     methods: {
+      getMessageImg(item) {
+        const messageMap = {
+          1: '/message_yellow.png',
+          2: '/message_yellow.png',
+          20: '/message_green.png',
+          30: '/message_green.png',
+          40: '/message_red.png',
+          50: '/message_red.png'
+        }
+        return messageMap[item.messageType] || ''
+      },
       clickRow(item) {
         this.$emit('clickRow', item)
       }
@@ -105,8 +122,24 @@
     margin-right: 80px;
     min-height: 20px;
     line-height: 20px;
-    padding:5px 0 5px 40px;
+    padding: 5px 0 5px 40px;
     color: #fff;
+  }
+
+  .message_type_icon {
+    position: absolute;
+    left: 10px;
+    width: 20px;
+    height: 20px;
+    top: 5px;
+  }
+
+  .message_type_icon img {
+    width: 20px;
+    height: 20px;
+    display: block;
+    margin: 0;
+    padding: 0;
   }
 
   .message_icon_gdlr {

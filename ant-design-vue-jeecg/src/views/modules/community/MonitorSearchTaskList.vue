@@ -61,7 +61,7 @@
 
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
-              <img :src="getImgView(text)" alt="图片不存在" style="max-width:300px;font-size: 12px;font-style: italic;"/>
+              <img :src="getImgView(text)" alt="图片不存在" style="max-width:500px;font-size: 12px;font-style: italic;"/>
             </template>
             <img :src="getImgView(text)" height="25px" alt="图片不存在"
                  style="max-width:80px;font-size: 12px;font-style: italic;"/>
@@ -117,7 +117,21 @@
       :width="1200"
       v-model="resultShow"
       :footer="null">
-      <MonitorSearchResultList v-if="resultShow" :searchId="selectRecord.id"></MonitorSearchResultList>
+      <div>
+        <span style="padding-right:20px;">检索结果数量：<span style="color:#1890ff;">{{getResultCount()}}</span></span>
+        <span v-if="searchStatus">
+        搜索状态：<span :style="'color:#'+(searchStatus==='30'?'8ada54':'1890ff')+';'">{{statusMap[searchStatus]}}
+        <span v-if="time>0">.</span>
+        <span v-if="time%5===1">.</span>
+        <span v-if="time%5===2">..</span>
+        <span v-if="time%5===3">...</span>
+        <span v-if="time%5===4">....</span>
+        </span></span>
+      </div>
+      <div style="padding:10px 0">
+        <a-button type="primary" style="margin-right:10px;" @click="refreshResult">刷新</a-button>
+      </div>
+      <MonitorSearchResultList ref="resultList" v-if="resultShow" :searchId="selectRecord.id"></MonitorSearchResultList>
     </a-modal>
     <monitorSearchTask-modal ref="modalForm" @ok="modalFormOk"></monitorSearchTask-modal>
   </a-card>
@@ -131,6 +145,7 @@
   import MonitorSearchTaskModal from './modules/MonitorSearchTaskModal'
   import MonitorSearchResultList from './MonitorSearchResultList'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import {getAction} from '@/api/manage'
 
   export default {
     name: "MonitorSearchTaskList",
@@ -140,12 +155,25 @@
       MonitorSearchTaskModal,
       MonitorSearchResultList
     },
+    watch: {
+      resultShow(v) {
+        if (!v) {
+          this.initData()
+        }
+      }
+    },
     data() {
       return {
+        statusMap: {
+          10: '搜索中',
+          20: '搜索中',
+          30: '已完成'
+        },
+        searchStatus: '',
         resultShow: false,
         selectRecord: undefined,
         description: '搜索任务管理页面',
-        jkVisible:false,
+        jkVisible: false,
         // 表头
         columns: [
           {
@@ -199,12 +227,15 @@
           }
         ],
         url: {
+          getStatus: "/monitor/monitorSearchTask/queryById",
           list: "/monitor/monitorSearchTask/list",
           delete: "/monitor/monitorSearchTask/delete",
           deleteBatch: "/monitor/monitorSearchTask/deleteBatch",
           exportXlsUrl: "/monitor/monitorSearchTask/exportXls",
           importExcelUrl: "monitor/monitorSearchTask/importExcel",
         },
+        time: 0,
+        timeInterval: undefined,
         dictOptions: {
           monitor_search_status: []
         },
@@ -216,6 +247,68 @@
       }
     },
     methods: {
+      showTimeCount() {
+        this.time = 1
+        if (this.timeInterval) {
+          clearInterval(this.timeInterval)
+        }
+        this.searchStatus = '10'
+        const that = this
+        this.timeInterval = setInterval(() => {
+          this.time++
+          if (this.time % 5 === 0) {
+            that.searchResultList()
+          }
+        }, 1000)
+      },
+      getResultStatus() {
+        getAction(this.url.getStatus, {id: this.selectRecord.id}).then(res => {
+          console.log(res)
+          if (res.success) {
+            this.searchStatus = res.result.searchStatus + ''
+            if (this.searchStatus === '30') {
+              if (this.timeInterval) {
+                clearInterval(this.timeInterval)
+                this.time = 0
+              }
+            }
+          }
+        })
+      },
+      initData() {
+        this.timeType = '0'
+        this.time = 0
+        this.searchStatus = ''
+        if (this.timeInterval) {
+          clearInterval(this.timeInterval)
+        }
+      },
+      searchResultList() {
+        this.$nextTick(() => {
+          this.getResultStatus()
+          this.$refs.resultList.loadData()
+        })
+      },
+      refreshResult() {
+        this.$nextTick(() => {
+          this.$refs.resultList.loadData(1)
+        })
+      },
+      getResultCount() {
+        if (this.$refs.resultList) {
+          return this.$refs.resultList.ipagination.total
+        }
+        return 0
+      },
+      getTimeStr() {
+        if (this.time / (3600) >= 1) {
+          return Math.floor(this.time / 3600) + '小时' + Math.floor(this.time % 3600 / 60) + '分钟' + this.time % 60 + '秒'
+        } else if (this.time / (60) >= 1) {
+          return Math.floor(this.time % 3600 / 60) + '分钟' + this.time % 60 + '秒'
+        } else if (this.time > 0) {
+          return this.time % 60 + '秒'
+        }
+      },
       getQueryParams() {
         //获取查询条件
         let sqp = {}
@@ -240,7 +333,9 @@
         this.selectRecord = record
         console.log(this.selectRecord)
         this.$nextTick(() => {
+          this.initData()
           this.resultShow = true
+          this.showTimeCount()
         })
 
         //MonitorSearchResultList

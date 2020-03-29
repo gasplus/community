@@ -61,16 +61,19 @@
       JDictSelectTag,
       JCategorySelect
     },
-    data () {
+    props: {
+      recordIdDJ: ''
+    },
+    data() {
       return {
         form: this.$form.createForm(this),
-        title:"访客登记",
-        width:800,
+        title: "访客登记",
+        width: 800,
         visible: false,
         model: {},
         labelCol: {
-          xs: { span: 24 },
-          sm: { span: 5 },
+          xs: {span: 24},
+          sm: {span: 5},
         },
         wrapperCol: {
           xs: { span: 24 },
@@ -135,20 +138,23 @@
             that.confirmLoading = true;
             let httpurl = '';
             let method = '';
-            if(!this.model.id){
-              httpurl+=this.url.add;
+            if (!this.model.id) {
+              httpurl += this.url.add;
               method = 'post';
-            }else{
-              httpurl+=this.url.edit;
-               method = 'put';
+            } else {
+              httpurl += this.url.edit;
+              method = 'put';
             }
             let formData = Object.assign(this.model, values);
-            console.log("表单提交数据",formData)
-            httpAction(httpurl,formData,method).then((res)=>{
-              if(res.success){
+            if (this.recordIdDJ) {
+              formData.recordId = this.recordIdDJ
+            }
+            console.log("表单提交数据", formData)
+            httpAction(httpurl, formData, method).then((res) => {
+              if (res.success) {
                 that.$message.success(res.message);
                 that.$emit('ok');
-              }else{
+              } else {
                 that.$message.warning(res.message);
               }
             }).finally(() => {

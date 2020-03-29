@@ -94,14 +94,15 @@
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
         </template>
-        <template slot="imgSlot" slot-scope="text">
+        <template slot="imgSlot" slot-scope="text,record">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
-              <img :src="getImgViewRecord(text)" alt="图片不存在"
-                   style="max-width:300px;font-size: 12px;font-style: italic;"/>
+              <img :src="getPanoramaImgViewRecord(text,record)" alt="图片不存在"
+                   style="max-width:500px;font-size: 12px;font-style: italic;"/>
             </template>
-            <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+            <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在"
+                 style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </a-popover>
         </template>
         <template slot="fileSlot" slot-scope="text">
@@ -137,8 +138,12 @@
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorPersonRecord-modal ref="modalForm" @ok="modalFormOk"></monitorPersonRecord-modal>
-    <MonitorRegisterPersonModal ref="modalRegisterForm" @ok="modalFormOk"></MonitorRegisterPersonModal>
-    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
+    <MonitorRegisterPersonModal ref="modalRegisterForm" :recordIdDJ="recordIdDJ"
+                                @ok="modalFormOk"></MonitorRegisterPersonModal>
+    <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId"
+                    @close="closePersonRelation"></PersonRelation>
+    <VisitorPersonRelation v-if="personRelationShowTwo" :selectInfo="selectPerson"
+                           @close="closePersonRelationTwo"></VisitorPersonRelation>
     <MonitorRecordRemarkListModal
       v-if="selectRecord"
       :recordId="selectRecord.id"
@@ -152,6 +157,8 @@
     <MonitorSearchTaskModalAdd
       :showFlag="taskShow"
       :person-record="selectRecord"
+      :searchType="10"
+      ref="taskAdd"
       @handleCancel="closeTaskAdd"
     ></MonitorSearchTaskModalAdd>
   </a-card>
@@ -189,10 +196,12 @@
   import JDate from '@/components/jeecg/JDate.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
   import MonitorRecordRemarkListModal from "./modules/MonitorRecordRemarkListModal";
+  import VisitorPersonRelation from './modules/VisitorPersonRelation'
+  import {getAction} from "../../../api/manage";
 
   export default {
     name: "MonitorPersonRecordList",
-    mixins:[JeecgListMixin,deviceMixin],
+    mixins: [JeecgListMixin, deviceMixin],
     components: {
       JDictSelectTag,
       JDate,
@@ -202,10 +211,14 @@
       MonitorPersonRecordModal,
       deviceDetail,
       PersonRelation,
-      MonitorRegisterPersonModal
+      MonitorRegisterPersonModal,
+      VisitorPersonRelation
     },
     data () {
       return {
+        selectPerson: {},
+        personRelationShowTwo: false,
+        recordIdDJ: '',
         taskShow: false,
         timeType: '',
         startValue: null,
@@ -290,6 +303,7 @@
           deleteBatch: "/monitor/monitorPersonRecord/deleteBatch",
           exportXlsUrl: "/monitor/monitorPersonRecord/exportXls",
           importExcelUrl: "monitor/monitorPersonRecord/importExcel",
+          queryById: '/monitor/monitorPerson/queryById'
         },
         deviceIds: [],
         selectedDevices:[],
@@ -342,6 +356,33 @@
       this.timeType = '3'
     },
     methods: {
+      closePersonRelation() {
+        this.personRelationShow = false
+        this.selectPersonId = ''
+      },
+      showPersonRelation(recordId) {
+        this.loading = true;
+        this.getPrersonData(recordId)
+      },
+      getPrersonData(data) {
+        getAction(this.url.queryById, {id: data}).then(res => {
+          if (res.success) {
+            if (res.result.type == 'A01A05') {
+              this.selectPerson = res.result
+              this.personRelationShowTwo = true
+            } else {
+              this.selectPersonId = data
+              this.personRelationShow = true
+            }
+
+          }
+          this.loading = false;
+        })
+      },
+      closePersonRelationTwo() {
+        this.personRelationShowTwo = false
+        this.selectPerson = ''
+      },
       closeTaskAdd() {
         this.selectRecord = undefined
         this.taskShow = false
@@ -349,8 +390,10 @@
       showTaskAdd(record) {
         this.selectRecord = record
         this.taskShow = true
+        this.$refs.taskAdd.initData()
       },
       showRegisterPerson(record) {
+        this.recordIdDJ = record.id
         let zhaoPian = this.getImgViewRecord(record.photoUrl)
         //   zhaoPian = 'http://www.people.com.cn/mediafile/pic/20140624/5/15681153115536736913.jpg'
         console.log(zhaoPian)
@@ -447,20 +490,21 @@
         })
       },
       /* 图片预览 */
-      getImgViewRecord(text){
-        if(text && text.indexOf(",")>0){
-          text = text.substring(0,text.indexOf(","))
+      getImgViewRecord(text) {
+        // if(text && text.indexOf(",")>0){
+        //   text = text.substring(0,text.indexOf(","))
+        // }
+        return window._CONFIG['imgDomainRecordURL'] + text
+      },
+      /*大 图片预览 */
+      getPanoramaImgViewRecord(text, record) {
+        let panoramaImg = record.panorama
+        if (panoramaImg) {
+          panoramaImg = panoramaImg
+        } else {
+          panoramaImg = text
         }
-        return window._CONFIG['imgDomainRecordURL']+text
-      },
-      closePersonRelation() {
-        this.personRelationShow = false
-        this.selectPersonId = ''
-      },
-      showPersonRelation(recordId) {
-        // recordId = '1213466081813917697'
-        this.selectPersonId = recordId
-        this.personRelationShow = true
+        return window._CONFIG['imgDomainRecordURL'] + panoramaImg
       }
 
     }

@@ -16,6 +16,13 @@
               <a-input placeholder="请输入账号查询" v-model="queryParam.xingMing"></a-input>
             </a-form-item>
           </a-col>
+
+          <a-col :span="6" v-if="type==='10'">
+            <a-form-item label="身份证号">
+              <a-input placeholder="请输入身份证号" v-model="queryParam.sfzh"></a-input>
+            </a-form-item>
+          </a-col>
+
           <a-col :span="6" v-if="type==='10'">
             <a-form-item label="联系电话">
               <a-input placeholder="请输入账号查询" v-model="queryParam.lxdh"></a-input>
@@ -96,8 +103,8 @@
             dataIndex: 'xingMing'
           },
           {
-            title:'公民身份证号',
-            align:"center",
+            title: '身份证号',
+            align: "center",
             dataIndex: 'sfzh'
           },
           {
@@ -151,23 +158,12 @@
             title: '身份证',
             align: "center",
             dataIndex: 'personCardId'
-          },
-          {
-            title: '布控类型',
-            align: "center",
-            dataIndex: 'alarmType',
-            customRender: (text) => {
-              if (!text) {
-                return ''
-              } else {
-                return filterMultiDictText(this.dictOptions['alarmType'], text + "")
-              }
-            }
           }
+
         ],
         dataSource:[],
-        url:{
-          userList: '/monitor/monitorPerson/list',
+        url: {
+          userList: '/monitor/monitorPerson/listAll',
           carList: '/monitor/monitorCar/list'
         },
         ipagination:{
@@ -205,16 +201,39 @@
       this.initDictConfig()
     },
     methods: {
-      add (selectUser,userIds) {
+      getQueryParams() {
+        //获取查询条件
+        let sqp = {}
+        if (this.superQueryParams) {
+          sqp['superQueryParams'] = encodeURI(this.superQueryParams)
+        }
+        var param = Object.assign(sqp, this.queryParam, this.isorter, this.filters);
+        if (param.xingMing != null) {
+          param.xingMing = "*" + param.xingMing + "*"
+        }
+
+        if (param.lxdh != null) {
+          param.lxdh = "*" + param.lxdh + "*"
+        }
+
+        if (param.sfzh != null) {
+          param.sfzh = "*" + param.sfzh + "*"
+        }
+        param.field = this.getQueryField();
+        param.pageNo = this.ipagination.current;
+        param.pageSize = this.ipagination.pageSize;
+        return filterObj(param);
+      },
+      add(selectUser, userIds) {
         this.visible = true;
-        this.edit(selectUser,userIds);
+        this.edit(selectUser, userIds);
         this.loadData();
       },
-      edit(selectUser,userIds){
-        if(!userIds){
+      edit(selectUser, userIds) {
+        if (!userIds) {
           this.selectedRowKeys = []
-        }else{
-          if((typeof userIds=='object')&&userIds.constructor==Array){
+        } else {
+          if ((typeof userIds == 'object') && userIds.constructor == Array) {
             this.selectedRowKeys = userIds
           }else{
             this.selectedRowKeys = userIds.split(',');
@@ -256,17 +275,7 @@
         }
 
       },
-      getQueryParams(){
-        let param = Object.assign({}, this.queryParam,this.isorter);
-        param.field = this.getQueryField();
-        //--update-begin----author:scott---date:20190818------for:新建公告时指定特定用户翻页错误SelectUserListModal #379----
-        // param.current = this.ipagination.current;
-        // param.pageSize = this.ipagination.pageSize;
-        param.pageNo = this.ipagination.current;
-        param.pageSize = this.ipagination.pageSize;
-        //--update-end----author:scott---date:20190818------for:新建公告时指定特定用户翻页错误SelectUserListModal #379---
-        return filterObj(param);
-      },
+
       getQueryField(){
         let str = "id,";
         for(let a = 0;a<this.columns.length;a++){

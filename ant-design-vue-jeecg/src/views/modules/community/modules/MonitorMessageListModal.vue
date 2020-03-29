@@ -99,7 +99,7 @@
     },
     data() {
       return {
-        imgBasePath: window._CONFIG['domianURL'] + '/',
+        imgBasePath: window._CONFIG['imgDomainRecordURL'] + '/',
         description: '监控信息管理页面',
         // 表头
         columns: [

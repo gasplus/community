@@ -90,7 +90,7 @@
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
               <img :src="getImgViewRecord(text)" alt="图片不存在"
-                   style="max-width:300px;font-size: 12px;font-style: italic;"/>
+                   style="max-width:500px;font-size: 12px;font-style: italic;"/>
             </template>
             <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </a-popover>
@@ -120,7 +120,7 @@
         </span>
 
         <span slot="show1" slot-scope="text,record">
-          <a @click="showCarRelation(record.carNumber,record.carId)">
+          <a @click="showCarRelation(record.carNumber,record.carId,record.carType2,record.carColor)">
             {{record.carNumber}}
           </a>
         </span>
@@ -138,7 +138,9 @@
     <monitorCarRecord-modal ref="modalForm" @ok="modalFormOk"></monitorCarRecord-modal>
     <MonitorRegisterCarModal ref="modalForm1" @ok="modalFormOk"></MonitorRegisterCarModal>
     <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
-    <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarNumber="selectCarNumber" @close="closeCarRelation"></CarRelation>
+    <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarNumber="selectCarNumber"
+                 :selectCarColor="selectCarColor" :selectCarType="selectCarType"
+                 @close="closeCarRelation"></CarRelation>
     <MonitorRecordRemarkListModal
       v-if="selectRecord"
       :recordId="selectRecord.id"
@@ -262,13 +264,14 @@
           exportXlsUrl: "/monitor/monitorCarRecord/exportXls",
           importExcelUrl: "monitor/monitorCarRecord/importExcel",
         },
-        dictOptions:{
-        },
+        dictOptions: {},
         deviceIds: [],
-        selectedDevices:[],
+        selectedDevices: [],
         selectPersonId: '',
         personRelationShow: false,
         selectCarId: '',
+        selectCarType: '',
+        selectCarColor: '',
         selectCarNumber: '',
         carRelationShow: false,
         selectRecord: undefined,
@@ -402,11 +405,11 @@
         this.queryParam.deviceId = this.deviceIds
       },
       /* 图片预览 */
-      getImgViewRecord(text){
-        if(text && text.indexOf(",")>0){
-          text = text.substring(0,text.indexOf(","))
-        }
-        return window._CONFIG['imgDomainRecordURL']+text
+      getImgViewRecord(text) {
+        // if(text && text.indexOf(",")>0){
+        //   text = text.substring(0,text.indexOf(","))
+        // }
+        return window._CONFIG['imgDomainRecordURL'] + text
       },
       initDictConfig(){
       },
@@ -422,13 +425,17 @@
       closeCarRelation() {
         this.carRelationShow = false
         this.selectCarId = ''
+        this.selectCarType = ''
+        this.selectCarColor = ''
         this.selectCarNumber = ''
       },
-      showCarRelation(carNumber,carId) {
+      showCarRelation(carNumber, carId, carType, carColor) {
         // carId = '1205450244422303747'
         // carNumber = '鲁R737HH'
         this.selectCarId = carId || ''
         this.selectCarNumber = carNumber || ''
+        this.selectCarType = carType || ''
+        this.selectCarColor = carColor || ''
         this.carRelationShow = true
       }
 

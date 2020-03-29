@@ -29,7 +29,7 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" style="padding:0;">
                   <div class="tongji_item">
-                    <div class="tongji_item_t" @click.stop="go2Page('/modules/community/MonitorHumanRecordList')">
+                    <div class="tongji_item_t" @click.stop="go2Page('/modules/community/MonitorPersonRecordList')">
                       <div class="tongji_item_t_label">总次数</div>
                       <div class="tongji_item_t_number">{{userToday.totalCount}}</div>
                     </div>
@@ -54,7 +54,8 @@
                 <a-popover  placement="left" trigger="hover">
                   <template slot="content">
                     <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
-                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="" style="width:200px;height:200px;"/>
+                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt=""
+                           style="width:300px;height:200px;"/>
                       <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
                     </div>
                   </template>
@@ -79,7 +80,8 @@
                 <a-popover  placement="left" trigger="hover">
                   <template slot="content">
                     <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
-                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="" style="width:200px;height:200px;"/>
+                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt=""
+                           style="width:300px;height:200px;"/>
                       <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
                     </div>
                   </template>
@@ -770,7 +772,11 @@
                 item.index = index + 1
               })
               const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
-              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:data,fields:fields}},'*');
+              console.log(JSON.stringify({data: data, fields: fields}))
+              this.$refs.mapIframe.contentWindow.postMessage({
+                funcName: 'drawPoint',
+                data: {data: data, fields: fields}
+              }, '*');
             }
           })
         },

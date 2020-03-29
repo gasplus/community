@@ -79,6 +79,16 @@
                 </div>
               </a-col>
             </a-row>
+            <a-row>
+              <a-col :span="2">
+                <div class="base_info_label">备注：</div>
+              </a-col>
+              <a-col :span="14">
+                <div class="base_info_content">
+                  {{selectInfo.memo}}
+                </div>
+              </a-col>
+            </a-row>
           </div>
         </div>
       </a-card>
@@ -101,7 +111,7 @@
             <a-popover v-else placement="topLeft" arrowPointAtCenter>
               <template slot="content">
                 <img :src="getImgViewRecord(text)" alt="图片不存在"
-                     style="max-width:80px;font-size: 12px;font-style: italic;"/>
+                     style="max-width:500px;font-size: 12px;font-style: italic;"/>
               </template>
               <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在"
                    style="max-width:80px;font-size: 12px;font-style: italic;"/>
@@ -251,7 +261,8 @@
           beginTime: beginTime,
           endTime: endTime,
           searchRecordId: this.selectInfo.id,
-          searchUrl: this.selectInfo.zhaoPian
+          searchUrl: this.selectInfo.zhaoPian,
+          searchType: 20
         }).then((res) => {
           if (res.success) {
             this.getTaskStatus()
@@ -263,9 +274,9 @@
       },
       /* 图片预览 */
       getImgViewRecord(text) {
-        if (text && text.indexOf(",") > 0) {
-          text = text.substring(0, text.indexOf(","))
-        }
+        // if (text && text.indexOf(",") > 0) {
+        //   text = text.substring(0, text.indexOf(","))
+        // }
         return window._CONFIG['imgDomainRecordURL'] + text
       },
       handleTableChange(pagination, filters, sorter) {
