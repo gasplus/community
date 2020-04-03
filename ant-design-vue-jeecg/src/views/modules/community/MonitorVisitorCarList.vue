@@ -14,21 +14,12 @@
               <j-dict-select-tag placeholder="请选择车辆类型" v-model="queryParam.carType" dictCode="carType"/>
             </a-form-item>
           </a-col>
-          <template v-if="toggleSearchStatus">
-            <a-col :md="6" :sm="8">
-              <a-form-item label="布控类型">
-                <j-dict-select-tag placeholder="请选择布控类型" v-model="queryParam.alarmType" dictCode="isYN"/>
-              </a-form-item>
-            </a-col>
-          </template>
+
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
-              <a @click="handleToggleSearch" style="margin-left: 8px">
-                {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
-              </a>
+
             </span>
           </a-col>
 

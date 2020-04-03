@@ -38,7 +38,7 @@
             </a-form-item>
           </a-col>
           <a-col :md="6" :sm="8">
-            <a-form-item label="汽车牌号">
+            <a-form-item label="车牌号">
               <a-input placeholder="请输入车牌号" v-model="queryParam.carNumber"></a-input>
             </a-form-item>
           </a-col>
@@ -54,6 +54,18 @@
               </a-select>
             </a-form-item>
           </a-col>
+          <a-col :md="6" :sm="8">
+            <a-form-item label="车辆类型">
+              <a-input placeholder="请输入车辆类型" v-model="queryParam.carType2"></a-input>
+            </a-form-item>
+          </a-col>
+
+          <a-col :md="6" :sm="8">
+            <a-form-item label="车辆颜色">
+              <a-input placeholder="请输入车辆颜色" v-model="queryParam.carColor"></a-input>
+            </a-form-item>
+          </a-col>
+
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
@@ -120,7 +132,7 @@
         </span>
 
         <span slot="show1" slot-scope="text,record">
-          <a @click="showCarRelation(record.carNumber,record.carId,record.carType2,record.carColor)">
+          <a @click="showCarRelation(record.carNumber,record.carId,record.carType2,record.carColor,record.photoUrl)">
             {{record.carNumber}}
           </a>
         </span>
@@ -139,7 +151,7 @@
     <MonitorRegisterCarModal ref="modalForm1" @ok="modalFormOk"></MonitorRegisterCarModal>
     <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
     <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarNumber="selectCarNumber"
-                 :selectCarColor="selectCarColor" :selectCarType="selectCarType"
+                 :selectCarColor="selectCarColor" :selectCarType="selectCarType" :selectPhotoUrl="selectPhotoUrl"
                  @close="closeCarRelation"></CarRelation>
     <MonitorRecordRemarkListModal
       v-if="selectRecord"
@@ -273,6 +285,7 @@
         selectCarType: '',
         selectCarColor: '',
         selectCarNumber: '',
+        selectPhotoUrl: '',
         carRelationShow: false,
         selectRecord: undefined,
         remarksShow: false
@@ -368,8 +381,14 @@
           sqp['superQueryParams'] = encodeURI(this.superQueryParams)
         }
         var param = Object.assign(sqp, this.queryParam, this.isorter, this.filters);
-        if (param.carNumber != null) {
+        if (param.carNumber) {
           param.carNumber = "*" + param.carNumber + "*"
+        }
+        if (param.carColor) {
+          param.carColor = "*" + param.carColor + "*"
+        }
+        if (param.carType2) {
+          param.carType2 = "*" + param.carType2 + "*"
         }
 
         param.field = this.getQueryField();
@@ -428,14 +447,16 @@
         this.selectCarType = ''
         this.selectCarColor = ''
         this.selectCarNumber = ''
+        this.selectPhotoUrl = ''
       },
-      showCarRelation(carNumber, carId, carType, carColor) {
+      showCarRelation(carNumber, carId, carType, carColor, photoUrl) {
         // carId = '1205450244422303747'
         // carNumber = '鲁R737HH'
         this.selectCarId = carId || ''
         this.selectCarNumber = carNumber || ''
         this.selectCarType = carType || ''
         this.selectCarColor = carColor || ''
+        this.selectPhotoUrl = photoUrl || ''
         this.carRelationShow = true
       }
 

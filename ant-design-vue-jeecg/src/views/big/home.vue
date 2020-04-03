@@ -365,8 +365,8 @@
           // accordionHeight:400,
           centerHeight: 0,
           // mapUrl: '',
-          mapUrl: 'https://www.thingjs.com/pp/2cf4c765df4d31d45a5e20ab',
-          // mapUrl: 'http://20.36.24.100:9000',
+          mapUrl: window._CONFIG['mapUrl'],
+          //mapUrl: 'http://20.36.24.100:9000',
           imagePath: window._CONFIG['imgDomainURL'],
           jkImagePath: window._CONFIG['imgDomainRecordURL'],
           dialogShow: false,
@@ -520,14 +520,14 @@
           clearInterval(this.interval);
         }
         this.interval = setInterval(() => {
-          this.getTodayStat()
-          this.getTodayCarStat()
-          this.getPersonMonitorList()
-          this.getCarMonitorList()
-          this.getMonitorMessage()
-          this.getMonitorCarStat()
-          this.getDeviceList()
-          this.getLeftTongjiData()
+          // this.getTodayStat()
+          // this.getTodayCarStat()
+          // this.getPersonMonitorList()
+          // this.getCarMonitorList()
+          // this.getMonitorMessage()
+          // this.getMonitorCarStat()
+          // this.getDeviceList()
+          // this.getLeftTongjiData()
         }, this.timeStep * 1000)
       },
       methods: {
@@ -774,7 +774,7 @@
               const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
               console.log(JSON.stringify({data: data, fields: fields}))
               this.$refs.mapIframe.contentWindow.postMessage({
-                funcName: 'drawPoint',
+                funcName: 'drawLinePoint',
                 data: {data: data, fields: fields}
               }, '*');
             }
@@ -796,7 +796,10 @@
                 item.index = index + 1
               })
               const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
-              this.$refs.mapIframe.contentWindow.postMessage({funcName:'drawPoint',data:{data:data,fields:fields}},'*');
+              this.$refs.mapIframe.contentWindow.postMessage({
+                funcName: 'drawLinePoint',
+                data: {data: data, fields: fields}
+              }, '*');
             }
           })
         },

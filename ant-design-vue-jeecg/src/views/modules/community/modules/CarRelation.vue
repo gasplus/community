@@ -22,7 +22,7 @@
               <a-col :span="3">
                 <div class="base_info_label">车牌号：</div>
               </a-col>
-              <a-col :span="6">
+              <a-col :span="3">
                 <div class="base_info_content">
                   {{selectCarNumber}}
                 </div>
@@ -30,9 +30,22 @@
               <a-col :span="3">
                 <div class="base_info_label">车辆类型</div>
               </a-col>
-              <a-col :span="6">
-                {{selectCarType}}
+              <a-col :span="3">
+                <div class="base_info_content">
+                  {{selectCarType}}
+                </div>
               </a-col>
+
+
+              <a-col :span="3">
+                <div class="base_info_label">车辆颜色</div>
+              </a-col>
+              <a-col :span="3">
+                <div class="base_info_content">
+                  {{selectCarColor}}
+                </div>
+              </a-col>
+
             </a-row>
             <a-row v-if="selectCarId!=='anonymous'&&selectInfo.personName">
               <a-col :span="3">
@@ -44,14 +57,6 @@
                 </div>
               </a-col>
 
-              <a-col :span="3">
-                <div class="base_info_label">车辆颜色</div>
-              </a-col>
-              <a-col :span="6">
-                <div class="base_info_content">
-                  {{selectCarColor}}
-                </div>
-              </a-col>
             </a-row>
             <a-row v-if="selectCarId!=='anonymous'&&selectInfo.personCardId">
               <a-col :span="3">
@@ -231,21 +236,28 @@
     },
     created() {
       this.visible = true
-      this.loadData(1)
+
       this.getCarData()
-      this.tongji()
+      if (this.selectCarNumber != "无法识别") {
+        this.tongji()
+        this.loadData(1)
+      }
+
     },
     methods: {
       tongji() {
-        getAction(this.url.tongji, {
-          carNumber: this.selectCarNumber,
-          xiaoQuId: 1
-        }).then(res => {
-          if(res.success){
-            console.log(res)
-            this.tjData = res.result
-          }
-        })
+        if (this.selectCarNumber != "无法识别") {
+          getAction(this.url.tongji, {
+            carNumber: this.selectCarNumber,
+            xiaoQuId: 1
+          }).then(res => {
+            if (res.success) {
+              console.log(res)
+              this.tjData = res.result
+            }
+          })
+        }
+
       },
       getCarData() {
         if (this.selectCarStatus == 'status') {
