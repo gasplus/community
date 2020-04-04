@@ -28,7 +28,7 @@
                 </div>
               </a-col>
               <a-col :span="3">
-                <div class="base_info_label">车辆类型</div>
+                <div class="base_info_label">车辆类型：</div>
               </a-col>
               <a-col :span="3">
                 <div class="base_info_content">
@@ -38,7 +38,7 @@
 
 
               <a-col :span="3">
-                <div class="base_info_label">车辆颜色</div>
+                <div class="base_info_label">车辆颜色：</div>
               </a-col>
               <a-col :span="3">
                 <div class="base_info_content">

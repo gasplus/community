@@ -133,25 +133,29 @@
         <span slot="monitor" slot-scope="text,record">
           <a-popover placement="top" trigger="hover" v-if="record.dataContent&&record.dataContent.indexOf('{')>=0">
             <template slot="content">
-              <a-row style="min-width:260px;">
-                <a-col span="24">
-                  <div class="monitor_img">
-                    <img
-                      alt="example"
-                      :src="imgBasePath+JSON.parse(record.dataContent).photoUrl"
-                      slot="cover"
-                    />
-                  </div>
-                </a-col>
-              </a-row>
-              <a-row>
-                <a-col span="6">进出地点</a-col>
-                <a-col span="18">{{JSON.parse(record.dataContent).address}}</a-col>
-              </a-row>
-              <a-row>
-                <a-col span="6">进出时间</a-col>
-                <a-col span="18">{{getDateStr(JSON.parse(record.dataContent).outInTime)}}</a-col>
-              </a-row>
+              <div style="background: #fff;">
+                <a-row style="min-width:260px;">
+                  <a-col span="24">
+                    <div class="monitor_img">
+                      <viewer>
+                        <img
+                          alt="example"
+                          :src="imgBasePath+JSON.parse(record.dataContent).photoUrl"
+                          slot="cover"
+                        />
+                      </viewer>
+                    </div>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col span="6">进出地点</a-col>
+                  <a-col span="18">{{JSON.parse(record.dataContent).address}}</a-col>
+                </a-row>
+                <a-row>
+                  <a-col span="6">进出时间</a-col>
+                  <a-col span="18">{{getDateStr(JSON.parse(record.dataContent).outInTime)}}</a-col>
+                </a-row>
+              </div>
             </template>
             <a>
               查看

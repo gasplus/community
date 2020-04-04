@@ -101,23 +101,23 @@
                   <img :src="imgBasePath+item.zhaoPian" alt="">
                 </div>
                 <div class="relation_item_info">
-                  <div class="relation_item_info_l">姓名:</div>
+                  <div class="relation_item_info_l">姓名：</div>
                   <div class="relation_item_info_r">{{item.xingMing}}</div>
                 </div>
                 <div class="relation_item_info">
-                  <div class="relation_item_info_l">性别:</div>
+                  <div class="relation_item_info_l">性别：</div>
                   <div class="relation_item_info_r">{{item.xingBie}}</div>
                 </div>
                 <div class="relation_item_info">
-                  <div class="relation_item_info_l">户主关系:</div>
+                  <div class="relation_item_info_l">户主关系：</div>
                   <div class="relation_item_info_r">{{item.guanXi}}</div>
                 </div>
                 <div class="relation_item_info">
-                  <div class="relation_item_info_l">身份证:</div>
+                  <div class="relation_item_info_l">身份证：</div>
                   <div class="relation_item_info_r">{{item.sfzh}}</div>
                 </div>
                 <div class="relation_item_info">
-                  <div class="relation_item_info_l">电话:</div>
+                  <div class="relation_item_info_l">电话：</div>
                   <div class="relation_item_info_r">{{item.lxdh}}</div>
                 </div>
               </div>

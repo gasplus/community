@@ -267,7 +267,7 @@
       </div>
       <personRealList v-if="personRealListShow" @leave="closePersonRealList" @showLD="showLD" :personType="personType"></personRealList>
       <DialogCard :position="position" v-show="dialogShow" @show="showPersonList" @leave="leave" ref="dialogDom"></DialogCard>
-      <PersonList v-show="personListShow" :personListData="personListData" :roomData="roomData" @close="closePersonList"></PersonList>
+      <PersonList v-show="personListShow" @drawLine="closeAndDrawLine" :personListData="personListData" :roomData="roomData" @close="closePersonList"></PersonList>
       <deviceList v-if="deviceListShow" @leave="closeDeviceList"></deviceList>
       <deviceDetail ref="deviceDetail" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
       <PersonDetail v-if="personDetailShow" @leave="closePersonDetail" :personData="personData"></PersonDetail>
@@ -401,6 +401,7 @@
             top: '100px'
           },
           url:{
+            showHouse: '/monitor/monitorPerson/getLouDongInfo',
             getLeftPerson: 'monitor/monitorPersonRecord/getTotalPersonStat',
             getLeftCar: 'monitor/monitorCarRecord/getTotalCarStat',
             readMessage: '/monitor/monitorMessage/read',
@@ -515,6 +516,10 @@
               }
             })
           }
+          if(event.data.funcName === 'showHouse'){
+            const louDong = event.data.data
+            this.showHouse(louDong)
+          }
         }, false);
         if(this.interval) {
           clearInterval(this.interval);
@@ -531,6 +536,34 @@
         }, this.timeStep * 1000)
       },
       methods: {
+        showHouse(louDong) {
+          getAction(this.url.showHouse, {xiaoQuId:1,louDongHao:louDong}).then(res => {
+            const data = res.result
+            data.louDongHao = louDong
+            if(this.$refs.mapIframe && this.$refs.mapIframe.contentWindow){
+              this.$refs.mapIframe.contentWindow.postMessage({
+                funcName:'showHouse',
+                data: data
+              },'*');
+            }else if(this.$refs.mapIframe && this.$refs.mapIframe.length>0 && this.$refs.mapIframe[0].contentWindow){
+              this.$refs.mapIframe[0].contentWindow.postMessage({
+                funcName:'showHouse',
+                data: data
+              },'*');
+            }
+
+              // "totalCount":"41",
+              // "zcCount":"34",
+              // "oldPersonCount":"0",
+              // "childrenCount":"0",
+              // "xdPersonCount":"0",
+              // "jsbPersonCount":"0",
+              // "keyPersonCount":"0",
+              // "zdrkPersonCount":"0",
+              // "ldPersonCount":"7",
+              // "zhsCount":"20",
+          })
+        },
         go2Page(url) {
           this.$router.push({
             path: url
@@ -759,6 +792,30 @@
         },
         clearTag() {
           this.$refs.mapIframe.contentWindow.postMessage({funcName:'clearTag',data:{}},'*');
+        },
+        closeAndDrawLine(item) {
+          this.dialogShow = false
+          getPersonMonitorList({
+            pageSize: 20,
+            pageNo: 1,
+            personId: item.id
+          }).then(rel => {
+            if(rel.code === 200) {
+              const data = rel.result.records
+              if(data.length===0){
+                this.$message.warning('该人员暂无监控记录')
+                return
+              }
+              data.forEach((item,index) => {
+                item.index = index + 1
+              })
+              const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
+              this.$refs.mapIframe.contentWindow.postMessage({
+                funcName: 'drawLinePoint',
+                data: {data: data, fields: fields}
+              }, '*');
+            }
+          })
         },
         drawLine(item) {
           getPersonMonitorList({
@@ -1520,7 +1577,7 @@
     top:40px;
     right:40px;
     position:absolute;
-    z-index: 4;
+    z-index: 3;
     cursor: pointer;
     background-color:rgba(0,0,0,0.6);
     border-radius: 10px;
@@ -1712,7 +1769,7 @@
     position: absolute;
     left:20px;
     top:10px;
-    z-index: 100;
+    z-index: 3;
     font-size:32px;
     color:#fff;
   }

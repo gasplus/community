@@ -81,14 +81,19 @@
                   </div>
                 </a-col>
 
-                <a-col :span="24">
-                  <div class="room_person_info" style="padding: 5px 20px;">
+                <a-col :span="8">
+                  <div class="room_person_info" style="padding: 5px 20px;border-right:none;">
                       <!--                      <a-tag color="#f50" v-if="item.type.indexOf('A01A04')>=0">{{personKeyMap[item.type]}}</a-tag>-->
                       <!--                      <a-tag color="#87d068" v-if="item.type === 'A01A01'">{{personKeyMap[item.type]}}</a-tag>-->
                       <!--                      <a-tag color="#2db7f5" v-if="item.type === 'A01A02'">{{personKeyMap[item.type]}}</a-tag>-->
                       <!--                      <a-tag color="#108ee9" v-if="item.type === 'A01A03'">{{personKeyMap[item.type]}}</a-tag>-->
                       <a-tag color="#2db7f5">{{item.typeText}}</a-tag>
                       <a-tag color="#87d068">{{item.rkxz}}</a-tag>
+                  </div>
+                </a-col>
+                <a-col :span="16">
+                  <div class="room_person_info" style="padding: 5px 20px;text-align: right;border-left:none;">
+                    <a-tag color="#2db7f5" @click="drawLine(item)">查看轨迹</a-tag>
                   </div>
                 </a-col>
               </a-row>
@@ -121,6 +126,11 @@
           }
         },
         methods: {
+          drawLine(item) {
+            item.personId = item.id
+            this.$emit('close')
+            this.$emit('drawLine', item)
+          },
           changeDY(index) {
             this.currentIndex = index
           },
