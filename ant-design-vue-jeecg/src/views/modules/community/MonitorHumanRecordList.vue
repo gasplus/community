@@ -151,7 +151,8 @@
         <span slot="action1" slot-scope="text, record">
           <a-popover title="" trigger="hover">
             <template slot="content">
-              <a-row style="background:#fff;">
+              <div style="background:#fff;">
+                <a-row>
                 <a-col span="12" v-if="record.bodyInfo">
                   <a-card hoverable style="width: 240px;margin:0 10px;" title="人体识别结果" size="small">
                     <img
@@ -162,9 +163,9 @@
                     <a-card-meta>
                       <template slot="description">
                         <a-row>
-                          <a-col span="12">年龄</a-col>
+                          <a-col span="12">年龄：</a-col>
                           <a-col span="12">{{record.bodyInfoAge_dictText}}</a-col>
-                          <a-col span="12">性别</a-col>
+                          <a-col span="12">性别：</a-col>
                           <a-col span="12">{{JSON.parse(record.bodyInfo).gender}}</a-col>
                         </a-row>
                       </template>
@@ -181,9 +182,9 @@
                     <a-card-meta title="">
                       <template slot="description">
                          <a-row>
-                          <a-col span="12">年龄</a-col>
+                          <a-col span="12">年龄：</a-col>
                           <a-col span="12">{{JSON.parse(record.faceInfo).age}}</a-col>
-                          <a-col span="12">性别</a-col>
+                          <a-col span="12">性别：</a-col>
                           <a-col span="12">{{JSON.parse(record.faceInfo).gender}}</a-col>
                         </a-row>
                       </template>
@@ -191,7 +192,7 @@
                   </a-card>
                 </a-col>
               </a-row>
-
+              </div>
             </template>
             <a-button type="primary">查看</a-button>
           </a-popover>

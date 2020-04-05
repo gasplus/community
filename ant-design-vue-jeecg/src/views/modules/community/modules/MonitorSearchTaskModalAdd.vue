@@ -139,10 +139,11 @@
         }
       },
       showFlag(v) {
-        console.log(v)
         if (v) {
+          this.timeType = ''
           this.form.resetFields();
           this.model = {};
+          this.initData()
           this.visible = true;
           this.$nextTick(() => {
             this.form.setFieldsValue(pick(this.model, 'searchTitle', 'searchUrl', 'beginTime', 'endTime'))
@@ -200,11 +201,16 @@
       }
     },
     mounted() {
-      this.timeType = '0'
     },
     methods: {
       initData() {
         this.timeType = '0'
+        const endDate = new Date()
+        this.model.beginTime = endDate.Format('yyyy-MM-dd 00:00:00')
+        this.model.endTime = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        this.$nextTick(() => {
+          this.form.setFieldsValue(pick(this.model, 'beginTime', 'endTime'))
+        })
         this.time = 0
         this.searchStatus = ''
         this.okSetting.props.disabled = false

@@ -13,24 +13,18 @@
         <!--        <a-form-item label="监控标题" :labelCol="labelCol" :wrapperCol="wrapperCol">-->
         <!--          <a-input v-decorator="[ 'title', validatorRules.title]" placeholder="请输入监控标题"></a-input>-->
         <!--        </a-form-item>-->
-        <a-form-item label="监控类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-dict-select-tag type="list" v-decorator="['alarmType', validatorRules.alarmType]" :trigger-change="true"
-                             @change="handleChangeAlarmType"
-                             dictCode="monitor_alarm_type" placeholder="请选择监控类型"/>
+        <a-form-item label="监控类型" v-if="selectAlarmType==='10'"  :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-tag>人员</a-tag>
         </a-form-item>
-        <a-form-item v-if="selectAlarmType==='10'" :label="(selectAlarmType==='10'?'人员':'车辆')+'选择'" :labelCol="labelCol"
+        <a-form-item label="监控类型" v-if="selectAlarmType==='20'"  :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-tag>车辆</a-tag>
+        </a-form-item>
+        <a-form-item v-if="selectAlarmType==='10'" :label="'监控'+(selectAlarmType==='10'?'人员':'车辆')" :labelCol="labelCol"
                      :wrapperCol="wrapperCol">
-          <a-select
-
-            :placeholder="'请选择'+(selectAlarmType+''==='10'?'人员':'车辆')"
-            v-model="selectedUser"
-            @deselect="removeSelected"
-            @dropdownVisibleChange="showUserSelect"
-          >
-          </a-select>
+          <a-tag color="blue">{{selectObj.xingMing}}</a-tag>
         </a-form-item>
         <a-form-item v-if="selectAlarmType === '20'" label="车牌号" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-input v-decorator="[ 'dataId', validatorRules.dataId]" placeholder="请输入车牌号"></a-input>
+          <a-tag color="blue">{{selectObj.carNumber}}</a-tag>
         </a-form-item>
         <a-form-item label="报警规则" :labelCol="labelCol" :wrapperCol="wrapperCol">
           <j-dict-select-tag type="list" v-decorator="['alarmRuleType', validatorRules.alarmRuleType]" :trigger-change="true"
@@ -53,7 +47,6 @@
         -->
       </a-form>
     </a-spin>
-    <SelectUCListModal ref="UserListModal" v-if="selectAlarmType" :type="selectAlarmType" @choseUserList="choseUserList"></SelectUCListModal>
   </a-modal>
 </template>
 
@@ -109,6 +102,7 @@
         userTypes: [],
         selectedUser: [],
         selectAlarmType: '',
+        selectObj: {},
         selectAlarmRuleType: '',
         nameKey: {
           10: 'xingMing',
@@ -122,75 +116,27 @@
       handleChangeAlarmRuleType(v){
         this.selectAlarmRuleType = v
       },
-      handleChangeAlarmType(v) {
-        this.userIds = ''
-        this.selectedUser = []
-        this.selectAlarmType = v
-      },
-      showUserSelect() {
-        this.$refs.UserListModal.add(this.selectedUser,this.userIds);
-      },
-      removeSelected(value) {
-        let deleteInd = -1
-        const userIds = this.userIds.split(',')
-        this.selectedUser.forEach((item,index) => {
-          if(item === value) {
-            deleteInd = index
-          }
-        })
-        if(deleteInd!==-1){
-          this.selectedUser.splice(deleteInd,1)
-          userIds.splice(deleteInd,1)
-          this.userIds = userIds.join(',')
-        }
-      },
-      choseUserList(userList) {
-        this.selectedUser = [];
-        this.userIds = '';
-        for (let i = 0; i < userList.length; i++) {
-          this.selectedUser.push(userList[i][this.nameKey[this.selectAlarmType]]);
-        }
-        this.userIds += userList.map(item => item.id).join(",")
-        this.userNames += userList.map(item => item.xingMing).join(",")
-        this.userIdCards += userList.map(item => item.sfzh).join(",")
-        this.userTypes += userList.map(item => item.type).join(",")
-        this.model.dataId = this.userIds
-        this.model.title = this.userNames
-        this.model.prop1 = this.userIdCards
-        this.model.prop2 = this.userTypes
-      },
-      queryUserById(id) {
-        let url = ''
-        if(this.selectAlarmType === '10'){
-          url = this.url.getUserById
-        }else if(this.selectAlarmType === '20'){
-          //url = this.url.getCarById
-          this.model.dataId = id
-          console.log(id)
-          this.form.setFieldsValue(pick(this.model, 'dataId'))
-          return
-        }
-        getAction(url,{id}).then(res => {
-          if(res.success){
-            this.selectedUser = [res.result[this.nameKey[this.selectAlarmType]]]
-          }else{
-            this.selectedUser = []
-          }
-        })
-      },
-      add() {
-        this.edit({
+      add(type,obj) {
+        this.selectAlarmType = type
+        this.selectAlarmRuleType = ''
+        this.selectObj = obj
+        const o = {
           status: 'N'
-        });
+        }
+        if(type==='10'){
+          o.dataId = obj.id
+          o.title = obj.xingMing
+          o.prop1 = obj.sfzh
+          o.prop2 = obj.type
+        } else if(type === '20'){
+          o.dataId = obj.carNumber
+          o.title = obj.carNumber
+        }
+        this.edit(o);
       },
       edit(record) {
         this.form.resetFields();
         this.model = Object.assign({}, record);
-        this.userIds = record.dataId
-        this.selectAlarmType = record.alarmType
-        this.selectAlarmRuleType = record.alarmRuleType
-        this.queryUserById(record.dataId)
-
         this.visible = true;
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model, 'title', 'alarmType', 'alarmRuleType', 'alarmTimeConfig', 'status','intervalDays'))
@@ -206,16 +152,10 @@
         this.form.validateFields((err, values) => {
           if (!err) {
             that.confirmLoading = true;
-            let httpurl = '';
-            let method = '';
-            if (!this.model.id) {
-              httpurl += this.url.add;
-              method = 'post';
-            } else {
-              httpurl += this.url.edit;
-              method = 'put';
-            }
+            const httpurl = this.url.add;
+            const method = 'post';
             let formData = Object.assign(this.model, values);
+            formData.alarmType = this.selectAlarmType
             console.log("表单提交数据", formData)
             httpAction(httpurl, formData, method).then((res) => {
               if (res.success) {

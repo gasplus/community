@@ -569,6 +569,8 @@
     float:left;
     margin-bottom:20px;
     cursor: pointer;
+    border-radius: 10px;
+    overflow: hidden;
   }
   .room_item_type{
     display: inline-block;
@@ -621,12 +623,15 @@
   }
   .room_green{
     border:1px solid green;
+    background: green;
   }
   .room_red{
-    border:1px solid red;
+    border:1px solid #d81e06;
+    background: #d81e06;
   }
   .room_yellow{
-    border:1px solid yellow;
+    border:1px solid #FFAF09;
+    background: #FFAF09;
   }
 
 

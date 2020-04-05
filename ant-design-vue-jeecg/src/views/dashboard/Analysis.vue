@@ -42,26 +42,44 @@
                 <a-card :bordered="false" :body-style="{ padding: 0 }">
                   <a-card-meta>
                     <div slot="title" class="card-title">
-                      <a-avatar size="default" :src="item.alarmType==='10'?'/car.png':'/person.png'"/>
-                      <a>{{ item.title }} <a-tag>{{ !item.alarmRuleType?'':filterMultiDictText(dictOptions['alarmRuleType'], item.alarmRuleType + "") }}</a-tag></a>
+                      <a-spin size="small" :spinning="!item.imgLoading">
+                        <a-avatar size="default"
+                                  :src="item.alarmType!=='10'?'/car.png':(item.personPhoto||'/person.png')"
+                        />
+                        <a><div style="position:absolute;font-weight:400;right:0px;top:0;text-align:right;width:100px;height:20px;line-height: 20px;color:#ccc;">{{item.createBy}}</div>{{ item.title }}<a-tag style="margin-left:10px;">{{ !item.alarmRuleType?'':filterMultiDictText(dictOptions['alarmRuleType'], item.alarmRuleType + "") }}<span v-if="item.alarmRuleType==='10'">（{{item.intervalDays}}天）</span></a-tag> </a>
+                      </a-spin>
                     </div>
+                    <template slot="description">
+                      <a-row>
+                        <a-col :span="12" style="text-align: left;color:#333;">
+                          <a-spin size="small" :spinning="!item.loading">
+                            告警 {{item.count||0}} 次
+                          </a-spin>
+                        </a-col>
+                        <a-col :span="12" style="text-align: right;color:#ccc;">{{item.createTime}}</a-col>
+                      </a-row>
+                    </template>
                   </a-card-meta>
                 </a-card>
               </a-card-grid>
             </div>
           </a-card>
 
-          <a-card :loading="loading" title="社区警情动态" :bordered="false">
+          <a-card :loading="loading" title="增加代办任务" :bordered="false">
             <a slot="extra" @click="go2Active">更多</a>
             <a-list>
-              <a-list-item :key="index" v-for="(item, index) in activities" style="cursor: pointer"
-                           @click="readMessage(item.id)">
+              <a-list-item :key="index" v-for="(item, index) in activities" style="cursor: pointer">
                 <a-list-item-meta>
                   <a-avatar slot="avatar" :src="getMessageImg(item)"/>
                   <div slot="title">
                     <span>{{ item.content }}</span>&nbsp;
+                    <span style="float:right" v-if="item.messageType === '50'&&item.dataContentObj.carNumber" @click="showCarRelation(item.dataContentObj)"><a-tag color="blue">{{item.dataContentObj.carNumber}}</a-tag></span>
+                    <span style="float:right" v-if="item.messageType === '40'&&item.dataContentObj.personName" @click="showPersonRelation(item.dataContentObj)"><a-tag color="blue">{{item.dataContentObj.personName}}</a-tag></span>
                   </div>
-                  <div slot="description">{{ item.createTime }}</div>
+                  <div slot="description">
+                    {{ item.createTime }}
+                    <span style="float:right"><a-tag @click="showPanelImg(item.dataContentObj)">查看图片</a-tag></span>
+                  </div>
                 </a-list-item-meta>
               </a-list-item>
             </a-list>
@@ -91,6 +109,13 @@
           </a-card>
         </a-col>
       </a-row>
+      <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId"
+                      @close="closePersonRelation"></PersonRelation>
+      <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarNumber="selectCarNumber"
+                   :selectCarColor="selectCarColor" :selectCarType="selectCarType" :selectPhotoUrl="selectPhotoUrl"
+                   @close="closeCarRelation"></CarRelation>
+      <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle" :imgUrl="imgUrl"></panelImg>
+
     </div>
   </page-layout>
 </template>
@@ -98,12 +123,15 @@
 <script>
   import {timeFix} from "@/utils/util"
   import {mapGetters} from "vuex"
+  import panelImg from '@/components/big/panelImg'
 
   import PageLayout from '@/components/page/PageLayout'
   import HeadInfo from '@/components/tools/HeadInfo'
   import Radar from '@/components/chart/Radar'
   import {getRoleList, getServiceList,getAction,putAction} from "@/api/manage"
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import PersonRelation from '@/views/modules/community/modules/PersonRelation'
+  import CarRelation from '@/views/modules/community/modules/CarRelation'
   import {
     getPersonMonitorList,
     getCarMonitorList,
@@ -124,7 +152,10 @@
     name: "Workplace",
     components: {
       PageLayout,
+      panelImg,
       HeadInfo,
+      CarRelation,
+      PersonRelation,
       Radar
     },
     data() {
@@ -185,9 +216,22 @@
         radarData: sourceData,
         radarSourceData: [],
         url: {
+          messageList: '/monitor/monitorMessage/list',
+          personDetail: 'monitor/monitorPerson/queryById',
           readMessage: '/monitor/monitorMessage/read',
           projectList: "/monitor/monitorAlarmConfig/list",
         },
+        imgUrl: '',
+        panelTitle: '',
+        panelImgShow: false,
+        carRelationShow: false,
+        personRelationShow: false,
+        selectPersonId: '',
+        selectCarId: '',
+        selectCarNumber: '',
+        selectCarColor: '',
+        selectCarType: '',
+        selectPhotoUrl: '',
         dictOptions: {
           alarmType: [],
           alarmRuleType: []
@@ -242,6 +286,35 @@
     methods: {
       ...mapGetters(["nickname", "welcome"]),
       filterMultiDictText: filterMultiDictText,
+      showPanelImg(data) {
+        const panelData = data
+        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+        this.panelTitle = panelData.address
+        this.panelImgShow = true
+
+        console.log(panelData)
+      },
+      closePanelImg() {
+        this.panelImgShow = false
+      },
+      showPersonRelation(obj) {
+        this.selectPersonId = obj.personId
+        this.personRelationShow = true
+      },
+      closePersonRelation() {
+        this.personRelationShow = false
+      },
+      showCarRelation(obj) {
+        this.selectCarId = obj.carId
+        this.selectCarNumber = obj.carNumber
+        this.selectCarColor = obj.carColor
+        this.selectCarType = obj.carType2
+        this.selectPhotoUrl = obj.photoUrl
+        this.carRelationShow = true
+      },
+      closeCarRelation() {
+        this.carRelationShow = false
+      },
       getMessageImg(item) {
         const messageMap = {
           1: '/message_yellow.png',
@@ -291,6 +364,7 @@
       getProjects() {
         getAction(this.url.projectList, {pageNo:1,pageSize:6,status: 'Y'}).then(res => {
           this.projects = res.result.records
+          this.getRecordCount()
           this.loading = false
         })
         /*
@@ -299,6 +373,29 @@
             this.projects = res.result && res.result.data
             this.loading = false
           })*/
+      },
+      getRecordCount() {
+        this.projects.forEach((item,index) => {
+          getAction(this.url.messageList, {pageNo:1,pageSize:10,alarmConfigId: item.id}).then(res => {
+            item.count = res.result.total
+            item.loading = true
+            if(item.alarmType === '10'){
+              item.isPerson = true
+              getAction(this.url.personDetail, {id: item.dataId}).then(res1 => {
+                const data = res1.result || {}
+                if(data.zhaoPian){
+                  item.personPhoto = window._CONFIG['imgDomainURL']+'/'+data.zhaoPian
+                }
+                item.imgLoading = true
+                this.$forceUpdate()
+              })
+            }else{
+              item.imgLoading = true
+            }
+            this.$forceUpdate()
+          })
+
+        })
       },
       getTongjiData() {
         getMonitorPersonTypeStat().then(rel => {
@@ -318,10 +415,18 @@
           column: 'createTime',
           status: 0,
           order: 'desc',
-          pageSize: 5
+          pageSize: 20
         }).then(rel => {
           if(rel.code === 200) {
-            this.activities = rel.result.records
+            const list = rel.result.records
+            list.forEach(item => {
+              if(item.dataContent&&item.dataContent.indexOf('{')>=0){
+                item.dataContentObj = JSON.parse(item.dataContent)
+              }else{
+                item.dataContentObj = {}
+              }
+            })
+            this.activities = list
           }
         })
       },

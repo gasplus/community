@@ -18,18 +18,23 @@
       <div style="position:absolute;left:20px;right:20px;top:20px;bottom:36px;">
         <div class="person_list_box">
           <a-row>
-            <a-col :span="8">
+            <a-col :span="6">
               <div style="margin-right:40px;">
                 <a-input placeholder="请输入人员姓名" v-model="xingming"></a-input>
               </div>
             </a-col>
-            <a-col :span="8">
+            <a-col :span="6">
+              <div style="margin-right:40px;">
+                <a-input placeholder="请输入人员身份证" v-model="idCard"></a-input>
+              </div>
+            </a-col>
+            <a-col :span="6">
 
               <div style="margin-right:40px;">
                 <a-input placeholder="请输入联系电话" v-model="lxdh"></a-input>
               </div>
             </a-col>
-            <a-col :span="8" style="padding-top:3px;">
+            <a-col :span="6" style="padding-top:3px;">
               <a-button type="primary" @click="refreshList" icon="search">查询</a-button>
             </a-col>
           </a-row>
@@ -189,6 +194,7 @@
         },
         xingming: '',
         lxdh: '',
+        idCard: '',
         personList: []
       }
     },
@@ -217,6 +223,10 @@
         if(this.xingming){
           const xingming = this.xingming
           params.xingMing = `*${xingming}*`
+        }
+        if(this.idCard){
+          const sfzh = this.idCard
+          params.sfzh = `*${sfzh}*`
         }
         if(this.lxdh){
           const lxdh = this.lxdh

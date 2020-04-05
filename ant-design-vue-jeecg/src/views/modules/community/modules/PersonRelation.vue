@@ -82,9 +82,14 @@
               <a-col :span="2">
                 <div class="base_info_label">户籍地址：</div>
               </a-col>
-              <a-col :span="14">
+              <a-col :span="12">
                 <div class="base_info_content">
                   {{selectInfo.hjdz}}
+                </div>
+              </a-col>
+              <a-col :span="2">
+                <div class="base_info_content">
+                  <a-tag color="#108ee9" @click="addAlarmConfig">AI鹰眼</a-tag>
                 </div>
               </a-col>
             </a-row>
@@ -162,12 +167,13 @@
         </a-row>
       </a-card>
     </div>
+    <MonitorAlarmConfigModalAdd ref="configAdd"></MonitorAlarmConfigModalAdd>
   </a-modal>
 </template>
 
 <script>
   import { filterObj } from '@/utils/util';
-
+  import MonitorAlarmConfigModalAdd from './MonitorAlarmConfigModalAdd'
   import { getAction } from '@/api/manage'
 
   export default {
@@ -181,6 +187,7 @@
       }
     },
     components: {
+      MonitorAlarmConfigModalAdd
     },
     data () {
       return {
@@ -265,6 +272,10 @@
       this.getRoomPerson()
     },
     methods: {
+      addAlarmConfig() {
+        console.log(this.selectInfo)
+        this.$refs.configAdd.add('10', this.selectInfo)
+      },
       tongji() {
         getAction(this.url.tongji, {
           personId: this.tabId,

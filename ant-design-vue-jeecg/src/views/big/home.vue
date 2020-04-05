@@ -9,7 +9,7 @@
           </template>
           <div class="home_head_info_item message_icon ani" style="height:30px;width:30px;margin:0;"></div>
         </a-popover>
-        <div class="home_head_info_item" style="width:40px;font-size:10px;margin:0;line-height:40px;">{{messageTotal>999?'999+':messageTotal}}</div>
+        <div class="home_head_info_item" style="width:40px;font-size:10px;margin:0;line-height:40px;color:#ff0000;">{{messageTotal>999?'999+':messageTotal}}</div>
         <div class="home_head_info_item">{{formatDate(dateData, 'yyyy-MM-dd hh:mm:ss')}}</div>
         <div class="home_head_info_item">星期{{weekMap[dateData.getDay()]}}</div>
       </div>
@@ -272,7 +272,7 @@
       <deviceDetail ref="deviceDetail" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
       <PersonDetail v-if="personDetailShow" @leave="closePersonDetail" :personData="personData"></PersonDetail>
       <carDetail v-if="carDetailShow" @leave="closeCarDetail" :carData="carData"></carDetail>
-
+      <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle" :imgUrl="imgUrl"></panelImg>
       <div class="home_c_body">
         <iframe ref="mapIframe" :src="mapUrl" frameborder="0" scrolling="no" style="border:0px;"></iframe>
       </div>
@@ -304,6 +304,7 @@
   } from "@/api/big"
   import { putAction, getAction } from "@/api/manage";
   import DialogCard from '@/components/big/dialogCard'
+  import panelImg from '@/components/big/panelImg'
   import PersonList from '@/components/big/personList'
   import PersonDetail from '@/components/big/personDetail'
   import carDetail from '@/components/big/carDetail'
@@ -315,6 +316,9 @@
       name: "home",
       data () {
         return {
+          imgUrl: '',
+          panelImgShow: false,
+          panelTitle: '',
           personType: '',
           faceCount: 0,
           carCount: 0,
@@ -418,6 +422,7 @@
         deviceList,
         deviceDetail,
         personRealList,
+        panelImg,
         DigitRoll
       },
       mounted() {
@@ -520,6 +525,10 @@
             const louDong = event.data.data
             this.showHouse(louDong)
           }
+          if(event.data.funcName === 'showPanelImg'){
+            const data = event.data
+            this.showPanelImg(data)
+          }
         }, false);
         if(this.interval) {
           clearInterval(this.interval);
@@ -536,6 +545,18 @@
         }, this.timeStep * 1000)
       },
       methods: {
+        showPanelImg(data) {
+          const panelData = data.panelData
+          const deviceData = data.data
+          this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+          this.panelTitle = panelData.address
+          this.panelImgShow = true
+
+          console.log(panelData)
+        },
+        closePanelImg() {
+          this.panelImgShow = false
+        },
         showHouse(louDong) {
           getAction(this.url.showHouse, {xiaoQuId:1,louDongHao:louDong}).then(res => {
             const data = res.result

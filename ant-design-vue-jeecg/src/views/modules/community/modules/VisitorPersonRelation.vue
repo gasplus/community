@@ -88,6 +88,12 @@
                   {{selectInfo.memo}}
                 </div>
               </a-col>
+              <a-col :span="6">&nbsp;</a-col>
+              <a-col :span="2">
+                <div class="base_info_content">
+                  <a-tag color="#108ee9">AI鹰眼</a-tag>
+                </div>
+              </a-col>
             </a-row>
           </div>
         </div>
@@ -120,6 +126,7 @@
         </a-table>
       </a-card>
     </div>
+    <MonitorAlarmConfigModalAdd ref="configAdd"></MonitorAlarmConfigModalAdd>
   </a-modal>
 </template>
 
@@ -140,7 +147,7 @@
     return fmt;
   }
   import {filterObj} from '@/utils/util';
-
+  import MonitorAlarmConfigModalAdd from './MonitorAlarmConfigModalAdd'
   import {getAction} from '@/api/manage'
   import {postAction} from "../../../../api/manage";
 
@@ -154,7 +161,9 @@
         }
       }
     },
-    components: {},
+    components: {
+      MonitorAlarmConfigModalAdd
+    },
     data() {
       return {
         imgBasePath: window._CONFIG['domianURL'] + '/',
@@ -237,6 +246,9 @@
       this.getTaskStatus()
     },
     methods: {
+      addAlarmConfig() {
+        this.$refs.configAdd.add('10', this.selectInfo)
+      },
       getTaskStatus() {
         getAction(this.url.taskStatus, {searchRecordId: this.selectInfo.id}).then((res) => {
           if (res.success) {

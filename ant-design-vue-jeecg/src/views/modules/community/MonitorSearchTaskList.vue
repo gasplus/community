@@ -208,6 +208,11 @@
             dataIndex: 'endTime'
           },
           {
+            title: '创建时间',
+            align: "center",
+            dataIndex: 'createTime'
+          },
+          {
             title: '状态',
             align: "center",
             dataIndex: 'searchStatus',

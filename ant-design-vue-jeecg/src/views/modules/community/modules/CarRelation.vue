@@ -67,12 +67,11 @@
                   {{selectInfo.personCardId}}
                 </div>
               </a-col>
-
-              <a-col :span="3">
-                <div class="base_info_label"></div>
-              </a-col>
-              <a-col :span="6">
+            </a-row>
+            <a-row>
+              <a-col :span="24">
                 <div class="base_info_content">
+                  <a-tag color="#108ee9" @click="addAlarmConfig">AI鹰眼</a-tag>
                 </div>
               </a-col>
             </a-row>
@@ -115,11 +114,13 @@
         </a-table>
       </a-card>
     </div>
+    <MonitorAlarmConfigModalAdd ref="configAdd"></MonitorAlarmConfigModalAdd>
   </a-modal>
 </template>
 
 <script>
   import { filterObj } from '@/utils/util';
+  import MonitorAlarmConfigModalAdd from './MonitorAlarmConfigModalAdd'
 
   import { getAction } from '@/api/manage'
 
@@ -153,6 +154,7 @@
       selectCarStatus: ''
     },
     components: {
+      MonitorAlarmConfigModalAdd
     },
     data () {
       return {
@@ -245,6 +247,9 @@
 
     },
     methods: {
+      addAlarmConfig() {
+        this.$refs.configAdd.add('20', {carNumber:this.selectCarNumber})
+      },
       tongji() {
         if (this.selectCarNumber != "无法识别") {
           getAction(this.url.tongji, {

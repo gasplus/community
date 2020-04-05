@@ -69,7 +69,7 @@
         bordered
         rowKey="id"
         :columns="columns"
-        :dataSource="dataSource"
+        :dataSource="tableDataList"
         :pagination="ipagination"
         :loading="loading"
         :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
@@ -104,7 +104,7 @@
         </span>
 
         <span slot="monitor" slot-scope="text, record">
-          <a @click="showMonitorMessage(record)">查看记录</a>
+          <a @click="showMonitorMessage(record)">告警记录 {{record.count||0}} 条</a>
         </span>
         <span slot="action" slot-scope="text, record">
 
@@ -163,13 +163,32 @@
       CarRelation,
       PersonRelation
     },
+    watch:{
+      dataSource:{
+        handler(list) {
+          this.tableDataList = []
+          list.forEach((o,index) => {
+            const item = Object.assign({}, o)
+            this.tableDataList.push(item)
+            getAction(this.url.messageList, {pageNo:1,pageSize:10,alarmConfigId: item.id}).then(res => {
+              item.count = res.result.total
+              this.$forceUpdate()
+            })
+          })
+          console.log(this.tableDataList)
+        },
+        deep: true
+      }
+    },
     data() {
       return {
+        dataSource: [],
         personRelationShowTwo: false,
         selectPersonId: '',
         personRelationShow: '',
         selectCarNumber: '',
         selectCarId: '',
+        tableDataList: [],
         selectCarStatus: 'status',
         carRelationShow: false,
         monitorMessageVisible: false,
@@ -244,6 +263,7 @@
           }
         ],
         url: {
+          messageList: '/monitor/monitorMessage/list',
           unUse: "/monitor/monitorAlarmConfig/invalid",
           use: "/monitor/monitorAlarmConfig/effective",
           list: "/monitor/monitorAlarmConfig/list",

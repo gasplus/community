@@ -98,7 +98,7 @@
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
-              <viewer>
+              <viewer :images="['https://dss0.baidu.com/73F1bjeh1BF3odCf/it/u=1161824910,2082346125&fm=85&s=B3A4D704481572DE582051D7030070A0']">
                 <img :src="getPanoramaImgViewRecord(text,record)" alt="图片不存在"
                      style="max-width:500px;font-size: 12px;font-style: italic;"/>
               </viewer>
