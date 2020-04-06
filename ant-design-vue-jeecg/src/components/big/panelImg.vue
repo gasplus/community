@@ -282,9 +282,10 @@
     right:220px;
     line-height: 40px;
     height:40px;
-    font-size:20px;
+    font-size:14px;
     color:#fff;
     text-align: center;
+    overflow: hidden;
   }
   .device_video video{
     width:640px;

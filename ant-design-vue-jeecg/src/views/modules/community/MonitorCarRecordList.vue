@@ -97,12 +97,14 @@
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
         </template>
-        <template slot="imgSlot" slot-scope="text">
+        <template slot="imgSlot" slot-scope="text,record">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
-              <img :src="getImgViewRecord(text)" alt="图片不存在"
-                   style="max-width:500px;font-size: 12px;font-style: italic;"/>
+              <img
+                @click="showPanelImg(record)"
+                :src="getImgViewRecord(text)" alt="图片不存在"
+                style="max-width:500px;font-size: 12px;font-style: italic;"/>
             </template>
             <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </a-popover>
@@ -162,6 +164,8 @@
       :recordShow="remarksShow"
       @handleCancel="closeRemarks"
     ></MonitorRecordRemarkListModal>
+    <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle" :imgUrl="imgUrl"></panelImg>
+
   </a-card>
 </template>
 
@@ -185,6 +189,7 @@
   }
 
   import {filterObj} from '@/utils/util';
+  import panelImg from '@/components/big/panelImg'
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import {deviceMixin} from '@/mixins/deviceMixin'
   import deviceDetail from '@/components/big/deviceDetail'
@@ -207,6 +212,7 @@
       deviceDetail,
       PersonRelation,
       MonitorRegisterCarModal,
+      panelImg,
       CarRelation
     },
     data () {
@@ -276,6 +282,9 @@
           exportXlsUrl: "/monitor/monitorCarRecord/exportXls",
           importExcelUrl: "monitor/monitorCarRecord/importExcel",
         },
+        imgUrl: '',
+        panelTitle: '',
+        panelImgShow: false,
         dictOptions: {},
         deviceIds: [],
         selectedDevices: [],
@@ -331,6 +340,17 @@
       this.timeType = '3'
     },
     methods: {
+      showPanelImg(data) {
+        const panelData = data
+        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+        this.panelTitle = panelData.address
+        this.panelImgShow = true
+
+        console.log(panelData)
+      },
+      closePanelImg() {
+        this.panelImgShow = false
+      },
       showCarRegister(record) {
         console.log(record)
         this.$refs.modalForm1.add({

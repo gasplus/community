@@ -98,10 +98,10 @@
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <a-popover v-else placement="topLeft" arrowPointAtCenter>
             <template slot="content">
-              <viewer :images="['https://dss0.baidu.com/73F1bjeh1BF3odCf/it/u=1161824910,2082346125&fm=85&s=B3A4D704481572DE582051D7030070A0']">
-                <img :src="getPanoramaImgViewRecord(text,record)" alt="图片不存在"
+              <img :src="getPanoramaImgViewRecord(text,record)"
+                   @click="showPanelImg(record)"
+                   alt="图片不存在"
                      style="max-width:500px;font-size: 12px;font-style: italic;"/>
-              </viewer>
             </template>
             <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在"
                  style="max-width:80px;font-size: 12px;font-style: italic;"/>
@@ -163,6 +163,7 @@
       ref="taskAdd"
       @handleCancel="closeTaskAdd"
     ></MonitorSearchTaskModalAdd>
+    <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle" :imgUrl="imgUrl"></panelImg>
   </a-card>
 </template>
 
@@ -186,6 +187,7 @@
   }
 
   import {filterObj} from '@/utils/util';
+  import panelImg from '@/components/big/panelImg'
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
   import {deviceMixin} from '@/mixins/deviceMixin'
   import MonitorPersonRecordModal from './modules/MonitorPersonRecordModal'
@@ -207,6 +209,7 @@
     components: {
       JDictSelectTag,
       JDate,
+      panelImg,
       SelectDeviceListModal,
       MonitorRecordRemarkListModal,
       MonitorSearchTaskModalAdd,
@@ -218,6 +221,9 @@
     },
     data () {
       return {
+        imgUrl: '',
+        panelTitle: '',
+        panelImgShow: false,
         selectPerson: {},
         personRelationShowTwo: false,
         recordIdDJ: '',
@@ -358,6 +364,16 @@
       this.timeType = '3'
     },
     methods: {
+      showPanelImg(data) {
+        const panelData = data
+        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+        this.panelTitle = panelData.address
+        this.panelImgShow = true
+        console.log(panelData)
+      },
+      closePanelImg() {
+        this.panelImgShow = false
+      },
       closePersonRelation() {
         this.personRelationShow = false
         this.selectPersonId = ''

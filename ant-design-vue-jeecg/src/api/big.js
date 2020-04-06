@@ -17,6 +17,7 @@ const api = {
   personById: 'monitor/monitorPerson/queryById',
   videoUrlConfig: 'monitor/monitorDevice/getVideoUrlConfig',
   flvUrl: 'monitor/monitorDevice/getLiveFlvUrl',
+  redMonitorMessage: 'monitor/monitorMessage/listRed',
   monitorPersonList: 'monitor/monitorPerson/list'
 }
 
@@ -160,6 +161,16 @@ export function getMonitorMessage(parameter) {
   // parameter.xiaoQuId = xiaoQuId
   return axios({
     url: api.monitorMessage,
+    method: 'get',
+    params: parameter
+  })
+}
+
+export function getRedMonitorMessage(parameter) {
+  parameter = parameter || {}
+  // parameter.xiaoQuId = xiaoQuId
+  return axios({
+    url: api.redMonitorMessage,
     method: 'get',
     params: parameter
   })

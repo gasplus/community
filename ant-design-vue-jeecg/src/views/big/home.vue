@@ -294,7 +294,7 @@
     getTodayCarStat,
     getLouDongInfo,
     getMonitorPersonTypeStat,
-    getMonitorMessage,
+    getRedMonitorMessage,
     getFangJianPerson,
     getMonitorCarStat,
     getPersonList,
@@ -926,7 +926,7 @@
         changeActivekey(key) {
         },
         getMonitorMessage() {
-          getMonitorMessage({
+          getRedMonitorMessage({
             page: 1,
             status: '0',
             column: 'createTime',

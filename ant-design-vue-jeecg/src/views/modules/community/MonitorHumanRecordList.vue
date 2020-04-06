@@ -154,7 +154,9 @@
               <div style="background:#fff;">
                 <a-row>
                 <a-col span="12" v-if="record.bodyInfo">
-                  <a-card hoverable style="width: 240px;margin:0 10px;" title="人体识别结果" size="small">
+                  <a-card
+                    @click="showPanelImg(JSON.parse(record.bodyInfo),'人体识别大图')"
+                    hoverable style="width: 240px;margin:0 10px;"title="人体识别结果" size="small">
                     <img
                       alt="example"
                       :src="imgBasePath+JSON.parse(record.bodyInfo).picture"
@@ -173,7 +175,9 @@
                   </a-card>
                 </a-col>
                 <a-col span="12" v-if="record.faceInfo">
-                  <a-card hoverable style="width: 240px;margin:0 10px;" title="人脸识别结果" size="small">
+                  <a-card
+                    @click="showPanelImg(JSON.parse(record.faceInfo),'人脸识别大图')"
+                    hoverable style="width: 240px;margin:0 10px;" title="人脸识别结果" size="small">
                     <img
                       alt="example"
                       :src="imgBasePath+JSON.parse(record.faceInfo).picture"
@@ -205,6 +209,8 @@
 
       </a-table>
     </div>
+    <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle" :imgUrl="imgUrl"></panelImg>
+
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
     <monitorHumanRecord-modal ref="modalForm" @ok="modalFormOk"></monitorHumanRecord-modal>
@@ -238,6 +244,7 @@
   }
   import moment from 'moment';
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
+  import panelImg from '@/components/big/panelImg'
   import {deviceMixin} from '@/mixins/deviceMixin'
   import deviceDetail from '@/components/big/deviceDetail'
   import MonitorHumanRecordModal from './modules/MonitorHumanRecordModal'
@@ -253,6 +260,7 @@
     components: {
       JDictSelectTag,
       JDate,
+      panelImg,
       SelectDeviceListModal,
       MonitorHumanRecordModal,
       deviceDetail,
@@ -260,6 +268,9 @@
     },
     data() {
       return {
+        imgUrl: '',
+        panelTitle: '',
+        panelImgShow: false,
         timeType: '',
         imgBasePath: window._CONFIG['imgDomainRecordURL'],
         description: '人体检测结果管理页面',
@@ -379,6 +390,18 @@
       }
     },
     methods: {
+      showPanelImg(data, title) {
+        const panelData = data
+        /*
+        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+        this.panelTitle = panelData.address
+        this.panelImgShow = true
+        */
+        console.log(panelData, title)
+      },
+      closePanelImg() {
+        this.panelImgShow = false
+      },
       closeRemarks() {
         this.selectRecord = undefined
         this.remarksShow = false
