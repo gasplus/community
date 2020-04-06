@@ -155,7 +155,7 @@
                 <a-row>
                 <a-col span="12" v-if="record.bodyInfo">
                   <a-card
-                    @click="showPanelImg(JSON.parse(record.bodyInfo),'人体识别大图')"
+                    @click="showPanelImg(JSON.parse(record.bodyInfo),'0',record)"
                     hoverable style="width: 240px;margin:0 10px;"title="人体识别结果" size="small">
                     <img
                       alt="example"
@@ -176,7 +176,7 @@
                 </a-col>
                 <a-col span="12" v-if="record.faceInfo">
                   <a-card
-                    @click="showPanelImg(JSON.parse(record.faceInfo),'人脸识别大图')"
+                    @click="showPanelImg(JSON.parse(record.faceInfo),'1',record)"
                     hoverable style="width: 240px;margin:0 10px;" title="人脸识别结果" size="small">
                     <img
                       alt="example"
@@ -390,14 +390,17 @@
       }
     },
     methods: {
-      showPanelImg(data, title) {
+      showPanelImg(data, type, record) {
         const panelData = data
-        /*
-        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
-        this.panelTitle = panelData.address
+        if(type === '0') {
+          this.panelTitle = '人体--'+record.address
+          this.imgUrl = this.imgBasePath+(panelData.panorama || panelData.picture)
+
+        }else{
+          this.panelTitle = '人脸--'+record.address
+          this.imgUrl = this.imgBasePath+(record.panorama || panelData.picture)
+        }
         this.panelImgShow = true
-        */
-        console.log(panelData, title)
       },
       closePanelImg() {
         this.panelImgShow = false
