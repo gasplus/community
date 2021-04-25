@@ -35,9 +35,14 @@
 
     <!-- 操作按钮区域 -->
     <div class="table-operator">
-      <a-button @click="handleAdd" type="primary" icon="plus">新增</a-button>
-      <a-button type="primary" icon="download" @click="handleExportXls('车辆信息')">导出</a-button>
-      <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl" @change="handleImportExcel">
+      <a-button @click="handleAdd" type="primary" icon="plus" style="margin-right:10px;">新增</a-button>
+      <a-button type="primary" icon="download" @click="handleExportXls('车辆信息')" style="margin-right:10px;">导出</a-button>
+      <a-upload name="file"
+                :showUploadList="false"
+                :multiple="false"
+                :headers="tokenHeader"
+                style="margin-right:10px;"
+                :action="importExcelUrl" @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>
       </a-upload>
       <a-dropdown v-if="selectedRowKeys.length > 0">
@@ -143,6 +148,8 @@
     },
     data() {
       return {
+        secondSearchVisible: true,
+
         description: '车辆信息管理页面',
         // 表头
         columns: [

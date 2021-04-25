@@ -109,46 +109,53 @@
     </div>
 -->
     <!-- table区域-begin -->
-    <div id="bd">
-      <a-table
-        ref="table"
-        size="middle"
-        bordered
-        rowKey="id"
-        :columns="columns"
-        :dataSource="dataSource"
-        :pagination="ipagination"
-        :loading="loading"
+    <div>
+      <a-tabs type="card">
+        <a-tab-pane key="1">
+          <span slot="tab">
+            <a-icon type="table" style="font-size:20px;"/>
+            表格
+          </span>
+          <div id="bd">
+            <a-table
+              ref="table"
+              size="middle"
+              bordered
+              rowKey="id"
+              :columns="columns"
+              :dataSource="dataSource"
+              :pagination="ipagination"
+              :loading="loading"
 
-        @change="handleTableChange">
+              @change="handleTableChange">
 
-        <template slot="htmlSlot" slot-scope="text">
-          <div v-html="text"></div>
-        </template>
-        <template slot="imgSlot" slot-scope="text">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <img v-else :src="getImgView(text)" height="25px" alt="图片不存在"
-               style="max-width:80px;font-size: 12px;font-style: italic;"/>
-        </template>
-        <template slot="fileSlot" slot-scope="text">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
-          <a-button
-            v-else
-            :ghost="true"
-            type="primary"
-            icon="download"
-            size="small"
-            @click="uploadFile(text)">
-            下载
-          </a-button>
-        </template>
+              <template slot="htmlSlot" slot-scope="text">
+                <div v-html="text"></div>
+              </template>
+              <template slot="imgSlot" slot-scope="text">
+                <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
+                <img v-else :src="getImgView(text)" height="25px" alt="图片不存在"
+                     style="max-width:80px;font-size: 12px;font-style: italic;"/>
+              </template>
+              <template slot="fileSlot" slot-scope="text">
+                <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
+                <a-button
+                  v-else
+                  :ghost="true"
+                  type="primary"
+                  icon="download"
+                  size="small"
+                  @click="uploadFile(text)">
+                  下载
+                </a-button>
+              </template>
 
-        <span slot="showRemarks" slot-scope="text,record">
+              <span slot="showRemarks" slot-scope="text,record">
           <a @click="showRemarksDialog(record)">
             查看备注
           </a>
         </span>
-        <span slot="action1" slot-scope="text, record">
+              <span slot="action1" slot-scope="text, record">
           <a-popover title="" trigger="hover">
             <template slot="content">
               <div style="background:#fff;">
@@ -156,7 +163,7 @@
                 <a-col span="12" v-if="record.bodyInfo">
                   <a-card
                     @click="showPanelImg(JSON.parse(record.bodyInfo),'0',record)"
-                    hoverable style="width: 240px;margin:0 10px;"title="人体识别结果" size="small">
+                    hoverable style="width: 240px;margin:0 10px;" title="人体识别结果" size="small">
                     <img
                       alt="example"
                       :src="imgBasePath+JSON.parse(record.bodyInfo).picture"
@@ -203,13 +210,153 @@
         </span>
 
 
-        <span slot="device" slot-scope="text, record">
-          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
+              <span slot="device" slot-scope="text, record">
+          <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer"
+                  @click="showDeviceVideo(record.deviceId)"/>
         </span>
 
-      </a-table>
+            </a-table>
+          </div>
+        </a-tab-pane>
+        <a-tab-pane key="2">
+          <span slot="tab">
+            <a-icon type="appstore" style="font-size:20px;"/>
+            列表
+          </span>
+          <a-list :grid="{ gutter: 16, xs: 1, sm: 1, md: 1, lg: 1, xl: 2, xxl: 2 }"
+                  size="small"
+                  @change="handleListChange"
+                  :data-source="dataSource">
+            <a-list-item slot="renderItem" slot-scope="item, index">
+
+              <a-card :title="''">
+                <a-row style="line-height: 40px;margin-top:-15px;">
+                  <a-col span="8">
+                    进出时间：{{item.outInTime}}
+                    <a v-if="item.deviceId"
+                       @click="showDeviceVideo(item.deviceId)"
+                       style="cursor:pointer;margin:0 5px;">
+                      <a-icon type="video-camera"/>
+                    </a>
+                  </a-col>
+                  <a-col span="12">
+                    进出地址：{{item.address}}
+                  </a-col>
+                  <a-col span="4">
+
+                    <a @click="showRemarksDialog(item)">
+                      查看备注
+                    </a>
+                  </a-col>
+                </a-row>
+                <a-row>
+                  <a-col :span="item.faceInfo&&item.bodyInfo?12:24" v-if="item.bodyInfo">
+                    <a-card :title="'人体识别结果'">
+
+                      <div class="person_card">
+                        <div class="person_card_photo">
+                          <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
+                          <!--                         @click="showPanelImg(item)"-->
+                          <!--                         alt="图片不存在"-->
+                          <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
+                          <img src="/manager.png"
+                               @click="showPanelImg(JSON.parse(item.bodyInfo),'0',item)"
+                               alt="图片不存在"
+                               style="max-width:200px;font-size: 12px;font-style: italic;"/>
+<!--                          :src="imgBasePath+JSON.parse(record.bodyInfo).picture"-->
+                        </div>
+                        <div class="person_card_info">
+                          <div class="person_card_info_row">
+                            年龄：
+                            {{item.bodyInfoAge_dictText}}
+                          </div>
+                          <div class="person_card_info_row">
+                            性别：
+                            {{JSON.parse(item.bodyInfo).gender}}
+                          </div>
+                        </div>
+                      </div>
+                    </a-card>
+                  </a-col>
+<!--                  <a-col :span="item.faceInfo&&item.bodyInfo?12:24" v-if="item.bodyInfo">-->
+<!--                    <a-card :title="'人脸识别结果'">-->
+
+<!--                      <div class="person_card">-->
+<!--                        <div class="person_card_photo">-->
+<!--                          &lt;!&ndash;                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"&ndash;&gt;-->
+<!--                          &lt;!&ndash;                         @click="showPanelImg(item)"&ndash;&gt;-->
+<!--                          &lt;!&ndash;                         alt="图片不存在"&ndash;&gt;-->
+<!--                          &lt;!&ndash;                         style="max-width:500px;font-size: 12px;font-style: italic;"/>&ndash;&gt;-->
+<!--                          <img src="/manager.png"-->
+<!--                               @click="showPanelImg(JSON.parse(item.bodyInfo),'0',item)"-->
+<!--                               alt="图片不存在"-->
+<!--                               style="max-width:200px;font-size: 12px;font-style: italic;"/>-->
+<!--&lt;!&ndash;                          :src="imgBasePath+JSON.parse(record.bodyInfo).picture"&ndash;&gt;-->
+<!--                        </div>-->
+<!--                        <div class="person_card_info">-->
+<!--                          <div class="person_card_info_row">-->
+<!--                            年龄：-->
+<!--                            {{item.bodyInfoAge_dictText}}-->
+<!--                          </div>-->
+<!--                          <div class="person_card_info_row">-->
+<!--                            性别：-->
+<!--                            {{JSON.parse(item.bodyInfo).gender}}-->
+<!--                          </div>-->
+<!--                        </div>-->
+<!--                      </div>-->
+<!--                    </a-card>-->
+<!--                  </a-col>-->
+                  <a-col :span="item.faceInfo&&item.bodyInfo?12:24" v-if="item.faceInfo">
+                    <a-card :title="'人脸识别结果'">
+                      <div class="person_card">
+                        <div class="person_card_photo">
+                          <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
+                          <!--                         @click="showPanelImg(item)"-->
+                          <!--                         alt="图片不存在"-->
+                          <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
+                          <img src="/manager.png"
+                               @click="showPanelImg(JSON.parse(item.faceInfo),'1',item)"
+                               alt="图片不存在"
+                               style="max-width:500px;font-size: 12px;font-style: italic;"/>
+<!--                          :src="imgBasePath+JSON.parse(record.faceInfo).picture"-->
+                        </div>
+                        <div class="person_card_info">
+                          <div class="person_card_info_row">
+                            年龄：
+                            {{JSON.parse(item.faceInfo).age}}
+                          </div>
+                          <div class="person_card_info_row">
+                            性别：
+                            {{JSON.parse(item.faceInfo).gender}}
+                          </div>
+                        </div>
+                      </div>
+                    </a-card>
+                  </a-col>
+                </a-row>
+              </a-card>
+            </a-list-item>
+          </a-list>
+          <div style="text-align: right;">
+            <a-pagination v-model="ipagination.current"
+                          v-bind:pageSize="ipagination.pageSize"
+                          v-bind:showTotal="ipagination.showTotal"
+                          v-bind:total="ipagination.total"
+                          v-bind:pageSizeOptions="ipagination.pageSizeOptions"
+                          v-bind:showQuickJumper="ipagination.showQuickJumper"
+                          v-bind:showSizeChanger="ipagination.showSizeChanger"
+                          @change="handleListChange"
+                          @showSizeChange="handleListChange"
+                          size="small"
+            ></a-pagination>
+          </div>
+
+        </a-tab-pane>
+      </a-tabs>
     </div>
-    <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle" :imgUrl="imgUrl"></panelImg>
+
+    <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle"
+              :imgUrl="imgUrl"></panelImg>
 
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
@@ -256,7 +403,7 @@
 
   export default {
     name: "MonitorHumanRecordList",
-    mixins: [JeecgListMixin,deviceMixin],
+    mixins: [JeecgListMixin, deviceMixin],
     components: {
       JDictSelectTag,
       JDate,
@@ -279,16 +426,16 @@
           {
             title: '#',
             dataIndex: '',
-            key:'rowIndex',
-            width:60,
-            align:"center",
-            customRender:function (t,r,index) {
-              return parseInt(index)+1;
+            key: 'rowIndex',
+            width: 60,
+            align: "center",
+            customRender: function (t, r, index) {
+              return parseInt(index) + 1;
             }
           },
           {
-            title:'进出时间',
-            align:"center",
+            title: '进出时间',
+            align: "center",
             dataIndex: 'outInTime'
           },
           {
@@ -317,7 +464,7 @@
         ],
 
         /* 排序参数 */
-        isorter:{
+        isorter: {
           column: 'outInTime',
           order: 'desc',
         },
@@ -337,7 +484,7 @@
         endValue: null,
         endOpen: false,
         deviceIds: [],
-        selectedDevices:[],
+        selectedDevices: [],
         disableMixinCreated: true,
         selectRecord: undefined,
         remarksShow: false
@@ -345,21 +492,21 @@
     },
     watch: {
       timeType(value) {
-        if(value === '0'){
+        if (value === '0') {
           const endDate = new Date()
           this.queryParam.outInTime_begin = endDate.Format('yyyy-MM-dd 00:00:00')
           this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
-        } else if(value === '1'){
+        } else if (value === '1') {
           const endDate = new Date()
-          const beginDate = new Date(endDate.getTime()-7*24*60*60*1000)
+          const beginDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000)
           this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
           this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
-        } else if(value === '2'){
+        } else if (value === '2') {
           const endDate = new Date()
-          const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+          const beginDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
           this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
           this.queryParam.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
-        } else if(value === '3'){
+        } else if (value === '3') {
           this.queryParam.outInTime_begin = ''
           this.queryParam.outInTime_end = ''
         }
@@ -385,20 +532,27 @@
       this.initDictConfig();
     },
     computed: {
-      importExcelUrl: function(){
+      importExcelUrl: function () {
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
       }
     },
     methods: {
+
+      handleListChange(page, pageSize) {
+        console.log("handleListChange")
+        this.ipagination.current = page;
+        this.ipagination.pageSize = pageSize;
+        this.loadData();
+      },
       showPanelImg(data, type, record) {
         const panelData = data
-        if(type === '0') {
-          this.panelTitle = '人体--'+record.address
-          this.imgUrl = this.imgBasePath+(panelData.panorama || panelData.picture)
+        if (type === '0') {
+          this.panelTitle = '人体--' + record.address
+          this.imgUrl = this.imgBasePath + (panelData.panorama || panelData.picture)
 
-        }else{
-          this.panelTitle = '人脸--'+record.address
-          this.imgUrl = this.imgBasePath+(record.panorama || panelData.picture)
+        } else {
+          this.panelTitle = '人脸--' + record.address
+          this.imgUrl = this.imgBasePath + (record.panorama || panelData.picture)
         }
         this.panelImgShow = true
       },
@@ -416,19 +570,19 @@
         })
       },
       showDeviceSelect() {
-        this.$refs.DeviceListModal.add(this.selectedDevices,this.deviceIds);
+        this.$refs.DeviceListModal.add(this.selectedDevices, this.deviceIds);
       },
       removeSelected(value) {
         let deleteInd = -1
         const deviceIds = this.deviceIds.split(',')
-        this.selectedDevices.forEach((item,index) => {
-          if(item === value) {
+        this.selectedDevices.forEach((item, index) => {
+          if (item === value) {
             deleteInd = index
           }
         })
-        if(deleteInd!==-1){
-          this.selectedDevices.splice(deleteInd,1)
-          deviceIds.splice(deleteInd,1)
+        if (deleteInd !== -1) {
+          this.selectedDevices.splice(deleteInd, 1)
+          deviceIds.splice(deleteInd, 1)
           this.deviceIds = deviceIds.join(',')
         }
       },
@@ -436,7 +590,7 @@
         console.log(deviceList)
         this.selectedDevices = [];
         this.deviceIds = '';
-        for(let i=0;i<deviceList.length;i++){
+        for (let i = 0; i < deviceList.length; i++) {
           this.selectedDevices.push(deviceList[i].address);
         }
         this.deviceIds += deviceList.map(item => item.deviceId).join(",")
@@ -487,10 +641,48 @@
   }
 </script>
 <style scoped>
-  @import '~@assets/less/common.less'
+  @import '~@assets/less/common.less';
+
+  .person_card {
+    position: relative;
+    margin: -24px -32px;
+  }
+
+  .person_card_photo {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 200px;
+    height: 220px;
+    line-height: 30px;
+    text-align: center;
+  }
+
+  .person_card_photo img {
+    display: block;
+    width: 200px;
+    height: 200px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .person_card_info {
+    margin-left: 210px;
+    min-height: 220px;
+    padding: 10px;
+  }
+
+  .ant-card-wider-padding .ant-card-body {
+    padding: 0;
+  }
+
+  .person_card_info_row {
+    line-height: 20px;
+    padding: 4px 0px;
+  }
 </style>
 <style>
-  #bd .ant-card-body{
-    padding:10px;
+  #bd .ant-card-body {
+    padding: 10px;
   }
 </style>
