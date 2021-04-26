@@ -91,7 +91,12 @@
         validatorRules: {
           // title: {rules: [{required: true, message: '请输入监控标题!'}]},
           alarmType: {rules: [{required: true, message: '请输入监控类型!'}]},
-          alarmRuleType: {rules: [{required: true, message: '请输入报警规则!'}]},
+          alarmRuleType: {
+            rules: [
+              {required: true, message: '请输入报警规则!'}
+              , {validator: this.validateType}
+            ]
+          },
           dataId: {rules: [{required: true, message: '请输入车牌号!'}]},
           intervalDays: {rules: [{required: true, message: '请输入间隔天数!'}]},
           alarmTimeConfig: {},
@@ -119,7 +124,7 @@
     created() {
     },
     methods: {
-      handleChangeAlarmRuleType(v){
+      handleChangeAlarmRuleType(v) {
         this.selectAlarmRuleType = v
       },
       handleChangeAlarmType(v) {
@@ -127,20 +132,28 @@
         this.selectedUser = []
         this.selectAlarmType = v
       },
+      validateType(rule, value, callback) {
+        if (this.selectAlarmType === '10' && value === '30') {
+          callback('人员不可选择模糊匹配')
+        } else {
+          callback()
+        }
+
+      },
       showUserSelect() {
-        this.$refs.UserListModal.add(this.selectedUser,this.userIds);
+        this.$refs.UserListModal.add(this.selectedUser, this.userIds);
       },
       removeSelected(value) {
         let deleteInd = -1
         const userIds = this.userIds.split(',')
-        this.selectedUser.forEach((item,index) => {
-          if(item === value) {
+        this.selectedUser.forEach((item, index) => {
+          if (item === value) {
             deleteInd = index
           }
         })
-        if(deleteInd!==-1){
-          this.selectedUser.splice(deleteInd,1)
-          userIds.splice(deleteInd,1)
+        if (deleteInd !== -1) {
+          this.selectedUser.splice(deleteInd, 1)
+          userIds.splice(deleteInd, 1)
           this.userIds = userIds.join(',')
         }
       },

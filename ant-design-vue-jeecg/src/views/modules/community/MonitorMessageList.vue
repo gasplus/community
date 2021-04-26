@@ -134,19 +134,20 @@
           <a-popover placement="top" trigger="hover" v-if="record.dataContent&&record.dataContent.indexOf('{')>=0">
             <template slot="content">
               <div style="background: #fff;">
-                <a-row style="min-width:260px;">
-                  <a-col span="24">
-                    <div class="monitor_img">
-                      <viewer>
-                        <img
-                          alt="example"
-                          :src="imgBasePath+JSON.parse(record.dataContent).photoUrl"
-                          slot="cover"
-                        />
-                      </viewer>
-                    </div>
-                  </a-col>
-                </a-row>
+                <viewer>
+                  <a-row style="min-width:260px;">
+                    <a-col span="24">
+                      <div class="monitor_img">
+                          <img
+                            :bigImg="getPanelImg(JSON.parse(record.dataContent))"
+                            alt=""
+                            :src="imgBasePath+JSON.parse(record.dataContent).photoUrl"
+                            slot="cover"
+                          />
+                      </div>
+                    </a-col>
+                  </a-row>
+                </viewer>
                 <a-row>
                   <a-col span="6">进出地点</a-col>
                   <a-col span="18">{{JSON.parse(record.dataContent).address}}</a-col>
@@ -180,7 +181,10 @@
 </template>
 
 <script>
+
+  import Viewer from 'viewerjs'
   import moment from "moment";
+
   Date.prototype.Format = function (fmt) { //author: meizz
     const o = {
       "M+": this.getMonth() + 1, //月份
@@ -218,7 +222,7 @@
         startValue: null,
         endValue: null,
         endOpen: false,
-        imgBasePath: window._CONFIG['imgDomainRecordURL'] + '/',
+        imgBasePath: window._CONFIG['imgDomainRecordURL'],
         description: '监控信息管理页面',
         // 表头
         columns: [
@@ -331,9 +335,18 @@
       },
     },
     created() {
+
+      Viewer.setDefaults({url: this.showImgBig})
       this.timeType = '3'
     },
     methods: {
+      getPanelImg(data) {
+        const panelData = data
+        return window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
+      },
+      showImgBig(image) {
+        return image.getAttribute("bigImg") || image.getAttribute("src")
+      },
       moment,
       disabledStartDate(startValue) {
         const endValue = this.endValue;

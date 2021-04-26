@@ -178,18 +178,7 @@
             align: "center",
             dataIndex: 'personCardId'
           },
-          {
-            title: '布控类型',
-            align: "center",
-            dataIndex: 'alarmType',
-            customRender: (text) => {
-              if (!text) {
-                return ''
-              } else {
-                return filterMultiDictText(this.dictOptions['alarmType'], text + "")
-              }
-            }
-          },
+
           {
             title: '操作',
             dataIndex: 'action',

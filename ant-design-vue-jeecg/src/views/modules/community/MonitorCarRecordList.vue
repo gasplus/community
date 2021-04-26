@@ -99,15 +99,12 @@
         </template>
         <template slot="imgSlot" slot-scope="text,record">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <a-popover v-else placement="topLeft" arrowPointAtCenter>
-            <template slot="content">
-              <img
-                @click="showPanelImg(record)"
-                :src="getImgViewRecord(text)" alt="图片不存在"
-                style="max-width:500px;font-size: 12px;font-style: italic;"/>
-            </template>
-            <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
-          </a-popover>
+          <viewer>
+            <img
+              :bigImg="getPanelImg(record)"
+              :src="getImgViewRecord(record)" height="25px" alt=""
+              style="max-width:80px;font-size: 12px;font-style: italic;"/>
+          </viewer>
         </template>
         <template slot="fileSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
@@ -171,7 +168,7 @@
 
 <script>
   import moment from "moment";
-
+  import Viewer from 'viewerjs'
   Date.prototype.Format = function (fmt) { //author: meizz
     const o = {
       "M+": this.getMonth() + 1, //月份
@@ -297,7 +294,8 @@
         selectPhotoUrl: '',
         carRelationShow: false,
         selectRecord: undefined,
-        remarksShow: false
+        remarksShow: false,
+        disableMixinCreated: true
       }
     },
     computed: {
@@ -337,12 +335,27 @@
       },
     },
     created() {
+      Viewer.setDefaults({url: this.showImgBig})
+      if (sessionStorage.getItem('recordId')) {
+        this.queryParam.id = sessionStorage.getItem('recordId')
+        sessionStorage.removeItem('recordId')
+      }
+      this.loadData();
+      //初始化字典配置 在自己页面定义
+      this.initDictConfig();
       this.timeType = '3'
     },
     methods: {
+      getPanelImg(data) {
+        const panelData = data
+        return window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
+      },
+      showImgBig(image) {
+        return image.getAttribute("bigImg") || image.getAttribute("src")
+      },
       showPanelImg(data) {
         const panelData = data
-        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+        this.imgUrl = window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
         this.panelTitle = panelData.address
         this.panelImgShow = true
 
@@ -444,11 +457,11 @@
         this.queryParam.deviceId = this.deviceIds
       },
       /* 图片预览 */
-      getImgViewRecord(text) {
+      getImgViewRecord(record) {
         // if(text && text.indexOf(",")>0){
         //   text = text.substring(0,text.indexOf(","))
         // }
-        return window._CONFIG['imgDomainRecordURL'] + text
+        return window._CONFIG['imgDomainRecordURL'] + record.photoUrl
       },
       initDictConfig(){
       },

@@ -1,7 +1,8 @@
 <template>
   <div id="big_home">
     <div class="home_head">
-      <div class="home_head_title">龙堌中心社区智慧感知中心</div>
+<!--      <div class="home_head_title">思沃全息社区感知中心</div>-->
+      <div class="home_head_title">龙堌中心社区智慧感知平台</div>
       <div class="home_head_info">
         <a-popover  placement="bottom" trigger="hover">
           <template slot="content">
@@ -29,7 +30,7 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" style="padding:0;">
                   <div class="tongji_item">
-                    <div class="tongji_item_t" @click.stop="go2Page('/modules/community/MonitorPersonRecordList')">
+                    <div class="tongji_item_t" @click.stop="go2PageOther('/modules/community/MonitorPersonRecordList')">
                       <div class="tongji_item_t_label">总次数</div>
                       <div class="tongji_item_t_number">{{userToday.totalCount}}</div>
                     </div>
@@ -45,28 +46,29 @@
         </div>
         <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
           <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-            <div class="home_bottom_item" v-for="item in userList" :key="item.id">
+            <div class="home_bottom_item" v-for="item in userList" :key="item.id" @click="go2InfoList(item,'person')">
               <div class="home_bottom_item_jiao1"></div>
               <div class="home_bottom_item_jiao2"></div>
               <div class="home_bottom_item_jiao3"></div>
               <div class="home_bottom_item_jiao4"></div>
               <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
-                <a-popover  placement="left" trigger="hover">
+                <a-popover placement="left" trigger="hover">
                   <template slot="content">
-                    <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
+                    <div
+                      style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
                       <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt=""
                            style="width:300px;height:200px;"/>
                       <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
                     </div>
                   </template>
                   <div class="home_bottom_item_img">
-<!--                    <viewer>-->
+                    <!--                    <viewer>-->
                       <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
 <!--                    </viewer>-->
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn" >
-                  <a-tag color="blue" @click="drawLine(item)">查看轨迹</a-tag>
+                  <a-tag color="blue" @click.stop="drawLine(item)">查看轨迹</a-tag>
                 </div>
                 <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
                 <div class="home_bottom_item_info card_id_card" v-if="item.personIdCard">{{tuomin(item.personIdCard,5,4)}}</div>
@@ -92,7 +94,7 @@
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn"  >
-                  <a-tag color="blue" @click="showPoint(item)">查看位置</a-tag>
+                  <a-tag color="blue" @click.stop="showPoint(item)">查看位置</a-tag>
                 </div>
                 <div class="home_bottom_item_info card_name">陌生人</div>
                 <div class="home_bottom_item_info card_address" v-if="item.address">{{item.address}}</div>
@@ -118,7 +120,7 @@
                 <div class="home_bottom_item_jiao4"></div>
                 <div class="home_bottom_item_body" style="padding:0;">
                   <div class="tongji_item">
-                    <div class="tongji_item_t" @click.stop="go2Page('/modules/community/MonitorCarRecordList')">
+                    <div class="tongji_item_t" @click.stop="go2PageOther('/modules/community/MonitorCarRecordList')">
                       <div class="tongji_item_t_label">总次数</div>
                       <div class="tongji_item_t_number">{{carToday.totalCount}}</div>
                     </div>
@@ -135,29 +137,33 @@
         <div slot="collapse-body" style="height:calc(100vh - 300px);position:relative;">
 
           <div class="scroll_body tongji_list" style="padding:10px;overflow: auto;">
-            <div class="home_bottom_item" v-for="item in carList" :key="item.id">
+            <div class="home_bottom_item" v-for="item in carList" :key="item.id" @click="go2InfoList(item,'car')">
               <div class="home_bottom_item_jiao1"></div>
               <div class="home_bottom_item_jiao2"></div>
               <div class="home_bottom_item_jiao3"></div>
               <div class="home_bottom_item_jiao4"></div>
               <div class="home_bottom_item_body" v-if="item.personId!=='anonymous'">
-                <a-popover  placement="left" trigger="hover">
+                <a-popover placement="left" trigger="hover">
                   <template slot="content">
-                    <div style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
-                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="" style="width:200px;height:200px;"/>
+                    <div
+                      style="width:200px;height:200px;border:1px solid #00F6FF;background:#fff;border-radius:5px;overflow: hidden;">
+                      <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt=""
+                           style="width:200px;height:200px;"/>
                       <div v-if="!item.photoUrl" style="line-height: 200px;text-align: center;">暂无信息</div>
                     </div>
                   </template>
                   <div class="home_bottom_item_img">
-<!--                    <viewer>-->
+                    <!--                    <viewer>-->
                       <img v-if="item.photoUrl" :src="jkImagePath+item.photoUrl" alt="">
 <!--                    </viewer>-->
                     <!--                    <img class="moshengren_photo" v-if="!item.photoUrl" src="@/assets/images/pdf4.jpg" alt="">-->
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn">
-                  <a-tag v-if="item.carNumber.indexOf('无法识别')<0" color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
-                  <a-tag v-if="item.carNumber.indexOf('无法识别')>=0" color="blue" @click="drawLine(item)">查看位置</a-tag>
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')<0" color="blue" @click.stop="drawCarLine(item)">查看轨迹
+                  </a-tag>
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')>=0" color="blue" @click.stop="drawCarPoint(item)">查看位置
+                  </a-tag>
                 </div>
                 <div class="home_bottom_item_info card_name" v-if="item.personName">{{item.personName}}</div>
                 <div class="home_bottom_item_info card_car" v-if="item.carNumber">{{item.carNumber}}</div>
@@ -183,9 +189,11 @@
                   </div>
                 </a-popover>
                 <div class="home_bottom_item_btn">
-                  <a-tag v-if="item.carNumber.indexOf('无法识别')<0" color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>
-                  <a-tag v-if="item.carNumber.indexOf('无法识别')>=0" color="blue" @click="drawLine(item)">查看位置</a-tag>
-<!--                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>-->
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')<0" color="blue" @click.stop="drawCarLine(item)">查看轨迹
+                  </a-tag>
+                  <a-tag v-if="item.carNumber.indexOf('无法识别')>=0" color="blue" @click.stop="drawCarPoint(item)">查看位置
+                  </a-tag>
+                  <!--                  <a-tag color="blue" @click="drawCarLine(item)">查看轨迹</a-tag>-->
                   <!--<a-tag color="blue" @click="showPoint(item, 'car')">查看位置</a-tag>-->
                 </div>
                 <div class="home_bottom_item_info card_name">临时车辆</div>
@@ -497,26 +505,32 @@
               this.dialogShow = true
               this.$nextTick(() => {
                 try{
-                  if(this.$refs.dialogDom.setLouDongData) {
-                    this.$refs.dialogDom.setLouDongData(data1,roomData)
-                  } else if(this.$refs.dialogDom[0].setLouDongData) {
-                    this.$refs.dialogDom[0].setLouDongData(data1,roomData)
+                  if (this.$refs.dialogDom.setLouDongData) {
+                    this.$refs.dialogDom.setLouDongData(data1, roomData)
+                  } else if (this.$refs.dialogDom[0].setLouDongData) {
+                    this.$refs.dialogDom[0].setLouDongData(data1, roomData)
                   }
                 } catch {
                 }
 
               })
             })
-          }else {
+          } else {
             this.dialogShow = false
           }
-          if(event.data.funcName === 'showDeviceDetail'){
+          if (event.data.funcName === 'showRoomDetail') {
+            const roomData = event.data.roomData;
+            this.showPersonList({
+              fangJianHao: roomData.fangJianHao
+            }, roomData)
+          }
+          if (event.data.funcName === 'showDeviceDetail') {
             this.deviceDetailShow = true
             this.$nextTick(() => {
               const deviceId = event.data.deviceId
-              if(this.$refs.deviceDetail.showVideo) {
+              if (this.$refs.deviceDetail.showVideo) {
                 this.$refs.deviceDetail.showVideo(deviceId)
-              } else if(this.$refs.deviceDetail[0].showVideo) {
+              } else if (this.$refs.deviceDetail[0].showVideo) {
                 this.$refs.deviceDetail[0].showVideo(deviceId)
               }
             })
@@ -534,21 +548,33 @@
           clearInterval(this.interval);
         }
         this.interval = setInterval(() => {
-          // this.getTodayStat()
-          // this.getTodayCarStat()
-          // this.getPersonMonitorList()
-          // this.getCarMonitorList()
-          // this.getMonitorMessage()
-          // this.getMonitorCarStat()
-          // this.getDeviceList()
-          // this.getLeftTongjiData()
-        }, this.timeStep * 1000)
+          this.getTodayStat()
+          this.getTodayCarStat()
+          this.getPersonMonitorList()
+          this.getCarMonitorList()
+          this.getMonitorMessage()
+          this.getMonitorCarStat()
+          this.getDeviceList()
+          this.getLeftTongjiData()
+        }, this.timeStep * 100000)
       },
       methods: {
+        go2InfoList(item, type) {
+          let url = ''
+          sessionStorage.setItem('recordId', item.id)
+          if (type === 'person') {
+            url = 'modules/community/MonitorPersonRecordList'
+            window.open(url)
+          } else if (type === 'car') {
+            url = 'modules/community/MonitorCarRecordList'
+            window.open(url)
+          }
+          console.log(item, type)
+        },
         showPanelImg(data) {
           const panelData = data.panelData
           const deviceData = data.data
-          this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+          this.imgUrl = window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
           this.panelTitle = panelData.address
           this.panelImgShow = true
 
@@ -565,25 +591,28 @@
               this.$refs.mapIframe.contentWindow.postMessage({
                 funcName:'showHouse',
                 data: data
-              },'*');
-            }else if(this.$refs.mapIframe && this.$refs.mapIframe.length>0 && this.$refs.mapIframe[0].contentWindow){
+              }, '*');
+            } else if (this.$refs.mapIframe && this.$refs.mapIframe.length > 0 && this.$refs.mapIframe[0].contentWindow) {
               this.$refs.mapIframe[0].contentWindow.postMessage({
-                funcName:'showHouse',
+                funcName: 'showHouse',
                 data: data
-              },'*');
+              }, '*');
             }
 
-              // "totalCount":"41",
-              // "zcCount":"34",
-              // "oldPersonCount":"0",
-              // "childrenCount":"0",
-              // "xdPersonCount":"0",
-              // "jsbPersonCount":"0",
-              // "keyPersonCount":"0",
-              // "zdrkPersonCount":"0",
-              // "ldPersonCount":"7",
-              // "zhsCount":"20",
+            // "totalCount":"41",
+            // "zcCount":"34",
+            // "oldPersonCount":"0",
+            // "childrenCount":"0",
+            // "xdPersonCount":"0",
+            // "jsbPersonCount":"0",
+            // "keyPersonCount":"0",
+            // "zdrkPersonCount":"0",
+            // "ldPersonCount":"7",
+            // "zhsCount":"20",
           })
+        },
+        go2PageOther(url) {
+          window.open(url)
         },
         go2Page(url) {
           this.$router.push({
@@ -591,15 +620,15 @@
           })
         },
         getLeftTongjiData() {
-          getAction(this.url.getLeftPerson, {xiaoQuId:1}).then(res => {
+          getAction(this.url.getLeftPerson, {xiaoQuId: 1}).then(res => {
             this.faceCount = res.result
           })
-          getAction(this.url.getLeftCar, {xiaoQuId:1}).then(res => {
+          getAction(this.url.getLeftCar, {xiaoQuId: 1}).then(res => {
             this.carCount = res.result
           })
         },
         readMessage(item) {
-          this.go2Page('/modules/community/MonitorMessageList')
+          this.go2PageOther('/modules/community/MonitorMessageList')
           /*
           putAction(this.url.readMessage, {id:item.id,status:1}).then(res => {
             this.getMonitorMessage()
@@ -819,6 +848,8 @@
           getPersonMonitorList({
             pageSize: 20,
             pageNo: 1,
+            column: 'outInTime',
+            order: 'desc',
             personId: item.id
           }).then(rel => {
             if(rel.code === 200) {
@@ -830,6 +861,8 @@
               data.forEach((item,index) => {
                 item.index = index + 1
               })
+
+              console.log('draw',data.map(item=>item.deviceId))
               const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
               this.$refs.mapIframe.contentWindow.postMessage({
                 funcName: 'drawLinePoint',
@@ -842,14 +875,16 @@
           getPersonMonitorList({
             pageSize: 20,
             pageNo: 1,
+            column: 'outInTime',
+            order: 'desc',
             personId: item.personId
           }).then(rel => {
             if(rel.code === 200) {
               const data = rel.result.records
-              data.forEach((item,index) => {
+              data.forEach((item, index) => {
                 item.index = index + 1
               })
-              const fields = [{key:'index'},{key:'outInTime'},{key:'address'}]
+              const fields = [{key: 'index'}, {key: 'outInTime'}, {key: 'address'}]
               console.log(JSON.stringify({data: data, fields: fields}))
               this.$refs.mapIframe.contentWindow.postMessage({
                 funcName: 'drawLinePoint',
@@ -858,17 +893,42 @@
             }
           })
         },
+        drawCarPoint(item) {
+          console.log('drawCarPoint')
+          getCarMonitorList({
+            pageSize: 20,
+            pageNo: 1,
+            column: 'outInTime',
+            order: 'desc',
+            id: item.id
+          }).then(rel => {
+            if (rel.code === 200) {
+              const data = rel.result.records
+              data.forEach((item, index) => {
+                item.index = index + 1
+              })
+              const fields = [{key: 'index'}, {key: 'outInTime'}, {key: 'address'}]
+              this.$refs.mapIframe.contentWindow.postMessage({
+                funcName: 'drawLinePoint',
+                data: {data: data, fields: fields}
+              }, '*');
+            }
+          })
+        },
         drawCarLine(item) {
-          if(!item.carNumber){
+          console.log('----', item)
+          if (!item.carNumber) {
             this.$message.warning('车辆车牌号未识别');
             return
           }
           getCarMonitorList({
             pageSize: 20,
             pageNo: 1,
+            column: 'outInTime',
+            order: 'desc',
             carNumber: item.carNumber
           }).then(rel => {
-            if(rel.code === 200) {
+            if (rel.code === 200) {
               const data = rel.result.records
               data.forEach((item,index) => {
                 item.index = index + 1
@@ -899,7 +959,7 @@
         },
         showPersonList(data,params) {
           this.getFangJianPerson(params,() => {
-            this.roomData = data
+            this.roomData = params
             this.personListShow = true
           })
         },
@@ -1262,26 +1322,30 @@
     left:0;
     right:0;
     overflow-y: auto;
-    overflow-x:hidden;
-    padding-right:20px;
+    overflow-x: hidden;
+    padding-right: 20px;
   }
-  .home_bottom_item{
-    min-height:102px;
-    position:relative;
-    margin-bottom:10px;
+
+  .home_bottom_item {
+    min-height: 102px;
+    position: relative;
+    margin-bottom: 10px;
     cursor: default;
   }
-  .home_bottom_item_body{
-    position:relative;
+
+  .home_bottom_item_body {
+    position: relative;
     min-height: 80px;
-    background:rgba(6,7,107,0);
-    border:1px solid rgba(55, 85, 218, 0.3);
+    background: rgba(6, 7, 107, 0);
+    border: 1px solid rgba(55, 85, 218, 0.3);
     z-index: 1;
-    padding:10px;
+    padding: 10px;
+    cursor: pointer;
   }
-  .home_bottom_item_jiao1,.home_bottom_item_jiao2,.home_bottom_item_jiao3,.home_bottom_item_jiao4{
-    position:absolute;
-    width:16px;
+
+  .home_bottom_item_jiao1, .home_bottom_item_jiao2, .home_bottom_item_jiao3, .home_bottom_item_jiao4 {
+    position: absolute;
+    width: 16px;
     height:16px;
     background-image: url("~@/assets/images/home_info_jiao.png");
     background-size:16px 16px;

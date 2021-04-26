@@ -123,7 +123,8 @@
 
     <VisitorPersonRelation v-if="personRelationShowTwo" :selectInfo="selectPerson"
                            @close="closePersonRelationTwo"></VisitorPersonRelation>
-    <CarRelation v-if="carRelationShow" :selectCarId="selectCarId" :selectCarStatus="selectCarStatus"
+    <CarRelation v-if="carRelationShow" :showType="selectRecordType" :selectCarId="selectCarId"
+                 :selectCarStatus="selectCarStatus"
                  :selectCarNumber="selectCarNumber" @close="closeCarRelation"></CarRelation>
     <monitorAlarmConfig-modal ref="modalForm" @ok="modalFormOk"></monitorAlarmConfig-modal>
     <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId"
@@ -163,14 +164,26 @@
       CarRelation,
       PersonRelation
     },
-    watch:{
-      dataSource:{
+    watch: {
+      '$route': {
+        handler(route) {
+          if (route.path === '/modules/community/MonitorAlarmConfigList') {
+            if (sessionStorage.getItem('alarmId')) {
+              this.queryParam.id = sessionStorage.getItem('alarmId')
+              sessionStorage.removeItem('alarmId')
+            }
+            this.loadData();
+          }
+        },
+        deep: true
+      },
+      dataSource: {
         handler(list) {
           this.tableDataList = []
-          list.forEach((o,index) => {
+          list.forEach((o, index) => {
             const item = Object.assign({}, o)
             this.tableDataList.push(item)
-            getAction(this.url.messageList, {pageNo:1,pageSize:10,alarmConfigId: item.id}).then(res => {
+            getAction(this.url.messageList, {pageNo: 1, pageSize: 10, alarmConfigId: item.id}).then(res => {
               item.count = res.result.total
               this.$forceUpdate()
             })
@@ -188,6 +201,7 @@
         personRelationShow: '',
         selectCarNumber: '',
         selectCarId: '',
+        selectRecordType: '',
         tableDataList: [],
         selectCarStatus: 'status',
         carRelationShow: false,
@@ -280,13 +294,24 @@
           alarmRuleType: [],
           status: [],
         },
-        alarmId: ''
+        alarmId: '',
+        disableMixinCreated: true
       }
     },
     computed: {
       importExcelUrl: function () {
         return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
       }
+    },
+
+    created() {
+      if (sessionStorage.getItem('alarmId')) {
+        this.queryParam.id = sessionStorage.getItem('alarmId')
+        sessionStorage.removeItem('alarmId')
+      }
+      this.loadData();
+      //初始化字典配置 在自己页面定义
+      this.initDictConfig();
     },
     methods: {
       closePersonRelationTwo() {
@@ -305,10 +330,12 @@
         this.carRelationShow = false
         this.selectCarId = ''
         this.selectCarNumber = ''
+        this.selectRecordType = ''
       },
-      showCarRelation(carNumber, carId) {
+      showCarRelation(carNumber, carId, selectCarStatus, selectRecordType) {
         // carId = '1205450244422303747'
         // carNumber = '鲁R737HH'
+        this.selectRecordType = selectRecordType
         this.selectCarId = carId || ''
         this.selectCarNumber = carNumber || ''
         this.carRelationShow = true
@@ -365,7 +392,7 @@
         console.log(record)
         if (record.alarmType == 20) {
           console.log('车辆')
-          this.showCarRelation(record.title, record.dataId, this.selectCarStatus)
+          this.showCarRelation(record.title, record.dataId, this.selectCarStatus, record.alarmRuleType)
         } else if (record.alarmType == 10) {
           if (record.prop2 == 'A01A05') {
             console.log('人员1')

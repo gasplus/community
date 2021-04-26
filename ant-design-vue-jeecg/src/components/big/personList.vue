@@ -17,7 +17,7 @@
     <div class="card1_body">
       <div class="room_box">
         <div class="room_title">
-          {{roomData.fangJianHao}}室
+          {{roomData.louDongHao}} 号楼 {{roomData.danYuanHao}} 单元 {{roomData.fangJianHao}} 室
         </div>
         <div class="room_person_list">
           <div class="room_person_item" v-for="(item,index) in personListData" :key="index">
@@ -82,13 +82,13 @@
                 </a-col>
 
                 <a-col :span="8">
-                  <div class="room_person_info" style="padding: 5px 20px;border-right:none;">
-                      <!--                      <a-tag color="#f50" v-if="item.type.indexOf('A01A04')>=0">{{personKeyMap[item.type]}}</a-tag>-->
-                      <!--                      <a-tag color="#87d068" v-if="item.type === 'A01A01'">{{personKeyMap[item.type]}}</a-tag>-->
-                      <!--                      <a-tag color="#2db7f5" v-if="item.type === 'A01A02'">{{personKeyMap[item.type]}}</a-tag>-->
-                      <!--                      <a-tag color="#108ee9" v-if="item.type === 'A01A03'">{{personKeyMap[item.type]}}</a-tag>-->
-                      <a-tag color="#2db7f5">{{item.typeText}}</a-tag>
-                      <a-tag color="#87d068">{{item.rkxz}}</a-tag>
+                  <div class="room_person_info" style="padding: 5px 10px;border-right:none;">
+                    <!--                      <a-tag color="#f50" v-if="item.type.indexOf('A01A04')>=0">{{personKeyMap[item.type]}}</a-tag>-->
+                    <!--                      <a-tag color="#87d068" v-if="item.type === 'A01A01'">{{personKeyMap[item.type]}}</a-tag>-->
+                    <!--                      <a-tag color="#2db7f5" v-if="item.type === 'A01A02'">{{personKeyMap[item.type]}}</a-tag>-->
+                    <!--                      <a-tag color="#108ee9" v-if="item.type === 'A01A03'">{{personKeyMap[item.type]}}</a-tag>-->
+                    <a-tag color="#2db7f5">{{item.typeText}}</a-tag>
+                    <a-tag color="#87d068">{{item.rkxz}}</a-tag>
                   </div>
                 </a-col>
                 <a-col :span="16">
@@ -149,8 +149,8 @@
     position:absolute;
     top:5px;
     right:10px;
-    width:20px;
-    height:20px;
+    width: 20px;
+    height: 20px;
     cursor: pointer;
     z-index: 1000;
     background-image: url("~@/assets/images/icon_close.png");
@@ -159,22 +159,24 @@
     background-size: 100% 100%;
     opacity: 0.8;
   }
-  .card1{
-    position:absolute;
-    width:700px;
-    left:50%;
-    top:50%;
-    min-height:500px;
-    margin-top:-250px;
-    margin-left:-140px;
+
+  .card1 {
+    position: absolute;
+    width: 700px;
+    left: 50%;
+    top: 50%;
+    min-height: 500px;
+    margin-top: -250px;
+    margin-left: -65px;
     z-index: 3;
   }
-  .card1_bg{
-    position:absolute;
-    left:0;
-    right:0;
-    top:0;
-    bottom:0;
+
+  .card1_bg {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
     overflow: hidden;
   }
   .card1_bg_l_t{

@@ -8,7 +8,7 @@
     <!-- 查询开始   -->
 
     <div class="table-page-search-wrapper">
-      <a-card title="车辆信息" size="small" style="margin-bottom:10px;" :headStyle="headStyle">
+      <a-card title="车辆信息" size="small" style="margin-bottom:10px;" v-if="showType!=='30'" :headStyle="headStyle">
         <div class="base_info">
           <div class="base_info_img">
             <img :src="imgBasePath + selectInfo.photoUrl" alt="">
@@ -101,15 +101,15 @@
           :pagination="ipagination"
           :loading="loading"
           @change="handleTableChange">
-          <template slot="imgSlot" slot-scope="text">
+          <template slot="imgSlot" slot-scope="text,record">
             <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-            <a-popover v-else placement="topLeft" arrowPointAtCenter>
-              <template slot="content">
-                <img :src="getImgViewRecord(text)" alt="图片不存在"
-                     style="max-width:500px;font-size: 12px;font-style: italic;"/>
-              </template>
-              <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
-            </a-popover>
+            <viewer>
+              <img
+                :bigImg="getPanelImg(record)"
+                :src="getImgViewRecord(text)" height="25px" alt=""
+                style="max-width:80px;font-size: 12px;font-style: italic;"/>
+            </viewer>
+
           </template>
         </a-table>
       </a-card>
@@ -119,14 +119,21 @@
 </template>
 
 <script>
-  import { filterObj } from '@/utils/util';
+  import {filterObj} from '@/utils/util';
+  import Viewer from 'viewerjs'
   import MonitorAlarmConfigModalAdd from './MonitorAlarmConfigModalAdd'
 
-  import { getAction } from '@/api/manage'
+  import {getAction} from '@/api/manage'
 
   export default {
     name: "PersonRelation",
     props: {
+      showType: {
+        type: String,
+        default() {
+          return ''
+        }
+      },
       selectCarType: {
         type: String,
         default() {
@@ -237,6 +244,8 @@
       }
     },
     created() {
+      Viewer.setDefaults({url: this.showImgBig})
+
       this.visible = true
 
       this.getCarData()
@@ -247,13 +256,28 @@
 
     },
     methods: {
+      getPanelImg(data) {
+        const panelData = data
+        return window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
+      },
+      showImgBig(image) {
+        return image.getAttribute("bigImg") || image.getAttribute("src")
+      },
       addAlarmConfig() {
-        this.$refs.configAdd.add('20', {carNumber:this.selectCarNumber})
+        this.$refs.configAdd.add('20', {carNumber: this.selectCarNumber})
       },
       tongji() {
+        let statCarNumber
         if (this.selectCarNumber != "无法识别") {
+
+          if (this.showType === '30') {
+            statCarNumber = '*' + this.selectCarNumber + '*'
+          } else {
+            statCarNumber = this.selectCarNumber
+          }
+
           getAction(this.url.tongji, {
-            carNumber: this.selectCarNumber,
+            carNumber: statCarNumber,
             xiaoQuId: 1
           }).then(res => {
             if (res.success) {
@@ -265,6 +289,9 @@
 
       },
       getCarData() {
+        if (this.showType === '30') {
+          return
+        }
         if (this.selectCarStatus == 'status') {
           getAction(this.url.queryByCarNumber, {
             carNumber: this.selectCarId
@@ -309,13 +336,16 @@
           pageSize: this.ipagination.pageSize,
           carNumber: this.selectCarNumber
         }
+        if (this.showType === '30') {
+          params.carNumber = '*' + this.selectCarNumber + '*'
+        }
         this.loading = true;
         getAction(this.url.list, params).then((res) => {
           if (res.success) {
             this.dataSource = res.result.records;
             this.ipagination.total = res.result.total;
           }
-          if(res.code===510){
+          if (res.code === 510) {
             this.$message.warning(res.message)
           }
           this.loading = false;

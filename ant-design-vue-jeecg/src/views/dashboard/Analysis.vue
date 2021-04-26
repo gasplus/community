@@ -38,7 +38,7 @@
             :body-style="{ padding: 0 }">
             <a slot="extra" @click="go2Project">更多</a>
             <div>
-              <a-card-grid class="project-card-grid" :key="i" v-for="(item, i) in projects">
+              <a-card-grid class="project-card-grid" :key="i" v-for="(item, i) in projects" @click="go2Alarm(item)">
                 <a-card :bordered="false" :body-style="{ padding: 0 }">
                   <a-card-meta>
                     <div slot="title" class="card-title">
@@ -46,7 +46,16 @@
                         <a-avatar size="default"
                                   :src="item.alarmType!=='10'?'/car.png':(item.personPhoto||'/person.png')"
                         />
-                        <a><div style="position:absolute;font-weight:400;right:0px;top:0;text-align:right;width:100px;height:20px;line-height: 20px;color:#ccc;">{{item.createBy}}</div>{{ item.title }}<a-tag style="margin-left:10px;">{{ !item.alarmRuleType?'':filterMultiDictText(dictOptions['alarmRuleType'], item.alarmRuleType + "") }}<span v-if="item.alarmRuleType==='10'">（{{item.intervalDays}}天）</span></a-tag> </a>
+                        <a>
+                          <div
+                            style="position:absolute;font-weight:400;right:0px;top:0;text-align:right;width:100px;height:20px;line-height: 20px;color:#ccc;">
+                            {{item.createBy}}
+                          </div>
+                          {{ item.title }}
+                          <a-tag style="margin-left:10px;">{{
+                            !item.alarmRuleType?'':filterMultiDictText(dictOptions['alarmRuleType'], item.alarmRuleType
+                            + "") }}<span v-if="item.alarmRuleType==='10'">（{{item.intervalDays}}天）</span></a-tag>
+                        </a>
                       </a-spin>
                     </div>
                     <template slot="description">
@@ -65,7 +74,7 @@
             </div>
           </a-card>
 
-          <a-card :loading="loading" title="增加代办任务" :bordered="false">
+          <a-card :loading="loading" title="待办任务" :bordered="false">
             <a slot="extra" @click="go2Active">更多</a>
             <a-list>
               <a-list-item :key="index" v-for="(item, index) in activities" style="cursor: pointer">
@@ -73,12 +82,21 @@
                   <a-avatar slot="avatar" :src="getMessageImg(item)"/>
                   <div slot="title">
                     <span>{{ item.content }}</span>&nbsp;
-                    <span style="float:right" v-if="item.messageType === '50'&&item.dataContentObj.carNumber" @click="showCarRelation(item.dataContentObj)"><a-tag color="blue">{{item.dataContentObj.carNumber}}</a-tag></span>
-                    <span style="float:right" v-if="item.messageType === '40'&&item.dataContentObj.personName" @click="showPersonRelation(item.dataContentObj)"><a-tag color="blue">{{item.dataContentObj.personName}}</a-tag></span>
+                    <span style="float:right" v-if="item.messageType === '50'&&item.dataContentObj.carNumber"
+                          @click="showCarRelation(item.dataContentObj)"><a-tag color="blue">{{item.dataContentObj.carNumber}}</a-tag></span>
+                    <span style="float:right" v-if="item.messageType === '40'&&item.dataContentObj.personName"
+                          @click="showPersonRelation(item.dataContentObj)"><a-tag color="blue">{{item.dataContentObj.personName}}</a-tag></span>
                   </div>
                   <div slot="description">
                     {{ item.createTime }}
-                    <span style="float:right"><a-tag @click="showPanelImg(item.dataContentObj)">查看图片</a-tag></span>
+                    <span style="float:right;position:relative">
+                      <viewer>
+                        <img
+                          style="position:absolute;left:0;right:0;top:0;bottom:0;z-index: 10;width:100%;height:100%;opacity:0;"
+                          :src="getPanelImg(item.dataContentObj)" alt="">
+                      </viewer>
+                      <a-tag>查看图片</a-tag>
+                    </span>
                   </div>
                 </a-list-item-meta>
               </a-list-item>
@@ -286,9 +304,19 @@
     methods: {
       ...mapGetters(["nickname", "welcome"]),
       filterMultiDictText: filterMultiDictText,
+      go2Alarm(item) {
+        sessionStorage.setItem('alarmId', item.id)
+        this.$router.push({
+          path: '/modules/community/MonitorAlarmConfigList'
+        })
+      },
+      getPanelImg(data) {
+        const panelData = data
+        return window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
+      },
       showPanelImg(data) {
         const panelData = data
-        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+        this.imgUrl = window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
         this.panelTitle = panelData.address
         this.panelImgShow = true
 
@@ -415,7 +443,7 @@
           column: 'createTime',
           status: 0,
           order: 'desc',
-          pageSize: 20
+          pageSize: 5
         }).then(rel => {
           if(rel.code === 200) {
             const list = rel.result.records

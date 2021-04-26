@@ -96,16 +96,12 @@
         </template>
         <template slot="imgSlot" slot-scope="text,record">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <a-popover v-else placement="topLeft" arrowPointAtCenter>
-            <template slot="content">
-              <img :src="getPanoramaImgViewRecord(text,record)"
-                   @click="showPanelImg(record)"
-                   alt="图片不存在"
-                     style="max-width:500px;font-size: 12px;font-style: italic;"/>
-            </template>
-            <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在"
-                 style="max-width:80px;font-size: 12px;font-style: italic;"/>
-          </a-popover>
+          <viewer>
+            <img
+              :bigImg="getPanelImg(record)"
+              :src="getImgViewRecord(text,record)" height="25px" alt=""
+              style="max-width:80px;font-size: 12px;font-style: italic;"/>
+          </viewer>
         </template>
         <template slot="fileSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
@@ -185,7 +181,7 @@
       if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
     return fmt;
   }
-
+  import Viewer from 'viewerjs'
   import {filterObj} from '@/utils/util';
   import panelImg from '@/components/big/panelImg'
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
@@ -314,14 +310,15 @@
           queryById: '/monitor/monitorPerson/queryById'
         },
         deviceIds: [],
-        selectedDevices:[],
-        dictOptions:{
-          personType:[],
+        selectedDevices: [],
+        dictOptions: {
+          personType: [],
         },
         selectPersonId: '',
         personRelationShow: false,
         selectRecord: undefined,
-        remarksShow: false
+        remarksShow: false,
+        disableMixinCreated: true
       }
     },
     computed: {
@@ -361,12 +358,27 @@
       },
     },
     created() {
+      Viewer.setDefaults({url: this.showImgBig})
+      if (sessionStorage.getItem('recordId')) {
+        this.queryParam.id = sessionStorage.getItem('recordId')
+        sessionStorage.removeItem('recordId')
+      }
+      this.loadData();
+      //初始化字典配置 在自己页面定义
+      this.initDictConfig();
       this.timeType = '3'
     },
     methods: {
+      getPanelImg(data) {
+        const panelData = data
+        return window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
+      },
+      showImgBig(image) {
+        return image.getAttribute("bigImg") || image.getAttribute("src")
+      },
       showPanelImg(data) {
         const panelData = data
-        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+        this.imgUrl = window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
         this.panelTitle = panelData.address
         this.panelImgShow = true
         console.log(panelData)

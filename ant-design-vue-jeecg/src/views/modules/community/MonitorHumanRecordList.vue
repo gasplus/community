@@ -154,10 +154,11 @@
               <div style="background:#fff;">
                 <a-row>
                 <a-col span="12" v-if="record.bodyInfo">
-                  <a-card
-                    @click="showPanelImg(JSON.parse(record.bodyInfo),'0',record)"
-                    hoverable style="width: 240px;margin:0 10px;"title="人体识别结果" size="small">
+                  <viewer>
+                    <a-card
+                      hoverable style="width: 240px;margin:0 10px;" title="人体识别结果" size="small">
                     <img
+                      :bigImg="getPanelImg(JSON.parse(record.bodyInfo),'0',record)"
                       alt="example"
                       :src="imgBasePath+JSON.parse(record.bodyInfo).picture"
                       slot="cover"
@@ -173,12 +174,15 @@
                       </template>
                     </a-card-meta>
                   </a-card>
+                  </viewer>
+
                 </a-col>
                 <a-col span="12" v-if="record.faceInfo">
-                  <a-card
-                    @click="showPanelImg(JSON.parse(record.faceInfo),'1',record)"
-                    hoverable style="width: 240px;margin:0 10px;" title="人脸识别结果" size="small">
+                  <viewer>
+                    <a-card
+                      hoverable style="width: 240px;margin:0 10px;" title="人脸识别结果" size="small">
                     <img
+                      :bigImg="getPanelImg(JSON.parse(record.faceInfo),'1',record)"
                       alt="example"
                       :src="imgBasePath+JSON.parse(record.faceInfo).picture"
                       slot="cover"
@@ -194,6 +198,8 @@
                       </template>
                     </a-card-meta>
                   </a-card>
+                  </viewer>
+
                 </a-col>
               </a-row>
               </div>
@@ -227,6 +233,9 @@
 </template>
 
 <script>
+
+  import Viewer from 'viewerjs'
+
   Date.prototype.Format = function (fmt) { //author: meizz
     const o = {
       "M+": this.getMonth() + 1, //月份
@@ -375,6 +384,9 @@
       },
     },
     created() {
+      Viewer.setDefaults({
+        url: this.showImgBig
+      })
       // const endDate = new Date()
       // const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
       // this.queryParam.outInTime_begin = beginDate.Format('yyyy-MM-dd hh:mm:ss')
@@ -390,15 +402,28 @@
       }
     },
     methods: {
+      showImgBig(image) {
+        return image.getAttribute("bigImg") || image.getAttribute("src")
+      },
+      getPanelImg(data, type, record) {
+        const panelData = data
+        let imgUrl = ''
+        if (type === '0') {
+          imgUrl = this.imgBasePath + (panelData.panorama || panelData.picture)
+        } else {
+          imgUrl = this.imgBasePath + (record.panorama || panelData.picture)
+        }
+        return imgUrl
+      },
       showPanelImg(data, type, record) {
         const panelData = data
-        if(type === '0') {
-          this.panelTitle = '人体--'+record.address
-          this.imgUrl = this.imgBasePath+(panelData.panorama || panelData.picture)
+        if (type === '0') {
+          this.panelTitle = '人体--' + record.address
+          this.imgUrl = this.imgBasePath + (panelData.panorama || panelData.picture)
 
-        }else{
-          this.panelTitle = '人脸--'+record.address
-          this.imgUrl = this.imgBasePath+(record.panorama || panelData.picture)
+        } else {
+          this.panelTitle = '人脸--' + record.address
+          this.imgUrl = this.imgBasePath + (record.panorama || panelData.picture)
         }
         this.panelImgShow = true
       },

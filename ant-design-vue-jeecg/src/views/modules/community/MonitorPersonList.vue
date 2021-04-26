@@ -47,9 +47,9 @@
     <!-- 操作按钮区域 -->
     <div class="table-operator">
       <a-button @click="handleAdd" type="primary" icon="plus" style="margin-right:8px;">新增</a-button>
-      <!--
+      <!--      -->
       <a-button type="primary" icon="download" @click="handleExportXls('人员信息')">导出</a-button>
-      -->
+
       <a-upload name="file" :showUploadList="false" :multiple="false" :headers="tokenHeader" :action="importExcelUrl"
                 @change="handleImportExcel">
         <a-button type="primary" icon="import">导入</a-button>

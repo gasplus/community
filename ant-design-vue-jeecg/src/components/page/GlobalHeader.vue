@@ -17,7 +17,8 @@
         :type="collapsed ? 'menu-unfold' : 'menu-fold'"
         @click.native="toggle"/>
 
-      <span v-if="device === 'desktop'">欢迎进入龙堌中心社区智慧感知中心</span>
+      <span v-if="device === 'desktop'">欢迎进入龙堌中心社区智慧感知平台</span>
+<!--      <span v-if="device === 'desktop'">欢迎进入思沃全息社区感知中心</span>-->
       <span v-else>智慧感知</span>
 
       <user-menu :theme="theme"/>

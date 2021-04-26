@@ -15,7 +15,7 @@
     </div>
     <div class="close_btn" @click="leave"></div>
     <div class="card1_body">
-      <div style="position:absolute;left:20px;right:20px;top:20px;bottom:36px;">
+      <div class="scroll_body" style="position:absolute;left:20px;right:20px;top:20px;bottom:36px;overflow:auto;">
         <img :src="imgUrl" alt="" style="width:100%;">
       </div>
 

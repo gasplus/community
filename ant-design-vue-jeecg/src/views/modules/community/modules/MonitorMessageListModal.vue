@@ -46,10 +46,14 @@
         </span>
         <div slot="monitor_img" slot-scope="text,record">
           <div v-if="record.dataContent&&record.dataContent.indexOf('{')>=0">
-            <span v-if="!JSON.parse(record.dataContent).photoUrl"
-                  style="font-size: 12px;font-style: italic;">无此图片</span>
-            <img v-else :src="imgBasePath+JSON.parse(record.dataContent).photoUrl" height="25px" alt="图片不存在"
-                 style="max-width:80px;font-size: 12px;font-style: italic;"/>
+            <viewer>
+              <span v-if="!JSON.parse(record.dataContent).photoUrl"
+                    style="font-size: 12px;font-style: italic;">无此图片</span>
+              <img v-else
+                   :bigImg="getPanelImg(JSON.parse(record.dataContent))"
+                   :src="imgBasePath+JSON.parse(record.dataContent).photoUrl" height="25px" alt=""
+                   style="max-width:80px;font-size: 12px;font-style: italic;"/>
+            </viewer>
           </div>
         </div>
 
@@ -60,6 +64,8 @@
 </template>
 
 <script>
+  import Viewer from 'viewerjs'
+
   Date.prototype.Format = function (fmt) { //author: meizz
     const o = {
       "M+": this.getMonth() + 1, //月份
@@ -99,7 +105,7 @@
     },
     data() {
       return {
-        imgBasePath: window._CONFIG['imgDomainRecordURL'] + '/',
+        imgBasePath: window._CONFIG['imgDomainRecordURL'],
         description: '监控信息管理页面',
         // 表头
         columns: [
@@ -167,6 +173,7 @@
       }
     },
     created() {
+      Viewer.setDefaults({url: this.showImgBig})
       this.queryParam.alarmConfigId = this.alarmId
       this.loadData();
       //初始化字典配置 在自己页面定义
@@ -178,6 +185,13 @@
       }
     },
     methods: {
+      getPanelImg(data) {
+        const panelData = data
+        return window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
+      },
+      showImgBig(image) {
+        return image.getAttribute("bigImg") || image.getAttribute("src")
+      },
       getQueryParams() {
         //获取查询条件
         let sqp = {}
