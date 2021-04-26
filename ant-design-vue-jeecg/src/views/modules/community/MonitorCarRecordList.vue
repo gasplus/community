@@ -79,46 +79,55 @@
 
     <!-- table区域-begin -->
     <div>
+      <a-tabs type="card">
+        <a-tab-pane key="1">
+          <span slot="tab">
+            <a-icon type="table" style="font-size:20px;" />
+            表格
+          </span>
 
-      <a-table
-        ref="table"
-        size="middle"
-        bordered
-        rowKey="id"
-        :columns="columns"
-        :dataSource="dataSource"
-        :pagination="ipagination"
-        :loading="loading"
+          <a-table
+            ref="table"
+            size="middle"
+            bordered
+            rowKey="id"
+            :columns="columns"
+            :dataSource="dataSource"
+            :pagination="ipagination"
+            :loading="loading"
 
-        @change="handleTableChange">
+            @change="handleTableChange">
         <span slot="device" slot-scope="text, record">
           <a-icon v-if="record.deviceId" type="video-camera" style="cursor:pointer" @click="showDeviceVideo(record.deviceId)" />
         </span>
-        <template slot="htmlSlot" slot-scope="text">
-          <div v-html="text"></div>
-        </template>
-        <template slot="imgSlot" slot-scope="text,record">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-          <viewer>
-            <img
-              :bigImg="getPanelImg(record)"
-              :src="getImgViewRecord(record)" height="25px" alt=""
-              style="max-width:80px;font-size: 12px;font-style: italic;"/>
-          </viewer>
-        </template>
-        <template slot="fileSlot" slot-scope="text">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
-          <a-button
-            v-else
-            :ghost="true"
-            type="primary"
-            icon="download"
-            size="small"
-            @click="uploadFile(text)">
-            下载
-          </a-button>
-        </template>
-        <span slot="show" slot-scope="text,record">
+            <template slot="htmlSlot" slot-scope="text">
+              <div v-html="text"></div>
+            </template>
+            <template slot="imgSlot" slot-scope="text,record">
+              <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
+              <a-popover v-else placement="topLeft" arrowPointAtCenter>
+                <template slot="content">
+                  <img
+                    @click="showPanelImg(record)"
+                    :src="getImgViewRecord(text)" alt="图片不存在"
+                    style="max-width:500px;font-size: 12px;font-style: italic;"/>
+                </template>
+                <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
+              </a-popover>
+            </template>
+            <template slot="fileSlot" slot-scope="text">
+              <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
+              <a-button
+                v-else
+                :ghost="true"
+                type="primary"
+                icon="download"
+                size="small"
+                @click="uploadFile(text)">
+                下载
+              </a-button>
+            </template>
+            <span slot="show" slot-scope="text,record">
           <a v-if="record.personId&&record.personId!=='anonymous'" @click="showPersonRelation(record.personId)">
             {{record.personName}}
           </a>
@@ -130,18 +139,100 @@
                     @click="showCarRegister(record)">登记</a-button>
         </span>
 
-        <span slot="show1" slot-scope="text,record">
+            <span slot="show1" slot-scope="text,record">
           <a @click="showCarRelation(record.carNumber,record.carId,record.carType2,record.carColor,record.photoUrl)">
             {{record.carNumber}}
           </a>
         </span>
-        <span slot="showRemarks" slot-scope="text,record">
+            <span slot="showRemarks" slot-scope="text,record">
           <a @click="showRemarksDialog(record)">
             查看备注
           </a>
         </span>
 
-      </a-table>
+          </a-table>
+        </a-tab-pane>
+        <a-tab-pane key="2">
+          <span slot="tab">
+            <a-icon type="appstore" style="font-size:20px;" />
+            列表
+          </span>
+          <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 3 }"
+                  size="small"
+                  @change="handleListChange"
+                  :data-source="dataSource">
+            <a-list-item slot="renderItem" slot-scope="item, index">
+              <a-card :title="''">
+                <div class="person_card">
+                  <div class="person_card_photo">
+                    <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
+                    <!--                         @click="showPanelImg(item)"-->
+                    <!--                         alt="图片不存在"-->
+                    <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
+                    <img src="/manager.png"
+                         @click="showPanelImg(item)"
+                         alt="图片不存在"
+                         style="max-width:500px;font-size: 12px;font-style: italic;"/>
+
+                  </div>
+                  <div class="person_card_info">
+                    <div class="person_card_info_row">
+                      <a-row>
+                        <a-col span="12">
+                          <span style="font-size:24px;line-height: 40px;">
+                             <a @click="showCarRelation(item.carNumber,item.carId,item.carType2,item.carColor,item.photoUrl)">
+                              {{item.carNumber}}
+                            </a>
+                          </span>
+                        </a-col>
+                        <a-col span="12" style="text-align: right;padding-right:10px;">
+                          <span style="font-size:18px;line-height: 40px;">
+                            <a v-if="item.personId!=='anonymous'" @click="showPersonRelation(item.personId)">
+                              {{item.personName}}
+                            </a>
+                            <a-button size="small" v-if="item.personId==='anonymous'" type="primary"
+                                      @click="showRegisterPerson(item)">登记</a-button>
+                          </span>
+                        </a-col>
+                      </a-row>
+                    </div>
+                    <div class="person_card_info_row">
+                      进出时间：{{item.outInTime}}
+                    </div>
+                    <div class="person_card_info_row">
+                      进出地址：{{item.address}}
+                      <a v-if="item.deviceId"
+                         @click="showDeviceVideo(item.deviceId)"
+                         style="cursor:pointer;margin:0 5px;">
+                        <a-icon type="video-camera"/>
+                      </a>
+                    </div>
+                    <div class="person_card_info_row">
+                      <a @click="showRemarksDialog(item)">
+                        查看备注
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </a-card>
+            </a-list-item>
+          </a-list>
+          <div style="text-align: right;">
+            <a-pagination v-model="ipagination.current"
+                          v-bind:pageSize="ipagination.pageSize"
+                          v-bind:showTotal="ipagination.showTotal"
+                          v-bind:total="ipagination.total"
+                          v-bind:pageSizeOptions="ipagination.pageSizeOptions"
+                          v-bind:showQuickJumper="ipagination.showQuickJumper"
+                          v-bind:showSizeChanger="ipagination.showSizeChanger"
+                          @change="handleListChange"
+                          @showSizeChange="handleListChange"
+                          size="small"
+            ></a-pagination>
+          </div>
+
+        </a-tab-pane>
+      </a-tabs>
     </div>
 
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
@@ -168,7 +259,7 @@
 
 <script>
   import moment from "moment";
-  import Viewer from 'viewerjs'
+
   Date.prototype.Format = function (fmt) { //author: meizz
     const o = {
       "M+": this.getMonth() + 1, //月份
@@ -294,8 +385,7 @@
         selectPhotoUrl: '',
         carRelationShow: false,
         selectRecord: undefined,
-        remarksShow: false,
-        disableMixinCreated: true
+        remarksShow: false
       }
     },
     computed: {
@@ -335,27 +425,18 @@
       },
     },
     created() {
-      Viewer.setDefaults({url: this.showImgBig})
-      if (sessionStorage.getItem('recordId')) {
-        this.queryParam.id = sessionStorage.getItem('recordId')
-        sessionStorage.removeItem('recordId')
-      }
-      this.loadData();
-      //初始化字典配置 在自己页面定义
-      this.initDictConfig();
       this.timeType = '3'
     },
     methods: {
-      getPanelImg(data) {
-        const panelData = data
-        return window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
-      },
-      showImgBig(image) {
-        return image.getAttribute("bigImg") || image.getAttribute("src")
+      handleListChange(page,pageSize) {
+        console.log("handleListChange")
+        this.ipagination.current = page;
+        this.ipagination.pageSize = pageSize;
+        this.loadData();
       },
       showPanelImg(data) {
         const panelData = data
-        this.imgUrl = window._CONFIG['imgDomainRecordURL'] + (panelData.panorama || panelData.photoUrl)
+        this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
         this.panelTitle = panelData.address
         this.panelImgShow = true
 
@@ -457,11 +538,11 @@
         this.queryParam.deviceId = this.deviceIds
       },
       /* 图片预览 */
-      getImgViewRecord(record) {
+      getImgViewRecord(text) {
         // if(text && text.indexOf(",")>0){
         //   text = text.substring(0,text.indexOf(","))
         // }
-        return window._CONFIG['imgDomainRecordURL'] + record.photoUrl
+        return window._CONFIG['imgDomainRecordURL'] + text
       },
       initDictConfig(){
       },
@@ -497,5 +578,37 @@
   }
 </script>
 <style scoped>
-  @import '~@assets/less/common.less'
+  @import '~@assets/less/common.less';
+  .person_card{
+    position:relative;
+    margin:-24px -32px;
+  }
+  .person_card_photo{
+    position:absolute;
+    left:10px;
+    top:10px;
+    width:200px;
+    height:220px;
+    line-height: 30px;
+    text-align: center;
+  }
+  .person_card_photo img{
+    display: block;
+    width:200px;
+    height:200px;
+    padding:0;
+    margin:0;
+  }
+  .person_card_info{
+    margin-left:210px;
+    min-height: 220px;
+    padding:10px;
+  }
+  .ant-card-wider-padding .ant-card-body{
+    padding:0;
+  }
+  .person_card_info_row{
+    line-height: 20px;
+    padding:4px 0px;
+  }
 </style>

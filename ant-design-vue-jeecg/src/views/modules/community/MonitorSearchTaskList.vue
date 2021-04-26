@@ -39,19 +39,26 @@
         selectedRowKeys.length }}</a>项
         <a style="margin-left: 24px" @click="onClearSelected">清空</a>
       </div>
+      <div>
+        <a-tabs type="card">
+          <a-tab-pane key="1">
+            <span slot="tab">
+              <a-icon type="table" style="font-size:20px;"/>
+              表格
+            </span>
 
-      <a-table
-        ref="table"
-        size="middle"
-        bordered
-        rowKey="id"
-        :columns="columns"
-        :dataSource="dataSource"
-        :pagination="ipagination"
-        :loading="loading"
-        :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
+            <a-table
+              ref="table"
+              size="middle"
+              bordered
+              rowKey="id"
+              :columns="columns"
+              :dataSource="dataSource"
+              :pagination="ipagination"
+              :loading="loading"
+              :rowSelection="{fixed:true,selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
 
-        @change="handleTableChange">
+              @change="handleTableChange">
 
         <template slot="htmlSlot" slot-scope="text">
           <div v-html="text"></div>
@@ -63,42 +70,130 @@
                  style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </viewer>
 
-        </template>
-        <template slot="fileSlot" slot-scope="text">
-          <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
-          <a-button
-            v-else
-            :ghost="true"
-            type="primary"
-            icon="download"
-            size="small"
-            @click="uploadFile(text)">
-            下载
-          </a-button>
-        </template>
+              </template>
+              <template slot="fileSlot" slot-scope="text">
+                <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
+                <a-button
+                  v-else
+                  :ghost="true"
+                  type="primary"
+                  icon="download"
+                  size="small"
+                  @click="uploadFile(text)">
+                  下载
+                </a-button>
+              </template>
 
-        <span slot="action" slot-scope="text, record">
-          <a @click="handleEdit(record)">编辑</a>
+              <span slot="action" slot-scope="text, record">
+                <a @click="handleEdit(record)">编辑</a>
 
-          <a-divider type="vertical"/>
+                <a-divider type="vertical"/>
 
-          <!--<a @click="handleView(record)">查看监控</a>-->
-          <a @click="handleResult(record)">查看结果</a>
+                      <!--<a @click="handleView(record)">查看监控</a>-->
+                <a @click="handleResult(record)">查看结果</a>
 
-          <a-divider type="vertical"/>
-          <a-dropdown>
-            <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
-            <a-menu slot="overlay">
-              <a-menu-item>
-                <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-                  <a>删除</a>
-                </a-popconfirm>
-              </a-menu-item>
-            </a-menu>
-          </a-dropdown>
-        </span>
+                <a-divider type="vertical"/>
+                <a-dropdown>
+                  <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
+                  <a-menu slot="overlay">
+                    <a-menu-item>
+                      <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                        <a>删除</a>
+                      </a-popconfirm>
+                    </a-menu-item>
+                  </a-menu>
+                </a-dropdown>
+              </span>
 
-      </a-table>
+            </a-table>
+          </a-tab-pane>
+          <a-tab-pane key="2">
+          <span slot="tab">
+            <a-icon type="appstore" style="font-size:20px;"/>
+            列表
+          </span>
+            <a-list :grid="{ gutter: 16, xs: 1, sm: 2, md: 2, lg: 3, xl: 3, xxl: 3 }"
+                    size="small"
+                    @change="handleListChange"
+                    :data-source="dataSource">
+              <a-list-item slot="renderItem" slot-scope="item, index">
+                <a-card :title="''">
+                  <div class="person_card">
+                    <div class="person_card_photo">
+                      <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
+                      <!--                         @click="showPanelImg(item)"-->
+                      <!--                         alt="图片不存在"-->
+                      <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
+                      <img src="/manager.png"
+                           alt="图片不存在"
+                           style="max-width:500px;font-size: 12px;font-style: italic;"/>
+
+                    </div>
+                    <div class="person_card_info">
+                      <div class="person_card_info_row">
+                        <a-row>
+                          <a-col span="24">
+                          <span style="font-size:16px;padding:10px 0;line-height: 20px;">
+                             {{item.searchTitle}}
+                          </span>
+                          </a-col>
+                        </a-row>
+                      </div>
+                      <div class="person_card_info_row">
+                        开始时间：{{item.beginTime}}
+                      </div>
+                      <div class="person_card_info_row">
+                        结束时间：{{item.endTime}}
+                      </div>
+                      <div class="person_card_info_row">
+                        创建时间：{{item.createTime}}
+                      </div>
+                      <div class="person_card_info_row">
+                        状态：{{item.searchStatus?filterMultiDictText(dictOptions['monitor_search_status'],
+                        item.searchStatus+""):''}}
+                      </div>
+                      <div class="person_card_info_row">
+                        <a @click="handleEdit(item)">编辑</a>
+
+                        <a-divider type="vertical"/>
+
+                        <!--<a @click="handleView(record)">查看监控</a>-->
+                        <a @click="handleResult(item)">查看结果</a>
+
+                        <a-divider type="vertical"/>
+                        <a-dropdown>
+                          <a class="ant-dropdown-link">更多 <a-icon type="down"/></a>
+                          <a-menu slot="overlay">
+                            <a-menu-item>
+                              <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(item.id)">
+                                <a>删除</a>
+                              </a-popconfirm>
+                            </a-menu-item>
+                          </a-menu>
+                        </a-dropdown>
+                      </div>
+                    </div>
+                  </div>
+                </a-card>
+              </a-list-item>
+            </a-list>
+            <div style="text-align: right;">
+              <a-pagination v-model="ipagination.current"
+                            v-bind:pageSize="ipagination.pageSize"
+                            v-bind:showTotal="ipagination.showTotal"
+                            v-bind:total="ipagination.total"
+                            v-bind:pageSizeOptions="ipagination.pageSizeOptions"
+                            v-bind:showQuickJumper="ipagination.showQuickJumper"
+                            v-bind:showSizeChanger="ipagination.showSizeChanger"
+                            @change="handleListChange"
+                            @showSizeChange="handleListChange"
+                            size="small"
+              ></a-pagination>
+            </div>
+
+          </a-tab-pane>
+        </a-tabs>
+      </div>
     </div>
     <a-modal
       v-if="selectRecord"
@@ -106,7 +201,8 @@
       :width="1200"
       v-model="jkVisible"
       :footer="null">
-      <SelectMonitorPersonRecordList v-if="jkVisible" :selectId="selectRecord.searchContent"></SelectMonitorPersonRecordList>
+      <SelectMonitorPersonRecordList v-if="jkVisible"
+                                     :selectId="selectRecord.searchContent"></SelectMonitorPersonRecordList>
     </a-modal>
     <a-modal
       title="结果记录"
@@ -212,11 +308,11 @@
             title: '状态',
             align: "center",
             dataIndex: 'searchStatus',
-            customRender:(text)=>{
-              if(!text){
+            customRender: (text) => {
+              if (!text) {
                 return ''
-              }else{
-                return filterMultiDictText(this.dictOptions['monitor_search_status'], text+"")
+              } else {
+                return filterMultiDictText(this.dictOptions['monitor_search_status'], text + "")
               }
             }
           },
@@ -248,6 +344,24 @@
       }
     },
     methods: {
+      filterMultiDictText,
+      handleListChange(page, pageSize) {
+        console.log("handleListChange")
+        this.ipagination.current = page;
+        this.ipagination.pageSize = pageSize;
+        this.loadData();
+      },
+      // showPanelImg(data) {
+      //   const panelData = data
+      //   this.imgUrl = window._CONFIG['imgDomainRecordURL']+(panelData.panorama || panelData.photoUrl)
+      //   this.panelTitle = panelData.address
+      //   this.panelImgShow = true
+      //
+      //   console.log(panelData)
+      // },
+      // closePanelImg() {
+      //   this.panelImgShow = false
+      // },
       showTimeCount() {
         this.time = 1
         if (this.timeInterval) {
@@ -354,5 +468,43 @@
   }
 </script>
 <style scoped>
-  @import '~@assets/less/common.less'
+  @import '~@assets/less/common.less';
+
+  .person_card {
+    position: relative;
+    margin: -24px -32px;
+  }
+
+  .person_card_photo {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    width: 200px;
+    height: 220px;
+    line-height: 30px;
+    text-align: center;
+  }
+
+  .person_card_photo img {
+    display: block;
+    width: 200px;
+    height: 200px;
+    padding: 0;
+    margin: 0;
+  }
+
+  .person_card_info {
+    margin-left: 210px;
+    min-height: 220px;
+    padding: 10px;
+  }
+
+  .ant-card-wider-padding .ant-card-body {
+    padding: 0;
+  }
+
+  .person_card_info_row {
+    line-height: 20px;
+    padding: 4px 0px;
+  }
 </style>
