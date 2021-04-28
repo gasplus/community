@@ -157,10 +157,16 @@
 <!--                         @click="showPanelImg(item)"-->
 <!--                         alt="图片不存在"-->
 <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
-                    <img src="/manager.png"
-                         @click="showPanelImg(item)"
-                         alt="图片不存在"
-                         style="max-width:500px;font-size: 12px;font-style: italic;"/>
+                    <viewer>
+                      <img
+                        :bigImg="getPanelImg(item)"
+                        :src="getPanelImg(item)"
+                        style="width:100%;font-size: 12px;font-style: italic;"/>
+                    </viewer>
+<!--                    <img v-else src="/manager.png"-->
+<!--                         @click="showPanelImg(item)"-->
+<!--                         alt="图片不存在"-->
+<!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
 
                   </div>
                   <div class="person_card_info">
