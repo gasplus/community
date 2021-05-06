@@ -69,6 +69,7 @@
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+              <a-button type="primary" @click="showSearchQuery" icon="search" style="margin-left:10px;">二次研判</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
             </span>
           </a-col>
@@ -105,15 +106,21 @@
             </template>
             <template slot="imgSlot" slot-scope="text,record">
               <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
-              <a-popover v-else placement="topLeft" arrowPointAtCenter>
-                <template slot="content">
-                  <img
-                    @click="showPanelImg(record)"
-                    :src="getImgViewRecord(text)" alt="图片不存在"
-                    style="max-width:500px;font-size: 12px;font-style: italic;"/>
-                </template>
-                <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>
-              </a-popover>
+              <viewer>
+                <img
+                  :bigImg="getPanelImg(record)"
+                  :src="getImgViewRecord(text,record)" height="25px" alt=""
+                  style="max-width:80px;font-size: 12px;font-style: italic;"/>
+              </viewer>
+<!--              <a-popover v-else placement="topLeft" arrowPointAtCenter>-->
+<!--                <template slot="content">-->
+<!--                  <img-->
+<!--                    @click="showPanelImg(record)"-->
+<!--                    :src="getImgViewRecord(text)" alt="图片不存在"-->
+<!--                    style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
+<!--                </template>-->
+<!--                <img :src="getImgViewRecord(text)" height="25px" alt="图片不存在" style="max-width:80px;font-size: 12px;font-style: italic;"/>-->
+<!--              </a-popover>-->
             </template>
             <template slot="fileSlot" slot-scope="text">
               <span v-if="!text" style="font-size: 12px;font-style: italic;">无此文件</span>
@@ -169,10 +176,14 @@
                     <!--                         @click="showPanelImg(item)"-->
                     <!--                         alt="图片不存在"-->
                     <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
-                    <img src="/manager.png"
-                         @click="showPanelImg(item)"
-                         alt="图片不存在"
-                         style="max-width:500px;font-size: 12px;font-style: italic;"/>
+
+                    <viewer>
+                      <img
+                        :bigImg="getPanelImg(item)"
+                        :src="getImgViewRecord(text,item)"
+                        alt=""
+                        style="max-width:500px;font-size: 12px;font-style: italic;"/>
+                    </viewer>
 
                   </div>
                   <div class="person_card_info">
@@ -237,6 +248,7 @@
 
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
+    <SelectDeviceListModal ref="DeviceListModal2" @choseDeviceList="choseDeviceList2"></SelectDeviceListModal>
     <monitorCarRecord-modal ref="modalForm" @ok="modalFormOk"></monitorCarRecord-modal>
     <MonitorRegisterCarModal ref="modalForm1" @ok="modalFormOk"></MonitorRegisterCarModal>
     <PersonRelation v-if="personRelationShow" :selectPersonId="selectPersonId" @close="closePersonRelation"></PersonRelation>
@@ -253,7 +265,87 @@
       @handleCancel="closeRemarks"
     ></MonitorRecordRemarkListModal>
     <panelImg :center="false" v-if="panelImgShow" @leave="closePanelImg" :title="panelTitle" :imgUrl="imgUrl"></panelImg>
+    <a-modal
+      title="二次研判"
+      :width="1200"
+      v-model="secondSearchVisible"
+      :footer="null"
+    >
 
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline" @keyup.enter.native="searchQuery2">
+          <a-row :gutter="24">
+            <a-col :md="timeType2==='3'?24:8" :sm="timeType2==='3'?24:8">
+              <a-form-item label="进出时间">
+                <a-radio-group v-model="timeType2" buttonStyle="solid">
+                  <a-radio-button value="3">自定义</a-radio-button>
+                  <a-radio-button value="0">当天</a-radio-button>
+                  <a-radio-button value="1">近7天</a-radio-button>
+                  <a-radio-button value="2">近30天</a-radio-button>
+                </a-radio-group>
+                <a-date-picker
+                  style="margin-left:20px;"
+                  v-if="timeType2==='3'"
+                  :disabledDate="disabledStartDate2"
+                  :allowClear="false"
+                  showTime
+                  format="YYYY-MM-DD HH:mm:ss"
+                  v-model="startValue2"
+                  placeholder="请选择开始时间"
+                  @openChange="handleStartOpenChange2"
+                />
+                <span class="query-group-split-cust" v-if="timeType2==='3'"></span>
+                <a-date-picker
+                  v-if="timeType2==='3'"
+                  :allowClear="false"
+                  :disabledDate="disabledEndDate2"
+                  showTime
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="请选择结束时间"
+                  v-model="endValue2"
+                  :open="endOpen2"
+                  @openChange="handleEndOpenChange2"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="车牌号">
+                <a-input placeholder="请输入车牌号" v-model="queryParam2.carNumber"></a-input>
+              </a-form-item>
+            </a-col>
+            <a-col :md="18" :sm="24">
+              <a-form-item label="设备选择">
+                <a-select
+                  mode="multiple"
+                  placeholder="请选择设备"
+                  v-model="selectedDevices2"
+                  @deselect="removeSelected2"
+                  @dropdownVisibleChange="showDeviceSelect2"
+                >
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="车辆类型">
+                <a-input placeholder="请输入车辆类型" v-model="queryParam2.carType2"></a-input>
+              </a-form-item>
+            </a-col>
+
+            <a-col :md="6" :sm="8">
+              <a-form-item label="车辆颜色">
+                <a-input placeholder="请输入车辆颜色" v-model="queryParam2.carColor"></a-input>
+              </a-form-item>
+            </a-col>
+
+            <a-col :md="6" :sm="8">
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchQuery2" icon="search">查询</a-button>
+            </span>
+            </a-col>
+          </a-row>
+        </a-form>
+      </div>
+    </a-modal>
   </a-card>
 </template>
 
@@ -276,6 +368,7 @@
     return fmt;
   }
 
+  import Viewer from 'viewerjs'
   import {filterObj} from '@/utils/util';
   import panelImg from '@/components/big/panelImg'
   import {JeecgListMixin} from '@/mixins/JeecgListMixin'
@@ -288,6 +381,8 @@
   import CarRelation from './modules/CarRelation'
   import SelectDeviceListModal from "./modules/SelectDeviceListModal";
   import JDate from '@/components/jeecg/JDate.vue'
+  import {getAction} from "../../../api/manage";
+
 
   export default {
     name: "MonitorCarRecordList",
@@ -305,6 +400,21 @@
     },
     data () {
       return {
+        secondSearchVisible: false,
+        queryParam2: {
+          carNumber: '',
+          deviceId:'',
+          carType2: '',
+          carColor: '',
+
+        },
+        timeType2: '',
+        startValue2: null,
+        endValue2: null,
+        deviceIds2: '',
+        selectedDevices2: [],
+        endOpen2: false,
+
         timeType: '',
         startValue: null,
         endValue: null,
@@ -423,11 +533,139 @@
         this.queryParam.outInTime_end = val._d.Format('yyyy-MM-dd hh:mm:ss')
 
       },
+      timeType2(value) {
+        if(value === '0'){
+          const endDate = new Date()
+          this.queryParam2.outInTime_begin = endDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam2.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '1'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-7*24*60*60*1000)
+          this.queryParam2.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam2.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '2'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+          this.queryParam2.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam2.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '3'){
+          this.queryParam2.outInTime_begin = ''
+          this.queryParam2.outInTime_end = ''
+        }
+      },
+      startValue2(val) {
+        console.log('startValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam2.outInTime_begin = val._d.Format('yyyy-MM-dd hh:mm:ss')
+      },
+      endValue2(val) {
+        console.log('endValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam2.outInTime_end = val._d.Format('yyyy-MM-dd hh:mm:ss')
+
+      },
     },
     created() {
+      Viewer.setDefaults({url: this.showImgBig})
       this.timeType = '3'
     },
     methods: {
+      showSearchQuery() {
+        this.timeType2 = ''
+        this.timeType2 = '3'
+
+        this.queryParam2.carNumber = ''
+        this.queryParam2.deviceId = ''
+        this.queryParam2.carType2 = ''
+        this.queryParam2.carColor = ''
+        this.selectedDevices2 = []
+        this.deviceIds2 = []
+        this.startValue2 = null
+        this.endValue2 = null
+        this.secondSearchVisible = true
+      },
+      searchQuery2() {
+        var params1 = this.getQueryParams();//查询条件
+        var params2 = this.getQueryParams2();//查询条件
+        const params = params1
+        for(let key in params2){
+          params['_2_'+key] = params2[key]
+        }
+        console.log(params2,params)
+        this.loading = true;
+
+        this.secondSearchVisible = false
+        getAction(this.url.list, params).then((res) => {
+          if (res.success) {
+            this.dataSource = res.result.records;
+            this.ipagination.total = res.result.total;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      },
+      disabledStartDate2(startValue) {
+        const endValue = this.endValue2;
+        if (!startValue || !endValue) {
+          return false;
+        }
+        return startValue.valueOf() > endValue.valueOf();
+      },
+      disabledEndDate2(endValue) {
+        const startValue = this.startValue2;
+        if (!endValue || !startValue) {
+          return false;
+        }
+        return startValue.valueOf() >= endValue.valueOf();
+      },
+      handleStartOpenChange2(open) {
+        if (!open) {
+          this.endOpen2 = true;
+        }
+      },
+      handleEndOpenChange2(open) {
+        this.endOpen2 = open;
+      },
+      getQueryParams2() {
+        var param = Object.assign({}, this.queryParam2);
+        if (param.carNumber != null) {
+          param.carNumber = "*" + param.carNumber + "*"
+        }
+        if (param.carType2 != null) {
+          param.carType2 = "*" + param.carType2 + "*"
+        }
+        if (param.carColor != null) {
+          param.carColor = "*" + param.carColor + "*"
+        }
+        return param;
+      },
+      showDeviceSelect2() {
+        this.$refs.DeviceListModal2.add(this.selectedDevices2, this.deviceIds2);
+      },
+      removeSelected2(value) {
+        let deleteInd = -1
+        const deviceIds = this.deviceIds2.split(',')
+        this.selectedDevices2.forEach((item, index) => {
+          if (item === value) {
+            deleteInd = index
+          }
+        })
+        if(deleteInd!==-1){
+          this.selectedDevices2.splice(deleteInd,1)
+          deviceIds.splice(deleteInd,1)
+          this.deviceIds2 = deviceIds.join(',')
+        }
+      },
+      choseDeviceList2(deviceList) {
+        console.log(deviceList)
+        this.selectedDevices2 = [];
+        this.deviceIds2 = '';
+        for(let i=0;i<deviceList.length;i++){
+          this.selectedDevices2.push(deviceList[i].address);
+        }
+        this.deviceIds2 += deviceList.map(item => item.deviceId).join(",")
+        this.queryParam2.deviceId = this.deviceIds2
+      },
       handleListChange(page,pageSize) {
         console.log("handleListChange")
         this.ipagination.current = page;
@@ -536,6 +774,14 @@
         }
         this.deviceIds += deviceList.map(item => item.deviceId).join(",")
         this.queryParam.deviceId = this.deviceIds
+      },
+
+      getPanelImg(data) {
+        const panelData = data
+        return window._CONFIG['imgDomainRecordURL'] + (panelData.photoUrl)
+      },
+      showImgBig(image) {
+        return image.getAttribute("bigImg") || image.getAttribute("src")
       },
       /* 图片预览 */
       getImgViewRecord(text) {

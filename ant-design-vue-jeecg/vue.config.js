@@ -63,9 +63,9 @@ module.exports = {
         }
       },*/
       '/jeecg-boot': {
-        // target: 'http://28b9919v28.zicp.vip:30718', //请求本地需要jeecg-boot后台项目
+        target: 'http://28b9919v28.zicp.vip:30718', //请求本地需要jeecg-boot后台项目
         // target: 'http://139.129.89.115:9080', //请求本地需要jeecg-boot后台项目
-        target: 'http://localhost:8080', //请求本地 需要jeecg-boot后台项目
+        // target: 'http://localhost:8080', //请求本地 需要jeecg-boot后台项目
         ws: false,
         changeOrigin: true
       }

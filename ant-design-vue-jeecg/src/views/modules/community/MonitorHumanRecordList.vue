@@ -80,6 +80,7 @@
           <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
+              <a-button type="primary" @click="showSearchQuery" icon="search" style="margin-left:10px;">二次研判</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
@@ -257,32 +258,38 @@
                 </a-row>
                 <a-row>
                   <a-col :span="item.faceInfo&&item.bodyInfo?12:24" v-if="item.bodyInfo">
-                    <a-card :title="'人体识别结果'">
+                    <viewer>
 
-                      <div class="person_card">
-                        <div class="person_card_photo">
-                          <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
-                          <!--                         @click="showPanelImg(item)"-->
-                          <!--                         alt="图片不存在"-->
-                          <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
-                          <img src="/manager.png"
-                               @click="showPanelImg(JSON.parse(item.bodyInfo),'0',item)"
-                               alt="图片不存在"
-                               style="max-width:200px;font-size: 12px;font-style: italic;"/>
-<!--                          :src="imgBasePath+JSON.parse(record.bodyInfo).picture"-->
-                        </div>
-                        <div class="person_card_info">
-                          <div class="person_card_info_row">
-                            年龄：
-                            {{item.bodyInfoAge_dictText}}
+                      <a-card :title="'人体识别结果'">
+
+                        <div class="person_card">
+                          <div class="person_card_photo">
+                            <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
+                            <!--                         @click="showPanelImg(item)"-->
+                            <!--                         alt="图片不存在"-->
+                            <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
+
+                            <img
+                              :bigImg="getPanelImg(JSON.parse(item.bodyInfo),'0',item)"
+                              alt="example"
+                              :src="imgBasePath+JSON.parse(item.bodyInfo).picture"
+                              slot="cover"
+                            />
+                            <!--                          :src="imgBasePath+JSON.parse(record.bodyInfo).picture"-->
                           </div>
-                          <div class="person_card_info_row">
-                            性别：
-                            {{JSON.parse(item.bodyInfo).gender}}
+                          <div class="person_card_info">
+                            <div class="person_card_info_row">
+                              年龄：
+                              {{item.bodyInfoAge_dictText}}
+                            </div>
+                            <div class="person_card_info_row">
+                              性别：
+                              {{JSON.parse(item.bodyInfo).gender}}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </a-card>
+                      </a-card>
+                    </viewer>
                   </a-col>
 <!--                  <a-col :span="item.faceInfo&&item.bodyInfo?12:24" v-if="item.bodyInfo">-->
 <!--                    <a-card :title="'人脸识别结果'">-->
@@ -313,31 +320,35 @@
 <!--                    </a-card>-->
 <!--                  </a-col>-->
                   <a-col :span="item.faceInfo&&item.bodyInfo?12:24" v-if="item.faceInfo">
-                    <a-card :title="'人脸识别结果'">
-                      <div class="person_card">
-                        <div class="person_card_photo">
-                          <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
-                          <!--                         @click="showPanelImg(item)"-->
-                          <!--                         alt="图片不存在"-->
-                          <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
-                          <img src="/manager.png"
-                               @click="showPanelImg(JSON.parse(item.faceInfo),'1',item)"
-                               alt="图片不存在"
-                               style="max-width:500px;font-size: 12px;font-style: italic;"/>
-<!--                          :src="imgBasePath+JSON.parse(record.faceInfo).picture"-->
-                        </div>
-                        <div class="person_card_info">
-                          <div class="person_card_info_row">
-                            年龄：
-                            {{JSON.parse(item.faceInfo).age}}
+                    <viewer>
+                      <a-card :title="'人脸识别结果'">
+                        <div class="person_card">
+                          <div class="person_card_photo">
+                            <!--                    <img :src="getPanoramaImgViewRecord(item.imgSlot,item)"-->
+                            <!--                         @click=" showPanelImg(item)"-->
+                            <!--                         alt="图片不存在"-->
+                            <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
+                            <img
+                              :bigImg="getPanelImg(JSON.parse(item.faceInfo),'1',item)"
+                              alt="example"
+                              :src="imgBasePath+JSON.parse(item.faceInfo).picture"
+                              slot="cover"
+                            />
+                            <!--                          :src="imgBasePath+JSON.parse(record.faceInfo).picture"-->
                           </div>
-                          <div class="person_card_info_row">
-                            性别：
-                            {{JSON.parse(item.faceInfo).gender}}
+                          <div class="person_card_info">
+                            <div class="person_card_info_row">
+                              年龄：
+                              {{JSON.parse(item.faceInfo).age}}
+                            </div>
+                            <div class="person_card_info_row">
+                              性别：
+                              {{JSON.parse(item.faceInfo).gender}}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </a-card>
+                      </a-card>
+                    </viewer>
                   </a-col>
                 </a-row>
               </a-card>
@@ -366,6 +377,7 @@
 
     <deviceDetail ref="deviceDetail" :center="true" v-if="deviceDetailShow" @leave="closeDeviceDetail"></deviceDetail>
     <SelectDeviceListModal ref="DeviceListModal" @choseDeviceList="choseDeviceList"></SelectDeviceListModal>
+    <SelectDeviceListModal ref="DeviceListModal2" @choseDeviceList="choseDeviceList2"></SelectDeviceListModal>
     <monitorHumanRecord-modal ref="modalForm" @ok="modalFormOk"></monitorHumanRecord-modal>
     <MonitorRecordRemarkListModal
       v-if="selectRecord"
@@ -376,6 +388,105 @@
       :recordShow="remarksShow"
       @handleCancel="closeRemarks"
     ></MonitorRecordRemarkListModal>
+
+    <a-modal
+      title="二次研判"
+      :width="1200"
+      v-model="secondSearchVisible"
+      :footer="null"
+    >
+
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline" @keyup.enter.native="searchQuery2">
+          <a-row :gutter="24">
+            <a-col :md="timeType2==='3'?24:8" :sm="timeType2==='3'?24:8">
+              <a-form-item label="进出时间">
+                <a-radio-group v-model="timeType2" buttonStyle="solid">
+                  <a-radio-button value="3">自定义</a-radio-button>
+                  <a-radio-button value="0">当天</a-radio-button>
+                  <a-radio-button value="1">近7天</a-radio-button>
+                  <a-radio-button value="2">近30天</a-radio-button>
+                </a-radio-group>
+                <a-date-picker
+                  style="margin-left:20px;"
+                  v-if="timeType2==='3'"
+                  :disabledDate="disabledStartDate2"
+                  :allowClear="false"
+                  showTime
+                  format="YYYY-MM-DD HH:mm:ss"
+                  v-model="startValue2"
+                  placeholder="请选择开始时间"
+                  @openChange="handleStartOpenChange2"
+                />
+                <span class="query-group-split-cust" v-if="timeType2==='3'"></span>
+                <a-date-picker
+                  v-if="timeType2==='3'"
+                  :allowClear="false"
+                  :disabledDate="disabledEndDate2"
+                  showTime
+                  format="YYYY-MM-DD HH:mm:ss"
+                  placeholder="请选择结束时间"
+                  v-model="endValue2"
+                  :open="endOpen2"
+                  @openChange="handleEndOpenChange2"
+                />
+              </a-form-item>
+            </a-col>
+            <a-col :md="6" :sm="8">
+              <a-form-item label="人体识别年龄">
+                <j-dict-select-tag placeholder="请选择人脸识别性别"
+                                   v-model="queryParam2.bodyInfoAge"
+                                   dictCode="body_age"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="12" :sm="24">
+              <a-form-item label="设备选择">
+                <a-select
+                  mode="multiple"
+                  placeholder="请选择设备"
+                  v-model="selectedDevices2"
+                  @deselect="removeSelected2"
+                  @dropdownVisibleChange="showDeviceSelect2"
+                >
+                </a-select>
+              </a-form-item>
+            </a-col>
+
+            <template>
+              <a-col :md="6" :sm="8">
+                <a-form-item label="人体识别性别">
+                  <j-dict-select-tag placeholder="请选择人体识别性别"
+                                     v-model="queryParam2.bodyInfoGender"
+                                     dictCode="monitor_gender"/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="12" :sm="16">
+                <a-form-item label="人脸识别年龄">
+                  <a-input placeholder="请输入最小值" class="query-group-cust"
+                           v-model="queryParam2.faceInfoAge_begin"></a-input>
+                  <span class="query-group-split-cust"></span>
+                  <a-input placeholder="请输入最大值" class="query-group-cust"
+                           v-model="queryParam2.faceInfoAge_end"></a-input>
+                </a-form-item>
+              </a-col>
+              <a-col :md="6" :sm="8">
+                <a-form-item label="人脸识别性别">
+                  <j-dict-select-tag placeholder="请选择人脸识别性别"
+                                     v-model="queryParam2.faceInfoGender"
+                                     dictCode="monitor_gender"/>
+                </a-form-item>
+              </a-col>
+            </template>
+            <a-col :md="6" :sm="8">
+            <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
+              <a-button type="primary" @click="searchQuery2" icon="search">查询</a-button>
+            </span>
+            </a-col>
+
+          </a-row>
+        </a-form>
+      </div>
+    </a-modal>
   </a-card>
 </template>
 
@@ -409,6 +520,7 @@
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import JDate from '@/components/jeecg/JDate.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
+  import {getAction} from "../../../api/manage";
 
   export default {
     name: "MonitorHumanRecordList",
@@ -424,6 +536,23 @@
     },
     data() {
       return {
+        secondSearchVisible: false,
+        queryParam2: {
+          bodyInfoAge: '',
+          deviceId:'',
+          bodyInfoGender: '',
+          faceInfoAge_begin: '',
+          faceInfoAge_end: '',
+          faceInfoGender: '',
+
+        },
+        timeType2: '',
+        startValue2: null,
+        endValue2: null,
+        deviceIds2: '',
+        selectedDevices2: [],
+        endOpen2: false,
+
         imgUrl: '',
         panelTitle: '',
         panelImgShow: false,
@@ -529,6 +658,35 @@
         this.queryParam.outInTime_end = val._d.Format('yyyy-MM-dd hh:mm:ss')
 
       },
+      timeType2(value) {
+        if(value === '0'){
+          const endDate = new Date()
+          this.queryParam2.outInTime_begin = endDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam2.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '1'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-7*24*60*60*1000)
+          this.queryParam2.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam2.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '2'){
+          const endDate = new Date()
+          const beginDate = new Date(endDate.getTime()-30*24*60*60*1000)
+          this.queryParam2.outInTime_begin = beginDate.Format('yyyy-MM-dd 00:00:00')
+          this.queryParam2.outInTime_end = endDate.Format('yyyy-MM-dd hh:mm:ss')
+        } else if(value === '3'){
+          this.queryParam2.outInTime_begin = ''
+          this.queryParam2.outInTime_end = ''
+        }
+      },
+      startValue2(val) {
+        console.log('startValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam2.outInTime_begin = val._d.Format('yyyy-MM-dd hh:mm:ss')
+      },
+      endValue2(val) {
+        console.log('endValue', val._d.Format('yyyy-MM-dd hh:mm:ss'));
+        this.queryParam2.outInTime_end = val._d.Format('yyyy-MM-dd hh:mm:ss')
+
+      },
     },
     created() {
       Viewer.setDefaults({
@@ -549,6 +707,98 @@
       }
     },
     methods: {
+
+      showSearchQuery() {
+        this.timeType2 = ''
+        this.timeType2 = '3'
+
+        this.queryParam2.bodyInfoAge = ''
+        this.queryParam2.deviceId = ''
+        this.queryParam2.bodyInfoGender = ''
+        this.queryParam2.faceInfoAge_begin = ''
+        this.queryParam2.faceInfoAge_end = ''
+        this.queryParam2.faceInfoGender = ''
+        this.selectedDevices2 = []
+        this.deviceIds2 = []
+        this.startValue2 = null
+        this.endValue2 = null
+        this.secondSearchVisible = true
+      },
+      searchQuery2() {
+        var params1 = this.getQueryParams();//查询条件
+        var params2 = this.getQueryParams2();//查询条件
+        const params = params1
+        for(let key in params2){
+          params['_2_'+key] = params2[key]
+        }
+        console.log(params2,params)
+        this.loading = true;
+
+        this.secondSearchVisible = false
+        getAction(this.url.list, params).then((res) => {
+          if (res.success) {
+            this.dataSource = res.result.records;
+            this.ipagination.total = res.result.total;
+          }
+          if(res.code===510){
+            this.$message.warning(res.message)
+          }
+          this.loading = false;
+        })
+      },
+      disabledStartDate2(startValue) {
+        const endValue = this.endValue2;
+        if (!startValue || !endValue) {
+          return false;
+        }
+        return startValue.valueOf() > endValue.valueOf();
+      },
+      disabledEndDate2(endValue) {
+        const startValue = this.startValue2;
+        if (!endValue || !startValue) {
+          return false;
+        }
+        return startValue.valueOf() >= endValue.valueOf();
+      },
+      handleStartOpenChange2(open) {
+        if (!open) {
+          this.endOpen2 = true;
+        }
+      },
+      handleEndOpenChange2(open) {
+        this.endOpen2 = open;
+      },
+      getQueryParams2() {
+        var param = Object.assign({}, this.queryParam2);
+        return param;
+      },
+      showDeviceSelect2() {
+        this.$refs.DeviceListModal2.add(this.selectedDevices2, this.deviceIds2);
+      },
+      removeSelected2(value) {
+        let deleteInd = -1
+        const deviceIds = this.deviceIds2.split(',')
+        this.selectedDevices2.forEach((item, index) => {
+          if (item === value) {
+            deleteInd = index
+          }
+        })
+        if(deleteInd!==-1){
+          this.selectedDevices2.splice(deleteInd,1)
+          deviceIds.splice(deleteInd,1)
+          this.deviceIds2 = deviceIds.join(',')
+        }
+      },
+      choseDeviceList2(deviceList) {
+        console.log(deviceList)
+        this.selectedDevices2 = [];
+        this.deviceIds2 = '';
+        for(let i=0;i<deviceList.length;i++){
+          this.selectedDevices2.push(deviceList[i].address);
+        }
+        this.deviceIds2 += deviceList.map(item => item.deviceId).join(",")
+        this.queryParam2.deviceId = this.deviceIds2
+      },
 
       handleListChange(page, pageSize) {
         console.log("handleListChange")

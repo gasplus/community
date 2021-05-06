@@ -66,7 +66,9 @@
         <template slot="imgSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <viewer>
-            <img :src="getImgView(text)" height="25px" alt=""
+            <img :src="getImgView(text)"
+                 :bigImg="getImgView(text)"
+                 height="25px" alt=""
                  style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </viewer>
 
@@ -124,9 +126,16 @@
                       <!--                         @click="showPanelImg(item)"-->
                       <!--                         alt="图片不存在"-->
                       <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
-                      <img src="/manager.png"
-                           alt="图片不存在"
-                           style="max-width:500px;font-size: 12px;font-style: italic;"/>
+
+                      <viewer>
+                        <img :src="getImgView(item.searchUrl)"
+                             :bigImg="getImgView(item.searchUrl)"
+                             alt=""
+                             style="max-width:500px;font-size: 12px;font-style: italic;"/>
+                      </viewer>
+<!--                      <img src="/manager.png"-->
+<!--                           alt="图片不存在"-->
+<!--                           style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
 
                     </div>
                     <div class="person_card_info">
