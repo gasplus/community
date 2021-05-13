@@ -77,10 +77,11 @@
               </a-form-item>
             </a-col>
           </template>
-          <a-col :md="6" :sm="8">
+          <a-col :md="24" :sm="24">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="showSearchQuery" icon="search" style="margin-left:10px;">二次研判</a-button>
+              <a-button type="primary" @click="downloadTable" icon="cloud-download" style="margin-left:10px;">下载</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
@@ -479,7 +480,7 @@
             </template>
             <a-col :md="6" :sm="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
-              <a-button type="primary" @click="searchQuery2" icon="search">查询</a-button>
+              <a-button type="primary" @click="searchQuery2" icon="search">查1询</a-button>
             </span>
             </a-col>
 
@@ -520,7 +521,7 @@
   import JDictSelectTag from '@/components/dict/JDictSelectTag.vue'
   import JDate from '@/components/jeecg/JDate.vue'
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
-  import {getAction} from "../../../api/manage";
+  import {getAction,downFile} from "../../../api/manage";
 
   export default {
     name: "MonitorHumanRecordList",
@@ -612,6 +613,7 @@
           deleteBatch: "/monitor/monitorHumanRecord/deleteBatch",
           exportXlsUrl: "/monitor/monitorHumanRecord/exportXls",
           importExcelUrl: "monitor/monitorHumanRecord/importExcel",
+          imgDownload: '/monitor/monitorHumanRecord/imgDownLoad'
         },
         dictOptions: {
           bodyInfoGender: [],
@@ -708,6 +710,36 @@
     },
     methods: {
 
+      downloadTable() {
+        var params1 = this.getQueryParams();//查询条件
+        var params2 = this.getQueryParams2();//查询条件
+        const params = params1
+        for(let key in params2){
+          if(params2[key]){
+            params['_2_'+key] = params2[key]
+          }
+        }
+        const fileName = '图片导出'
+        downFile(this.url.imgDownload, params).then((data) => {
+          if (!data) {
+            this.$message.warning("文件下载失败")
+            return
+          }
+          if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            window.navigator.msSaveBlob(new Blob([data]), fileName+'.xls')
+          }else{
+            let url = window.URL.createObjectURL(new Blob([data]))
+            let link = document.createElement('a')
+            link.style.display = 'none'
+            link.href = url
+            link.setAttribute('download', fileName+'.zip')
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link); //下载完成移除元素
+            window.URL.revokeObjectURL(url); //释放掉blob对象
+          }
+        })
+      },
       showSearchQuery() {
         this.timeType2 = ''
         this.timeType2 = '3'
@@ -724,17 +756,25 @@
         this.endValue2 = null
         this.secondSearchVisible = true
       },
-      searchQuery2() {
+
+      loadData(arg) {
+        if(!this.url.list){
+          this.$message.error("请设置url.list属性!")
+          return
+        }
+        //加载数据 若传入参数1则加载第一页的内容
+        if (arg === 1) {
+          this.ipagination.current = 1;
+        }
         var params1 = this.getQueryParams();//查询条件
         var params2 = this.getQueryParams2();//查询条件
         const params = params1
         for(let key in params2){
-          params['_2_'+key] = params2[key]
+          if(params2[key]){
+            params['_2_'+key] = params2[key]
+          }
         }
-        console.log(params2,params)
         this.loading = true;
-
-        this.secondSearchVisible = false
         getAction(this.url.list, params).then((res) => {
           if (res.success) {
             this.dataSource = res.result.records;
@@ -745,6 +785,16 @@
           }
           this.loading = false;
         })
+      },
+      searchQuery2() {
+        this.loadData(1)
+        this.secondSearchVisible = false
+      },
+      searchQuery() {
+        for(let key in this.queryParam2){
+          this.queryParam2[key] = ''
+        }
+        this.loadData(1)
       },
       disabledStartDate2(startValue) {
         const endValue = this.endValue2;

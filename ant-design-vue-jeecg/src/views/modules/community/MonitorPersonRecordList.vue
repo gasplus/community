@@ -47,7 +47,7 @@
               <a-input placeholder="请输入身份证" v-model="queryParam.personIdCard"></a-input>
             </a-form-item>
           </a-col>
-          <a-col :md="18" :sm="18">
+          <a-col :md="16" :sm="16">
             <a-form-item label="设备选择">
               <a-select
                 mode="multiple"
@@ -59,11 +59,11 @@
               </a-select>
             </a-form-item>
           </a-col>
-
-          <a-col :md="6" :sm="6">
+          <a-col :md="8" :sm="24">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="showSearchQuery" icon="search" style="margin-left:10px;">二次研判</a-button>
+              <a-button type="primary" @click="downloadTable" icon="cloud-download" style="margin-left:10px;">下载</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
             </span>
           </a-col>
@@ -361,7 +361,7 @@
   import {initDictOptions, filterMultiDictText} from '@/components/dict/JDictSelectUtil'
   import MonitorRecordRemarkListModal from "./modules/MonitorRecordRemarkListModal";
   import VisitorPersonRelation from './modules/VisitorPersonRelation'
-  import {getAction} from "../../../api/manage";
+  import {getAction,downFile} from "../../../api/manage";
 
   export default {
     name: "MonitorPersonRecordList",
@@ -484,7 +484,8 @@
           deleteBatch: "/monitor/monitorPersonRecord/deleteBatch",
           exportXlsUrl: "/monitor/monitorPersonRecord/exportXls",
           importExcelUrl: "monitor/monitorPersonRecord/importExcel",
-          queryById: '/monitor/monitorPerson/queryById'
+          queryById: '/monitor/monitorPerson/queryById',
+          imgDownload: '/monitor/monitorPersonRecord/imgDownLoad'
         },
         deviceIds: [],
         selectedDevices: [],
@@ -575,6 +576,36 @@
       this.timeType = '3'
     },
     methods: {
+      downloadTable() {
+        var params1 = this.getQueryParams();//查询条件
+        var params2 = this.getQueryParams2();//查询条件
+        const params = params1
+        for(let key in params2){
+          if(params2[key]){
+            params['_2_'+key] = params2[key]
+          }
+        }
+        const fileName = '图片导出'
+        downFile(this.url.imgDownload, params).then((data) => {
+          if (!data) {
+            this.$message.warning("文件下载失败")
+            return
+          }
+          if (typeof window.navigator.msSaveBlob !== 'undefined') {
+            window.navigator.msSaveBlob(new Blob([data]), fileName+'.xls')
+          }else{
+            let url = window.URL.createObjectURL(new Blob([data]))
+            let link = document.createElement('a')
+            link.style.display = 'none'
+            link.href = url
+            link.setAttribute('download', fileName+'.zip')
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link); //下载完成移除元素
+            window.URL.revokeObjectURL(url); //释放掉blob对象
+          }
+        })
+      },
       showSearchQuery() {
         this.timeType2 = ''
         this.timeType2 = '3'
@@ -587,17 +618,25 @@
         this.endValue2 = null
         this.secondSearchVisible = true
       },
-      searchQuery2() {
+
+      loadData(arg) {
+        if(!this.url.list){
+          this.$message.error("请设置url.list属性!")
+          return
+        }
+        //加载数据 若传入参数1则加载第一页的内容
+        if (arg === 1) {
+          this.ipagination.current = 1;
+        }
         var params1 = this.getQueryParams();//查询条件
         var params2 = this.getQueryParams2();//查询条件
         const params = params1
         for(let key in params2){
-          params['_2_'+key] = params2[key]
+          if(params2[key]){
+            params['_2_'+key] = params2[key]
+          }
         }
-        console.log(params2,params)
         this.loading = true;
-
-        this.secondSearchVisible = false
         getAction(this.url.list, params).then((res) => {
           if (res.success) {
             this.dataSource = res.result.records;
@@ -608,6 +647,16 @@
           }
           this.loading = false;
         })
+      },
+      searchQuery2() {
+        this.loadData(1)
+        this.secondSearchVisible = false
+      },
+      searchQuery() {
+        for(let key in this.queryParam2){
+          this.queryParam2[key] = ''
+        }
+        this.loadData(1)
       },
       // ipagination:{
       //   current: 1,
@@ -748,10 +797,10 @@
       },
       getQueryParams2() {
         var param = Object.assign({}, this.queryParam2);
-        if (param.personName != null) {
+        if (param.personName) {
           param.personName = "*" + param.personName + "*"
         }
-        if (param.personIdCard != null) {
+        if (param.personIdCard) {
           param.personIdCard = "*" + param.personIdCard + "*"
         }
         return param;
