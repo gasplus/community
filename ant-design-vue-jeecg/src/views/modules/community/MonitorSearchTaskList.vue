@@ -66,8 +66,8 @@
         <template slot="imgSlot" slot-scope="text">
           <span v-if="!text" style="font-size: 12px;font-style: italic;">无此图片</span>
           <viewer>
-            <img :src="getImgView(text)"
-                 :bigImg="getImgView(text)"
+            <img :src="text"
+                 :bigImg="text"
                  height="25px" alt=""
                  style="max-width:80px;font-size: 12px;font-style: italic;"/>
           </viewer>
@@ -128,8 +128,8 @@
                       <!--                         style="max-width:500px;font-size: 12px;font-style: italic;"/>-->
 
                       <viewer>
-                        <img :src="getImgView(item.searchUrl)"
-                             :bigImg="getImgView(item.searchUrl)"
+                        <img :src="item.searchImgBase64"
+                             :bigImg="item.searchImgBase64"
                              alt=""
                              style="max-width:500px;font-size: 12px;font-style: italic;"/>
                       </viewer>
@@ -295,7 +295,7 @@
           {
             title: '搜索图片',
             align: "center",
-            dataIndex: 'searchUrl',
+            dataIndex: 'searchImgBase64',
             scopedSlots: {customRender: 'imgSlot'}
           },
           {
