@@ -10,14 +10,14 @@
     <a-spin :spinning="confirmLoading">
       <a-form :form="form">
 
-        <a-form-item label="搜索百度分组"
+        <a-form-item label="图片分组"
                      :labelCol="labelCol"
                      :wrapperCol="wrapperCol">
           <a-select
             v-decorator="[ 'group_id_list', validatorRules.group_id_list]"
             mode="multiple"
             style="width: 100%"
-            placeholder="请选择搜索百度分组"
+            placeholder="请选择图片分组"
             :maxTagCount="10"
             @change="changeData"
             option-label-prop="label"
