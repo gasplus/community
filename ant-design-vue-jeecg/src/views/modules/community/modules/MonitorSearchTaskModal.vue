@@ -154,7 +154,7 @@
             httpAction(httpurl, params, method).then((res) => {
               if (res.success) {
                 that.$message.success('添加成功');
-                that.$emit('ok');
+                that.$emit('ok',{id: res.message});
               } else {
                 that.$message.warning(res.message);
               }

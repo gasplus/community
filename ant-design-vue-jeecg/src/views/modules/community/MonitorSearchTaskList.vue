@@ -148,12 +148,12 @@
                           </a-col>
                         </a-row>
                       </div>
-                      <div class="person_card_info_row">
-                        开始时间：{{item.beginTime}}
-                      </div>
-                      <div class="person_card_info_row">
-                        结束时间：{{item.endTime}}
-                      </div>
+<!--                      <div class="person_card_info_row">-->
+<!--                        开始时间：{{item.beginTime}}-->
+<!--                      </div>-->
+<!--                      <div class="person_card_info_row">-->
+<!--                        结束时间：{{item.endTime}}-->
+<!--                      </div>-->
                       <div class="person_card_info_row">
                         创建时间：{{item.createTime}}
                       </div>
@@ -234,7 +234,8 @@
       </div>
       <MonitorSearchResultList ref="resultList" v-if="resultShow" :searchId="selectRecord.id"></MonitorSearchResultList>
     </a-modal>
-    <monitorSearchTask-modal ref="modalForm" @ok="modalFormOk"></monitorSearchTask-modal>
+    <monitorSearchTask-modal
+      ref="modalForm" @ok="modalFormOk"></monitorSearchTask-modal>
   </a-card>
 </template>
 
@@ -298,16 +299,16 @@
             dataIndex: 'searchImgBase64',
             scopedSlots: {customRender: 'imgSlot'}
           },
-          {
-            title: '开始时间',
-            align: "center",
-            dataIndex: 'beginTime'
-          },
-          {
-            title: '结束时间',
-            align: "center",
-            dataIndex: 'endTime'
-          },
+          // {
+          //   title: '开始时间',
+          //   align: "center",
+          //   dataIndex: 'beginTime'
+          // },
+          // {
+          //   title: '结束时间',
+          //   align: "center",
+          //   dataIndex: 'endTime'
+          // },
           {
             title: '创建时间',
             align: "center",
@@ -359,6 +360,10 @@
         this.ipagination.current = page;
         this.ipagination.pageSize = pageSize;
         this.loadData();
+      },
+      modalFormOk(record) {
+        this.loadData(1)
+        this.handleResult(record)
       },
       // showPanelImg(data) {
       //   const panelData = data

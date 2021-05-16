@@ -130,6 +130,11 @@
         this.previewVisible = true;
       },
       initFileList(paths){
+        console.log(paths)
+        if(!paths){
+          this.imgList = []
+          this.fileList = []
+        }
         // console.log('initFileList')
         // if(!paths || paths.length==0){
         //   //return [];
