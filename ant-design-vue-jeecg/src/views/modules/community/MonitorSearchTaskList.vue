@@ -232,7 +232,9 @@
       <div style="padding:10px 0">
         <a-button type="primary" style="margin-right:10px;" @click="refreshResult">刷新</a-button>
       </div>
-      <MonitorSearchResultList ref="resultList" v-if="resultShow" :searchId="selectRecord.id"></MonitorSearchResultList>
+      <MonitorSearchResultList ref="resultList"
+                               v-if="resultShow"
+                               :searchId="selectRecord.id"></MonitorSearchResultList>
     </a-modal>
     <monitorSearchTask-modal
       ref="modalForm" @ok="modalFormOk"></monitorSearchTask-modal>
@@ -261,6 +263,7 @@
       resultShow(v) {
         if (!v) {
           this.initData()
+          this.loadData()
         }
       }
     },
@@ -404,10 +407,10 @@
           }
         })
       },
-      initData() {
+      initData(status) {
         this.timeType = '0'
         this.time = 0
-        this.searchStatus = ''
+        this.searchStatus = status || ''
         if (this.timeInterval) {
           clearInterval(this.timeInterval)
         }
@@ -462,9 +465,18 @@
         this.selectRecord = record
         console.log(this.selectRecord)
         this.$nextTick(() => {
-          this.initData()
+          this.initData(record.searchStatus)
           this.resultShow = true
-          this.showTimeCount()
+          if(record.searchStatus === '30') {
+            this.$refs.resultList.loadData()
+          } else {
+            console.log(record)
+            // if( === '30') {
+            //   this.searchStatus = record.searchStatus
+            // }
+            this.showTimeCount()
+          }
+
         })
 
         //MonitorSearchResultList

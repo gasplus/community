@@ -8,53 +8,42 @@
     @ok="handleOk"
     @cancel="handleCancel"
     cancelText="关闭">
-    <div class="result_list" v-if="okSetting.props.disabled">
-      <div>
-        <span v-if="searchStatus!=='30'" style="padding-right:20px;">搜索已耗时：<span
-          style="color:#1890ff;">{{getTimeStr()}}</span></span>
-        <span style="padding-right:20px;">检索结果数量：<span style="color:#1890ff;">{{getResultCount()}}</span></span>
-        <span v-if="searchStatus">
-          搜索状态：<span :style="'color:#'+(searchStatus==='30'?'8ada54':'1890ff')+';'">{{statusMap[searchStatus]}}
-          <span v-if="time>0">.</span>
-          <span v-if="time%5===1">.</span>
-          <span v-if="time%5===2">..</span>
-          <span v-if="time%5===3">...</span>
-          <span v-if="time%5===4">....</span>
-        </span></span>
-      </div>
-      <div style="padding:10px 0">
-        <a-button type="primary" style="margin-right:10px;" @click="refreshResult">刷新</a-button>
-        <a-button type="primary" @click="showTaskRecord">查看任务</a-button>
-      </div>
-      <MonitorSearchResultList ref="resultList" :searchId="selectRecord.id"></MonitorSearchResultList>
-    </div>
-    <a-spin :spinning="confirmLoading" v-if="!okSetting.props.disabled">
+    <a-spin :spinning="confirmLoading">
       <a-form :form="form">
+        <a-form-item label="图片分组"
+                     :labelCol="labelCol"
+                     :wrapperCol="wrapperCol">
+          <a-select
+            v-decorator="[ 'group_id_list', validatorRules.group_id_list]"
+            mode="multiple"
+            style="width: 100%"
+            placeholder="请选择图片分组"
+            :maxTagCount="10"
+            @change="changeData"
+            option-label-prop="label"
+          >
+            <a-select-option
+              :key="ind"
+              :disabled="getDisabledStatus(item)"
+              v-for="(item,ind) in baiduGroupList"
+              :value="item.value"
+              :label="item.label">
+              {{item.label}}
+            </a-select-option>
+          </a-select>
+          <!--          <a-input v-decorator="[ 'searchTitle', validatorRules.searchTitle]" placeholder="请输入搜索标题"></a-input>-->
+        </a-form-item>
 
         <!--
                 <a-form-item label="搜索标题" :labelCol="labelCol" :wrapperCol="wrapperCol">
                   <a-input v-decorator="[ 'searchTitle', validatorRules.searchTitle]" placeholder="请输入搜索标题"></a-input>
                 </a-form-item>-->
         <a-form-item label="搜索图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <img :src="getImgViewRecord(personRecord.photoUrl)" style="width:100px;" alt="">
+<!--          <JUploadImageBase64-->
+<!--            v-decorator="[ 'image', validatorRules.image]"-->
+<!--            :trigger-change="true"></JUploadImageBase64>-->
+          <img :src="base64Img" v-if="base64Img" style="width:100px;" alt="">
         </a-form-item>
-        <a-form-item label="进出时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <a-radio-group v-model="timeType" buttonStyle="solid">
-            <a-radio-button value="0">当天</a-radio-button>
-            <a-radio-button value="1">近7天</a-radio-button>
-            <a-radio-button value="2">近30天</a-radio-button>
-            <a-radio-button value="3">自定义</a-radio-button>
-          </a-radio-group>
-        </a-form-item>
-        <a-form-item v-if="timeType==='3'" label="开始时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-date placeholder="请选择开始时间" v-decorator="[ 'beginTime', validatorRules.beginTime]" :trigger-change="true"
-                  :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
-        </a-form-item>
-        <a-form-item v-if="timeType==='3'" label="结束时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-          <j-date placeholder="请选择结束时间" v-decorator="[ 'endTime', validatorRules.endTime]" :trigger-change="true"
-                  :show-time="true" date-format="YYYY-MM-DD HH:mm:ss" style="width: 100%"/>
-        </a-form-item>
-
       </a-form>
     </a-spin>
   </a-modal>
@@ -67,13 +56,15 @@
   import JDate from '@/components/jeecg/JDate'
   import JUpload from '@/components/jeecg/JUpload'
   import MonitorSearchResultList from '../MonitorSearchResultList'
+  import JUploadImageBase64 from '@/components/jeecg/JUploadImageBase64'
 
   export default {
     name: "MonitorSearchTaskModal",
     components: {
       JDate,
       JUpload,
-      MonitorSearchResultList
+      MonitorSearchResultList,
+      JUploadImageBase64,
     },
     props: {
       searchType: {
@@ -106,38 +97,6 @@
       searchType: ''
     },
     watch: {
-      timeType(value) {
-        if (value === '0') {
-          const endDate = new Date()
-          this.model.beginTime = endDate.Format('yyyy-MM-dd 00:00:00')
-          this.model.endTime = endDate.Format('yyyy-MM-dd hh:mm:ss')
-          this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model, 'beginTime', 'endTime'))
-          })
-        } else if (value === '1') {
-          const endDate = new Date()
-          const beginDate = new Date(endDate.getTime() - 7 * 24 * 60 * 60 * 1000)
-          this.model.beginTime = beginDate.Format('yyyy-MM-dd hh:mm:ss')
-          this.model.endTime = endDate.Format('yyyy-MM-dd hh:mm:ss')
-          this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model, 'beginTime', 'endTime'))
-          })
-        } else if (value === '2') {
-          const endDate = new Date()
-          const beginDate = new Date(endDate.getTime() - 30 * 24 * 60 * 60 * 1000)
-          this.model.beginTime = beginDate.Format('yyyy-MM-dd hh:mm:ss')
-          this.model.endTime = endDate.Format('yyyy-MM-dd hh:mm:ss')
-          this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model, 'beginTime', 'endTime'))
-          })
-        } else if (value === '3') {
-          this.model.beginTime = ''
-          this.model.endTime = ''
-          this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model, 'beginTime', 'endTime'))
-          })
-        }
-      },
       showFlag(v) {
         if (v) {
           this.timeType = ''
@@ -145,9 +104,6 @@
           this.model = {};
           this.initData()
           this.visible = true;
-          this.$nextTick(() => {
-            this.form.setFieldsValue(pick(this.model, 'searchTitle', 'searchUrl', 'beginTime', 'endTime'))
-          })
         }
       }
     },
@@ -186,37 +142,96 @@
         timeInterval: undefined,
         confirmLoading: false,
         validatorRules: {
-          searchTitle: {rules: [{required: true, message: '请输入搜索标题!'}]},
-          searchUrl: {rules: [{required: true, message: '请输入搜索图片!'}]},
-          beginTime: {rules: [{required: true, message: '请输入开始时间!'}]},
-          endTime: {rules: [{required: true, message: '请输入结束时间!'}]},
+          group_id_list: {rules: [{required: true, message: '请选择百度分组!'}]},
+          image: {rules: [{required: true, message: '请选择搜索图片!'}]},
         },
         searchStatus: '',
         url: {
           getStatus: "/monitor/monitorSearchTask/queryById",
           add: "/monitor/monitorSearchTask/add",
           edit: "/monitor/monitorSearchTask/edit",
-        }
-
+          addBaiduSearchTask:"/monitor/monitorSearchTask/addBaiduSearchTask",
+          baiduGroup: "/monitor/monitorSearchTask/getGroupList"
+        },
+        baiduGroupList: [],
+        selectGroupList: [],
+        limitGroupCount: 10,
+        base64Img: ''
       }
     },
     mounted() {
+
+      this.getBaiduGroup()
+
     },
     methods: {
-      initData() {
-        this.timeType = '0'
-        const endDate = new Date()
-        this.model.beginTime = endDate.Format('yyyy-MM-dd 00:00:00')
-        this.model.endTime = endDate.Format('yyyy-MM-dd hh:mm:ss')
-        this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'beginTime', 'endTime'))
+      getDisabledStatus(item) {
+        const result = this.selectGroupList.length >= this.limitGroupCount && this.selectGroupList.indexOf(item.value)===-1
+        return result
+      },
+      changeData(value) {
+        this.selectGroupList.splice(0,this.selectGroupList.length,...value)
+      },
+      getBaiduGroup() {
+        getAction(this.url.baiduGroup, {}).then((res) => {
+          if (res.success) {
+            const result = res.result
+            const statusList = result.group_option_list
+            const groupList = result.group_id_list
+            const resultList = []
+            groupList.forEach((item,ind)=>{
+              if(statusList[ind] && statusList[ind] === 'LIVE'){
+                resultList.push({
+                  value: item,
+                  label: item,
+                  disabled: true
+                })
+              }
+            })
+            this.baiduGroupList = resultList
+          } else {
+            this.$message.warning(res.message);
+          }
         })
-        this.time = 0
-        this.searchStatus = ''
-        this.okSetting.props.disabled = false
-        if (this.timeInterval) {
-          clearInterval(this.timeInterval)
+      },
+      // 将图片转换为Base64
+      imageUrlToBase64(img) {
+        return  new Promise((resolve, reject) => {
+          // 一定要设置为let，不然图片不显示
+          let image = new Image();
+          // 解决跨域问题
+          image.setAttribute('crossOrigin', 'anonymous');
+          let imageUrl = img;
+          image.src = imageUrl;
+          // image.onload为异步加载
+          image.onload = () => {
+            const resultUrl = this.getImage(image);
+            resolve(resultUrl)
+          };
+        })
+      },
+      getImage(image) {
+        let canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        let context = canvas.getContext('2d');
+        context.drawImage(image, 0, 0, image.width, image.height);
+        let quality = 1;
+        // 这里的dataurl就是base64类型
+        let dataURL = canvas.toDataURL('image/png', quality);
+        return dataURL
+      },
+      initData() {
+        if(this.personRecord.photoUrl) {
+          this.imageUrlToBase64(this.personRecord.photoUrl).then(res => {
+            this.base64Img = res
+          })
         }
+        // this.imageUrlToBase64('/manager.png').then(res => {
+        //   this.model.image = res
+        //   console.log(res)
+        //   this.base64Img = res
+        // })
       },
       getResultCount() {
         if (this.$refs.resultList) {
@@ -230,103 +245,35 @@
         // }
         return window._CONFIG['imgDomainRecordURL'] + text
       },
-      showTaskRecord() {
-        this.$router.push({
-          path: '/modules/community/MonitorSearchTaskList'
-        })
-      },
-      refreshResult() {
-        this.$nextTick(() => {
-          this.$refs.resultList.loadData(1)
-        })
-      },
-      getResultStatus() {
-        getAction(this.url.getStatus, {id: this.selectRecord.id}).then(res => {
-          console.log(res)
-          if (res.success) {
-            this.searchStatus = res.result.searchStatus + ''
-            if (this.searchStatus === '30') {
-              if (this.timeInterval) {
-                clearInterval(this.timeInterval)
-                this.time = 0
-              }
-            }
-          }
-        })
-      },
-      searchResultList() {
-        this.$nextTick(() => {
-          this.getResultStatus()
-          this.$refs.resultList.loadData()
-        })
-      },
-      showTimeCount() {
-        this.time = 1
-        if (this.timeInterval) {
-          clearInterval(this.timeInterval)
-        }
-        this.searchStatus = '10'
-        this.timeInterval = setInterval(() => {
-          this.time++
-          if (this.time % 5 === 0) {
-            this.searchResultList()
-          }
-        }, 1000)
-      },
-      add() {
-
-        this.edit({});
-      },
-      edit(record) {
-        this.form.resetFields();
-        this.model = Object.assign({}, record);
-        this.visible = true;
-        this.$nextTick(() => {
-          this.form.setFieldsValue(pick(this.model, 'searchTitle', 'searchUrl', 'beginTime', 'endTime'))
-        })
-      },
-      getTimeStr() {
-        if (this.time / (3600) >= 1) {
-          return Math.floor(this.time / 3600) + '小时' + Math.floor(this.time % 3600 / 60) + '分钟' + this.time % 60 + '秒'
-        } else if (this.time / (60) >= 1) {
-          return Math.floor(this.time % 3600 / 60) + '分钟' + this.time % 60 + '秒'
-        } else if (this.time > 0) {
-          return this.time % 60 + '秒'
-        }
-      },
       close() {
+        this.base64Img = ''
         this.$emit('close');
         this.visible = false;
       },
       handleOk() {
+        if(!this.base64Img){
+          that.$message.warning('当前记录没有监控照片，无法发起搜索');
+          return
+        }
+
         const that = this;
         // 触发表单验证
         this.form.validateFields((err, values) => {
           if (!err) {
             that.confirmLoading = true;
-            let httpurl = '';
-            let method = '';
-            if (!this.model.id) {
-              httpurl += this.url.add;
-              method = 'post';
-            } else {
-              httpurl += this.url.edit;
-              method = 'put';
-            }
+            let httpurl = this.url.addBaiduSearchTask;
+            let method = 'post';
             let formData = Object.assign(this.model, values);
-            if (this.searchType) {
-              formData.searchType = this.searchType
+            const params = {
+              group_id_list: formData.group_id_list.join(','),
+              image: this.base64Img
             }
-            console.log("表单提交数据", formData)
-            formData.personId = this.personRecord.personId
-            formData.searchUrl = this.getImgViewRecord(this.personRecord.photoUrl)
-            httpAction(httpurl, formData, method).then((res) => {
+            console.log("表单提交数据", params)
+            httpAction(httpurl, params, method).then((res) => {
               if (res.success) {
                 that.$message.success('添加成功');
-                that.selectRecord = res.result
-                that.okSetting.props.disabled = true
-                that.showTimeCount();
                 that.$emit('ok');
+                this.base64Img = ''
               } else {
                 that.$message.warning(res.message);
               }
@@ -343,9 +290,6 @@
         this.initData()
         this.close()
         this.$emit('handleCancel')
-      },
-      popupCallback(row) {
-        this.form.setFieldsValue(pick(row, 'searchTitle', 'searchUrl', 'beginTime', 'endTime'))
       },
 
 
